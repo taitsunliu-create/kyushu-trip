@@ -2533,7 +2533,7 @@
             
             // 視覺回饋
             tempEl.innerText = '..';
-            locDisplay.innerHTML = '<span style="color:#2563EB; font-size:0.9rem;">定位中...</span>';
+            locDisplay.innerHTML = '<span style="color:#2563EB; font-size:0.9rem;">定位與解析中...</span>';
 
             const options = {
                 enableHighAccuracy: false, 
@@ -2547,21 +2547,48 @@
                 const lon = position.coords.longitude;
                 
                 try {
+                    // 1. 取得天氣數據 (Open-Meteo)
                     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
                     const res = await fetch(url);
                     const data = await res.json();
                     
                     currentMyTemp = data.current_weather.temperature;
+
+                    // 2. 反向地理編碼：將座標轉為地名 (BigDataCloud Free API)
+                    let myCityZh = "未知地點";
+                    let myCityEn = "Current Location";
+
+                    try {
+                        const geoUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=zh`;
+                        const geoRes = await fetch(geoUrl);
+                        const geoData = await geoRes.json();
+                        // 優先順序：城市 > 行政區 > 地區
+                        myCityZh = geoData.city || geoData.locality || geoData.principalSubdivision || "您的位置";
+                        
+                        // 3. 使用 AI 取得英文地名 (保持一致性)
+                        // 如果取得的名稱已經是英文 (非亞洲地區)，則直接使用
+                        if (/^[a-zA-Z\s\-,]+$/.test(myCityZh)) {
+                            myCityEn = myCityZh;
+                        } else {
+                            // 呼叫 AI 進行翻譯
+                            const translatePrompt = `Task: Translate the place name "${myCityZh}" to English city name. Output ONLY the English name (e.g. "Taipei", "Aso").`;
+                            const aiName = await getGeminiResponse(translatePrompt);
+                            if (aiName && aiName.length < 20) myCityEn = aiName;
+                        }
+
+                    } catch (geoErr) {
+                        console.warn("反向地理編碼失敗:", geoErr);
+                        myCityZh = "GPS 位置"; // 失敗時的備案
+                    }
                     
-                    // 恢復顯示
+                    // 4. 更新 UI 顯示真實地名
                     tempEl.innerText = `${currentMyTemp}°C`;
                     tempEl.style.fontSize = '1.5rem';
                     tempEl.style.color = '#1F2937'; 
                     
-                    // GPS 定位成功顯示
                     locDisplay.innerHTML = `
-                        <span class="my-loc-zh">GPS 定位</span>
-                        <span class="my-loc-en" style="font-size:0.7rem;">Current Location</span>
+                        <span class="my-loc-zh">${myCityZh}</span>
+                        <span class="my-loc-en" style="font-size:0.7rem;">${myCityEn}</span>
                     `;
                     
                     // Update comparison
