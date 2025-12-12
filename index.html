@@ -399,20 +399,6 @@
         
         .wc-temp-big { font-size: 4rem; font-weight: 700; line-height: 1; margin: 10px 0; position: relative; z-index: 1; }
         .wc-loc { font-size: 1.5rem; font-weight: 500; position: relative; z-index: 1; }
-        
-        /* 新增：英文地名樣式 */
-        .wc-loc-en { 
-            font-size: 1rem; 
-            font-weight: 400; 
-            opacity: 0.8; 
-            margin-top: -2px; 
-            margin-bottom: 5px;
-            position: relative; 
-            z-index: 1; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            letter-spacing: 0.5px;
-        }
-
         /* Add flexbox to center content and icon */
         .wc-desc { 
             font-size: 1.1rem; 
@@ -446,16 +432,9 @@
         .wc-mini-card {
             flex: 1; background: white; padding: 15px; border-radius: 16px; border: 1px solid #E5E7EB; text-align: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        .wc-mini-title { font-size: 0.85rem; color: #6B7280; margin-bottom: 5px; width: 100%; }
-        
-        /* 新增：我的位置專用排版優化 */
-        .my-loc-group { display: flex; flex-direction: column; align-items: center; line-height: 1.3; }
-        .my-loc-zh { font-weight: 700; font-size: 1rem; color: #374151; }
-        .my-loc-en { font-size: 0.75rem; color: #9CA3AF; margin-top: 2px; }
-
-        .wc-mini-temp { font-size: 1.5rem; font-weight: 700; color: #1F2937; margin-top: auto; }
+        .wc-mini-title { font-size: 0.85rem; color: #6B7280; margin-bottom: 5px; }
+        .wc-mini-temp { font-size: 1.5rem; font-weight: 700; color: #1F2937; }
         .wc-diff-tag { 
             display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; margin-top: 5px; 
         }
@@ -1405,93 +1384,183 @@
 
     <!-- TAB 2: 住宿資訊 (Updated Day 3) -->
     <div id="view-stay" class="container">
+        <!-- Day 1: THE BLOSSOM -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Day 1: 熊本</div>
-                <div class="tag tag-stay">市區</div>
+                <div class="card-title">Day 1: 熊本 - THE BLOSSOM KUMAMOTO</div>
+                <div class="tag tag-stay">市區/車站</div>
             </div>
+            
             <div class="info-grid">
-                <div class="info-label">飯店名稱</div>
-                <div class="info-val">THE BLOSSOM KUMAMOTO</div>
+                <div class="info-label">地址</div>
+                <div class="info-val">熊本県熊本市西区春日3丁目15-26</div>
             </div>
-            <div class="info-grid">
-                <div class="info-label">特色</div>
-                <div class="info-val">新穎、位於車站旁、交通最便利</div>
+            
+            <div class="info-detail-box">
+                <h4 style="color: var(--primary);">✨ 飯店特色與服務</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
+                    <li><b>絕佳位置：</b>與 JR 熊本站直結 (AMU PLAZA 樓上)，下樓即可逛街用餐。</li>
+                    <li><b>大浴場：</b>設有住客專用的大浴場與桑拿 (9F)，玩了一天可以好好放鬆。</li>
+                    <li><b>景觀大廳：</b>大廳位於 9 樓，視野開闊，可眺望熊本市區。</li>
+                    <li><b>親子友善：</b>提供兒童備品 (需向櫃台索取)，房間新穎寬敞。</li>
+                </ul>
+            </div>
+
+            <div class="info-detail-box" style="margin-top: 10px; background-color: #FFFBEB; border-color: #F59E0B;">
+                <h4 style="color: #D97706;">⚠️ 注意事項</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
+                    <li><b>入口位置：</b>飯店入口位於 AMU PLAZA 旁，需搭乘專用電梯至 9 樓 Check-in。</li>
+                    <li><b>停車資訊：</b>使用 AMU PLAZA 地下停車場 (住客優惠約 ¥1,000/晚)。請務必將停車券帶至櫃台消磁。</li>
+                    <li><b>早餐：</b>早餐評價極高，建議預留充裕時間享用。</li>
+                </ul>
             </div>
             <a href="https://www.google.com/maps/search/?api=1&query=THE+BLOSSOM+KUMAMOTO" target="_blank" class="btn-link">開啟地圖</a>
         </div>
 
+        <!-- Day 2: Kurokawa -->
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Day 2: 黑川溫泉 (兩備選比較)</div>
                 <div class="tag tag-stay">溫泉鄉</div>
             </div>
             
+            <!-- 備選 A: 麓旅館 -->
             <div class="info-detail-box">
                 <h4>備選 A: 麓旅館 (Fumoto Ryokan)</h4>
                  <div class="info-grid">
                     <div class="info-label">地址</div>
                     <div class="info-val">熊本県阿蘇郡南小国町満願寺6618</div>
                 </div>
-                 <div class="info-grid">
-                    <div class="info-label">特色</div>
-                    <div class="info-val">湯池數量最多 (15個)，原始野趣風格，適合探索。</div>
+                
+                <div style="margin-top: 10px;">
+                    <strong style="color: #059669;">✨ 特色與服務：</strong>
+                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
+                        <li><b>湯池巡禮：</b>擁有 15 個湯池，包含多個「貸切風呂 (私人湯屋)」供住客免費使用，不需預約，看燈號即可進入。</li>
+                        <li><b>餐食：</b>通常提供部屋食 (在房間內用餐) 或包廂，適合帶小孩的家庭。</li>
+                    </ul>
                 </div>
+
+                <div style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 5px;">
+                    <strong style="color: #D97706;">⚠️ 注意事項：</strong>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">
+                        館內保留古老建築結構，<b>樓梯非常多且陡</b>，若有大型行李或推車會較吃力。建議將大行李留在車上，只帶輕便過夜包。
+                    </p>
+                </div>
+
                 <a href="tel:0967440103" class="btn-link-tel">撥打 0967-44-0103 (導航電話)</a>
                 <a href="https://www.google.com/maps/search/?api=1&query=麓旅館+黑川溫泉" target="_blank" class="btn-link-sub">開啟 Google 地圖導航 📍</a>
-                <div style="font-size: 0.8rem; color: #9CA3AF; margin-top: 5px;">*從阿蘇大觀峰出發約 55 分鐘。</div>
             </div>
 
+            <!-- 備選 B: 湯本莊 -->
             <div class="info-detail-box" style="margin-top: 15px; border-color: #F59E0B;">
                 <h4 style="color: #F59E0B;">備選 B: 湯本莊 (Yumoto So)</h4>
                  <div class="info-grid">
                     <div class="info-label">地址</div>
                     <div class="info-val">熊本県阿蘇郡南小国町満願寺6692</div>
                 </div>
-                 <div class="info-grid">
-                    <div class="info-label">特色</div>
-                    <div class="info-val">溫泉街核心，以獨特的「洞窟風呂」聞名。</div>
+                
+                <div style="margin-top: 10px;">
+                    <strong style="color: #D97706;">✨ 特色與服務：</strong>
+                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
+                        <li><b>位置絕佳：</b>位於溫泉街正中心，出門逛街最方便。</li>
+                        <li><b>特色溫泉：</b>以手工挖掘的「釜風呂」和視野好的露天風呂聞名。</li>
+                    </ul>
                 </div>
+
+                 <div style="margin-top: 10px; border-top: 1px dashed #F59E0B; padding-top: 5px;">
+                    <strong style="color: #D97706;">⚠️ 注意事項：</strong>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">
+                        飯店門口道路狹窄，建議先將車停在溫泉街入口的共同停車場，再致電旅館派接駁車接送，或請旅館人員指引停車。
+                    </p>
+                </div>
+
                 <a href="tel:0967440211" class="btn-link-tel">撥打 0967-44-0211 (導航電話)</a>
                 <a href="https://www.google.com/maps/search/?api=1&query=湯本莊+黑川溫泉" target="_blank" class="btn-map">開啟 Google 地圖導航 📍</a>
-                <div style="font-size: 0.8rem; color: #9CA3AF; margin-top: 5px;">*從阿蘇大觀峰出發約 55 分鐘。</div>
             </div>
         </div>
 
+        <!-- Day 3: Yufuin -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Day 3: 由布院 (已確認)</div>
-                <div class="tag tag-stay">溫泉旅館</div>
+                <div class="card-title">Day 3: 由布院 - 湯布院 山燈館</div>
+                <div class="tag tag-stay">傳統日式</div>
             </div>
+            <div class="info-grid">
+                <div class="info-label">地址</div>
+                <div class="info-val">大分県由布市湯布院町川上1553</div>
+            </div>
+            
             <div class="info-detail-box">
-                <h4 style="color: #F59E0B;">湯布院 山燈館 (Santoukan)</h4>
-                <div class="info-grid">
-                    <div class="info-label">地址</div>
-                    <div class="info-val">大分県由布市湯布院町川上1553</div>
-                </div>
-                <div class="info-grid">
-                    <div class="info-label">特色</div>
-                    <div class="info-val">純日式京風旅館，位於金鱗湖附近，擁有檜木露天風呂。</div>
-                </div>
-                <a href="tel:0977845310" class="btn-link-tel">撥打 0977-84-5310 (導航電話)</a>
-                <a href="https://www.google.com/maps/search/?api=1&query=Yufuin+Santoukan" target="_blank" class="btn-link-sub">開啟 Google 地圖導航 📍</a>
+                <h4 style="color: var(--primary);">✨ 飯店特色與服務</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
+                    <li><b>純京風建築：</b>全館僅13間客房，全室檜木造，環境清幽雅致。</li>
+                    <li><b>金鱗湖旁：</b>步行至金鱗湖僅需 1-2 分鐘，非常適合清晨去欣賞晨霧。</li>
+                    <li><b>會席料理：</b>提供高品質的懷石料理，晚餐通常安排在房內或包廂享用。</li>
+                    <li><b>姊妹館溫泉：</b>可免費使用隔壁姊妹館「田乃倉」的露天溫泉。</li>
+                </ul>
             </div>
+
+            <div class="info-detail-box" style="margin-top: 10px; background-color: #FFFBEB; border-color: #F59E0B;">
+                <h4 style="color: #D97706;">⚠️ 注意事項</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
+                    <li><b>抵達時間：</b>因包含晚餐，請務必於 17:30 - 18:00 前辦理入住。若會晚到請務必電話聯繫。</li>
+                    <li><b>停車：</b>旅館備有免費停車場。</li>
+                    <li><b>隔音：</b>日式木造建築隔音較弱，夜間請放輕腳步。</li>
+                </ul>
+            </div>
+
+            <a href="tel:0977845310" class="btn-link-tel">撥打 0977-84-5310 (導航電話)</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=Yufuin+Santoukan" target="_blank" class="btn-link-sub">開啟 Google 地圖導航 📍</a>
         </div>
 
+        <!-- Day 4-5: Fukuoka -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Day 4-5: 福岡</div>
+                <div class="card-title">Day 4-5: 福岡 (兩備選比較)</div>
                 <div class="tag tag-stay">市區</div>
             </div>
-            <div class="info-grid">
-                <div class="info-label">備選 A</div>
-                <div class="info-val">福岡日航西鐵</div>
+            
+            <!-- 福岡選項 A -->
+            <div class="info-detail-box">
+                <h4>備選 A: 西鐵飯店 Croom 博多</h4>
+                <div class="info-grid">
+                    <div class="info-label">地址</div>
+                    <div class="info-val">福岡県福岡市博多区博多駅前1-17-6</div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <strong style="color: #2563EB;">✨ 推薦理由 (親子首選)：</strong>
+                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
+                        <li><b>溫泉大浴場：</b>市區少見設有舒適大浴場的飯店，並提供泡湯後的免費冰棒/飲料。</li>
+                        <li><b>交通便利：</b>位於博多巴士總站對面，距離博多站博多口步行約 5 分鐘。</li>
+                        <li><b>便利商店：</b>飯店一樓即是 Lawson，補給非常方便。</li>
+                    </ul>
+                </div>
+                 <div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
+                    ⚠️ <b>注意：</b>停車場為立體機械式 (¥1,500/晚)，若車輛較大(如休旅車)可能需停至特約平面停車場。
+                </div>
+                 <a href="https://www.google.com/maps/search/?api=1&query=Nishitetsu+Hotel+Croom+Hakata" target="_blank" class="btn-link-sub">地圖</a>
             </div>
-            <div class="info-grid">
-                <div class="info-label">備選 B</div>
-                <div class="info-val">休雷克蓋特 (Hotel Croom)</div>
+
+            <!-- 福岡選項 B -->
+            <div class="info-detail-box" style="margin-top: 15px; border-color: #EF4444;">
+                <h4 style="color: #EF4444;">備選 B: 日航飯店福岡 (Hotel Nikko)</h4>
+                <div class="info-grid">
+                    <div class="info-label">地址</div>
+                    <div class="info-val">福岡県福岡市博多区博多駅前2-18-25</div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <strong style="color: #DC2626;">✨ 推薦理由 (舒適尊榮)：</strong>
+                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
+                        <li><b>地下連通：</b>有地下道直通博多車站，下雨天完全不用淋雨。</li>
+                        <li><b>服務一流：</b>五星級日式服務，房間相對較寬敞，隔音佳。</li>
+                        <li><b>早餐豐盛：</b>自助早餐種類豐富，品質穩定。</li>
+                    </ul>
+                </div>
+                 <div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
+                    ⚠️ <b>注意：</b>通常無免費大浴場 (除部分會員/房型外)。地下停車場費用較高 (約 ¥2,000/晚)。
+                </div>
+                 <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Nikko+Fukuoka" target="_blank" class="btn-link-sub">地圖</a>
             </div>
-             <a href="https://www.google.com/maps/search/?api=1&query=Hakata+Station+Area+Hotels" target="_blank" class="btn-link">開啟地圖</a>
         </div>
     </div>
 
@@ -1575,82 +1644,6 @@
             <a href="https://www.google.com/maps/search/?api=1&query=Toyota+Rent+a+Car+阿蘇駅前店" target="_blank" class="btn-link">導航至取車點</a>
             <a href="https://www.google.com/maps/search/?api=1&query=Toyota+Rent+a+Car+Hakata+Station+Hakata+Exit" target="_blank" class="btn-link" style="margin-top: 5px;">導航至還車點</a>
         </div>
-
-        <!-- 新增：自駕導航 Map Code 表格 -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">📍 自駕導航 Map Code & 電話</div>
-                <div class="tag tag-car">車機輸入用</div>
-            </div>
-            
-            <div class="info-section" style="background-color: #EFF6FF; border-color: #2563EB;">
-                <p style="font-size: 0.9rem; color: #1E3A8A; margin-bottom: 10px; line-height: 1.5;">
-                    <b>💡 操作小撇步：</b><br>
-                    日本車載導航最準確的輸入方式是 <b>「Map Code」</b>，其次是 <b>「電話號碼」</b>。<br>
-                    <span style="font-size:0.85rem; opacity:0.8;">*輸入電話時請包含區碼 (例如 0967...)，不需輸入國碼 +81。</span>
-                </p>
-
-                <div class="price-table" style="grid-template-columns: 1.2fr 1fr 1fr;">
-                    <div class="price-header" style="color:#1D4ED8; border-color:#1D4ED8;">地點</div>
-                    <div class="price-header" style="color:#1D4ED8; border-color:#1D4ED8;">Map Code</div>
-                    <div class="price-header" style="color:#1D4ED8; border-color:#1D4ED8;">電話搜尋</div>
-                    
-                    <!-- Day 2 (修正：加入 grid-column: 1 / -1 讓標題橫跨整排，不再導致錯位) -->
-                    <div class="price-item" style="grid-column: 1 / -1; font-weight:700; color:#1D4ED8; background:#DBEAFE; text-align: center; margin-top: 5px; border-radius: 4px;">Day 2: 阿蘇 & 黑川</div>
-                    
-                    <div class="price-item"><b>Toyota 阿蘇站前</b></div>
-                    <div class="price-item" style="font-family:monospace; font-weight:700;">256 640 874*26</div>
-                    <div class="price-item">0967-35-5511</div>
-
-                    <div class="price-item"><b>いまきん食堂 (午餐)</b></div>
-                    <div class="price-item">-</div>
-                    <div class="price-item">0967-32-0031</div>
-
-                    <div class="price-item"><b>阿蘇神社</b></div>
-                    <div class="price-item">-</div>
-                    <div class="price-item">0967-22-0064</div>
-
-                    <div class="price-item"><b>草千里 (火山博物館)</b></div>
-                    <div class="price-item">-</div>
-                    <div class="price-item">0967-34-1600</div>
-
-                    <div class="price-item"><b>大觀峰展望所</b></div>
-                    <div class="price-item" style="font-family:monospace; font-weight:700;">256 878 354*82</div>
-                    <div class="price-item">-</div>
-
-                    <div class="price-item"><b>黑川溫泉 (旅館組合)</b></div>
-                    <div class="price-item">-</div>
-                    <div class="price-item">0967-44-0076</div>
-
-                    <!-- Day 3 (修正排版) -->
-                    <div class="price-item" style="grid-column: 1 / -1; font-weight:700; color:#1D4ED8; background:#DBEAFE; text-align: center; margin-top: 10px; border-radius: 4px;">Day 3: 別府 & 由布院</div>
-
-                    <div class="price-item"><b>海地獄 (別府)</b></div>
-                    <div class="price-item">-</div>
-                    <div class="price-item">0977-66-0121</div>
-
-                    <div class="price-item"><b>九州自然動物公園</b></div>
-                    <div class="price-item">-</div>
-                    <div class="price-item">0978-48-2331</div>
-
-                    <div class="price-item"><b>由布院 山燈館</b></div>
-                    <div class="price-item">-</div>
-                    <div class="price-item">0977-84-5310</div>
-
-                    <!-- Day 4 (修正排版) -->
-                    <div class="price-item" style="grid-column: 1 / -1; font-weight:700; color:#1D4ED8; background:#DBEAFE; text-align: center; margin-top: 10px; border-radius: 4px;">Day 4: 還車</div>
-
-                    <div class="price-item"><b>山田 SA (休息站)</b></div>
-                    <div class="price-item">-</div>
-                    <div class="price-item">0946-52-3100</div>
-
-                    <div class="price-item"><b>Toyota 博多站博多口</b></div>
-                    <div class="price-item" style="font-family:monospace; font-weight:700;">13 320 557*33</div>
-                    <div class="price-item">092-432-0100</div>
-                </div>
-            </div>
-        </div>
-
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Day 2 (1/26) 必搭：阿蘇男孩!</div>
@@ -1691,6 +1684,137 @@
                 </p>
             </div>
         </div>
+
+        <!-- [新增] Map Code 一覽表 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📍 導航必備：行程景點 Map Code 一覽</div>
+                <div class="tag tag-car">車機輸入用</div>
+            </div>
+            
+            <div class="info-section" style="background-color: #F3F4F6; border-color: #9CA3AF;">
+                <p style="font-size: 0.85rem; color: #4B5563; margin-bottom: 10px;">
+                    💡 <b>使用小撇步：</b>日本車載導航輸入 Map Code 最為精準。若 Map Code 查無地點，使用下方提供的<b>電話號碼 (Tel)</b> 導航是最佳備案。
+                </p>
+
+                <!-- 熊本區域 -->
+                <h4 style="color: #3B82F6; margin: 15px 0 5px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">🐻 熊本區域 (Day 1-2)</h4>
+                <div class="price-table" style="grid-template-columns: 1.5fr 1fr;">
+                    <div class="price-item" style="font-weight:600;">景點名稱</div>
+                    <div class="price-item" style="font-weight:600; font-family:monospace;">Map Code / Tel</div>
+
+                    <div class="price-item">熊本機場 (KMJ)</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#2563EB; font-weight:600;">29 434 250*85</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 096-232-2810</div>
+                    </div>
+
+                    <div class="price-item">熊本站 (The Blossom)</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#2563EB; font-weight:600;">29 459 270*76</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 096-327-8777</div>
+                    </div>
+
+                    <div class="price-item">櫻之馬場 城彩苑</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#2563EB; font-weight:600;">29 489 328*36</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 096-288-5600</div>
+                    </div>
+                </div>
+
+                <!-- 阿蘇/黑川區域 -->
+                <h4 style="color: #10B981; margin: 20px 0 5px 0; border-left: 4px solid #10B981; padding-left: 8px;">⛰️ 阿蘇與黑川 (Day 2-3)</h4>
+                <div class="price-table" style="grid-template-columns: 1.5fr 1fr;">
+                    <div class="price-item">Toyota 租車 (阿蘇站前)</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#059669; font-weight:600;">256 386 414*43</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0967-35-5100</div>
+                    </div>
+
+                    <div class="price-item">草千里 (阿蘇火山博物館)</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#059669; font-weight:600;">256 456 833*60</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0967-34-2111</div>
+                    </div>
+
+                    <div class="price-item">大觀峰展望所</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#059669; font-weight:600;">256 688 642*31</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0967-32-3856</div>
+                    </div>
+
+                    <div class="price-item">黑川溫泉 (遊客中心)</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#059669; font-weight:600;">440 542 567*14</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0967-44-0076</div>
+                    </div>
+                </div>
+
+                <!-- 別府/由布院區域 -->
+                <h4 style="color: #F59E0B; margin: 20px 0 5px 0; border-left: 4px solid #F59E0B; padding-left: 8px;">♨️ 別府與由布院 (Day 3-4)</h4>
+                <div class="price-table" style="grid-template-columns: 1.5fr 1fr;">
+                    <div class="price-item">別府 海地獄</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#D97706; font-weight:600;">46 521 440*43</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0977-66-0121</div>
+                    </div>
+
+                    <div class="price-item">九州自然動物公園</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#D97706; font-weight:600;">46 434 225*85</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0978-48-2331</div>
+                    </div>
+
+                    <div class="price-item">由布院車站</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#D97706; font-weight:600;">269 357 442*11</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0977-84-2446</div>
+                    </div>
+
+                    <div class="price-item">金鱗湖 (附近地標)</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#D97706; font-weight:600;">269 359 586*66</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0977-28-8500</div>
+                    </div>
+                </div>
+
+                <!-- 福岡區域 -->
+                <h4 style="color: #EF4444; margin: 20px 0 5px 0; border-left: 4px solid #EF4444; padding-left: 8px;">🍜 福岡與太宰府 (Day 4-6)</h4>
+                <div class="price-table" style="grid-template-columns: 1.5fr 1fr;">
+                    <!-- 新增山田休息站 -->
+                    <div class="price-item">山田服務區 (往福岡)</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#DC2626; font-weight:600;">55 136 580*55</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0946-52-3103</div>
+                    </div>
+
+                    <div class="price-item">Toyota 租車 (博多站)</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#DC2626; font-weight:600;">13 320 644*85</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 092-441-0100</div>
+                    </div>
+
+                    <div class="price-item">太宰府天滿宮 (停車場)</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#DC2626; font-weight:600;">55 364 046*12</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 092-922-8225</div>
+                    </div>
+
+                    <div class="price-item">九州國立博物館</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#DC2626; font-weight:600;">55 334 895*88</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 092-918-2807</div>
+                    </div>
+                    
+                    <div class="price-item">LaLaport 福岡</div>
+                    <div class="price-item">
+                        <div style="font-family:monospace; color:#DC2626; font-weight:600;">13 133 766*55</div>
+                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 092-707-9820</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- [新增結束] -->
 
         <div class="card">
             <div class="card-header">
@@ -2188,8 +2312,6 @@
             <div id="weather-result" style="display:none;">
                 <div class="weather-card-main">
                     <div class="wc-loc" id="wc-loc">--</div>
-                    <!-- 新增：顯示翻譯後的英文地名 -->
-                    <div class="wc-loc-en" id="wc-loc-en">--</div>
                     <div class="wc-temp-big" id="wc-temp">--°</div>
                     <div class="wc-desc" id="wc-desc">載入中...</div>
                 </div>
@@ -2198,15 +2320,9 @@
                 <div class="weather-compare-row">
                     <div class="wc-mini-card" onclick="getLocalWeather()" style="cursor:pointer; background:#F9FAFB;">
                         <!-- 修正 1: 我的位置圖示 (Pin) -->
-                        <div class="wc-mini-title" id="wc-mini-title-container">
-                            <div style="display: flex; align-items: center; justify-content: center; gap:4px; color: #EF4444; margin-bottom: 4px;">
-                                <svg class="icon-mini" style="color: #EF4444; margin:0;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                <span style="font-size: 0.8rem; color: #6B7280;">我的位置</span>
-                            </div>
-                            <!-- 預設顯示 -->
-                            <div class="my-loc-group" id="my-loc-display">
-                                <span style="font-size: 0.85rem; color: #9CA3AF;">(點擊設定)</span>
-                            </div>
+                        <div class="wc-mini-title" style="display: flex; align-items: center; justify-content: center;">
+                            <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            我的位置 (點擊更新)
                         </div>
                         <div class="wc-mini-temp" id="wc-my-temp">--°</div>
                     </div>
@@ -2354,7 +2470,7 @@
             '黑川溫泉': 'Minamioguni',
             '熊本': 'Kumamoto',
             '熊本市': 'Kumamoto',
-            '阿蘇': 'Aso',
+            '阿蘇': 'Aso', 
             '別府': 'Beppu',
             '福岡': 'Fukuoka',
             '博多': 'Fukuoka',
@@ -2443,7 +2559,8 @@
                 document.getElementById('wc-desc').innerText = '連線氣象衛星...';
 
                 // 步驟 3: Geocoding API 查詢
-                // 修改：增加搜尋數量 count=10，以便後續篩選日本地點
+                // 優先使用翻譯後的英文，若無則用中文
+                // [修改] count=10 以獲取更多候選地點來篩選日本
                 let geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchTerm)}&count=10&language=en&format=json`;
                 let geoRes = await fetch(geoUrl);
                 let geoData = await geoRes.json();
@@ -2459,8 +2576,14 @@
                      throw new Error(`找不到「${rawInput}」<br>AI 翻譯: ${searchTerm}`);
                 }
 
-                // 修改：優先篩選日本 (JP) 的結果，如果沒有則使用第一個結果
-                const targetLocation = geoData.results.find(r => r.country_code === 'JP') || geoData.results[0];
+                // [新增] 篩選邏輯：優先找日本的結果
+                let targetLocation = geoData.results[0];
+                const jpLocation = geoData.results.find(r => r.country_code === 'JP' || r.country === 'Japan');
+                if (jpLocation) {
+                    targetLocation = jpLocation;
+                    console.log("已自動鎖定日本地點:", targetLocation.name);
+                }
+
                 const { latitude, longitude, name, country } = targetLocation;
                 
                 // 步驟 4: 取得天氣
@@ -2471,13 +2594,21 @@
                 const temp = weatherData.current_weather.temperature;
                 const weatherCode = weatherData.current_weather.weathercode;
 
-                // Update UI
+                // Update UI with Vertical English Name (上下分層)
+                let displayLocHtml = rawInput;
+                if (searchTerm && searchTerm.toLowerCase() !== rawInput.toLowerCase()) {
+                    displayLocHtml = `
+                        <div style="display: flex; flex-direction: column; align-items: center; line-height: 1.2;">
+                            <span>${rawInput}</span>
+                            <span style="font-size: 0.6em; opacity: 0.8; font-weight: 400; margin-top: 4px; font-family: sans-serif; letter-spacing: 0.5px;">${searchTerm}</span>
+                        </div>
+                    `;
+                }
+                document.getElementById('wc-loc').innerHTML = displayLocHtml;
+
                 document.getElementById('wc-temp').innerText = `${temp}°C`;
                 // 修正 3: 改用 innerHTML 以支援 SVG 圖示
                 document.getElementById('wc-desc').innerHTML = getWeatherDesc(weatherCode);
-                
-                // 新增：顯示英文翻譯地名
-                document.getElementById('wc-loc-en').innerText = searchTerm;
 
                 // 步驟 5: 溫差對比
                 updateComparison(temp);
@@ -2523,7 +2654,7 @@
 
         function getLocalWeather() {
             const tempEl = document.getElementById('wc-my-temp');
-            const locDisplay = document.getElementById('my-loc-display');
+            const titleEl = document.querySelector('.wc-mini-card .wc-mini-title'); // 取得標題元素
             
             // 狀態 1: 檢查瀏覽器支援
             if (!navigator.geolocation) {
@@ -2532,8 +2663,10 @@
             }
             
             // 視覺回饋
-            tempEl.innerText = '..';
-            locDisplay.innerHTML = '<span style="color:#2563EB; font-size:0.9rem;">定位與解析中...</span>';
+            tempEl.innerText = '定位中..';
+            tempEl.style.fontSize = '1.2rem';
+            tempEl.style.color = '#2563EB'; 
+            titleEl.innerHTML = '正在讀取 GPS...'; // 提示使用者
 
             const options = {
                 enableHighAccuracy: false, 
@@ -2547,50 +2680,57 @@
                 const lon = position.coords.longitude;
                 
                 try {
-                    // 1. 取得天氣數據 (Open-Meteo)
-                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-                    const res = await fetch(url);
-                    const data = await res.json();
+                    // 平行處理：同時取得天氣 與 解析地名
+                    // 1. 取得天氣
+                    const weatherPromise = fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+                        .then(res => res.json());
+
+                    // 2. [新增] 呼叫 AI 解析經緯度對應的地名 (反向地理編碼)
+                    const locationPrompt = `
+                        Task: Identify the city/district name for coordinates: ${lat}, ${lon}.
+                        Output Format: "Traditional Chinese Name|English Name"
+                        Rule: Output ONLY the names separated by a pipe. No labels.
+                        Example: "竹北市|Zhubei City", "熊本市|Kumamoto City", "台北市|Taipei City".
+                    `;
+                    const locationPromise = getGeminiResponse(locationPrompt);
+
+                    // 等待兩者完成
+                    const [weatherData, locationStr] = await Promise.all([weatherPromise, locationPromise]);
                     
-                    currentMyTemp = data.current_weather.temperature;
-
-                    // 2. 反向地理編碼：將座標轉為地名 (BigDataCloud Free API)
-                    let myCityZh = "未知地點";
-                    let myCityEn = "Current Location";
-
-                    try {
-                        const geoUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=zh`;
-                        const geoRes = await fetch(geoUrl);
-                        const geoData = await geoRes.json();
-                        // 優先順序：城市 > 行政區 > 地區
-                        myCityZh = geoData.city || geoData.locality || geoData.principalSubdivision || "您的位置";
-                        
-                        // 3. 使用 AI 取得英文地名 (保持一致性)
-                        // 如果取得的名稱已經是英文 (非亞洲地區)，則直接使用
-                        if (/^[a-zA-Z\s\-,]+$/.test(myCityZh)) {
-                            myCityEn = myCityZh;
-                        } else {
-                            // 呼叫 AI 進行翻譯
-                            const translatePrompt = `Task: Translate the place name "${myCityZh}" to English city name. Output ONLY the English name (e.g. "Taipei", "Aso").`;
-                            const aiName = await getGeminiResponse(translatePrompt);
-                            if (aiName && aiName.length < 20) myCityEn = aiName;
-                        }
-
-                    } catch (geoErr) {
-                        console.warn("反向地理編碼失敗:", geoErr);
-                        myCityZh = "GPS 位置"; // 失敗時的備案
-                    }
-                    
-                    // 4. 更新 UI 顯示真實地名
+                    // --- 更新天氣數值 ---
+                    currentMyTemp = weatherData.current_weather.temperature;
                     tempEl.innerText = `${currentMyTemp}°C`;
                     tempEl.style.fontSize = '1.5rem';
                     tempEl.style.color = '#1F2937'; 
                     
-                    locDisplay.innerHTML = `
-                        <span class="my-loc-zh">${myCityZh}</span>
-                        <span class="my-loc-en" style="font-size:0.7rem;">${myCityEn}</span>
-                    `;
+                    // --- 更新地名顯示 (上下分層) ---
+                    let displayZh = "我的位置";
+                    let displayEn = "";
                     
+                    // 解析 AI 回傳的 "中文|英文" 格式
+                    if (locationStr && locationStr.includes('|')) {
+                        const parts = locationStr.split('|');
+                        displayZh = parts[0].trim();
+                        displayEn = parts[1].trim();
+                    } else if (locationStr) {
+                        displayZh = locationStr.trim(); // Fallback
+                    }
+
+                    // 組合 HTML
+                    let titleHtml = `
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <span>${displayZh}</span>
+                            </div>
+                    `;
+                    if (displayEn) {
+                        titleHtml += `<span style="font-size: 0.75rem; color: #9CA3AF; font-weight: 400; font-family: sans-serif;">${displayEn}</span>`;
+                    }
+                    titleHtml += `</div>`;
+                    
+                    titleEl.innerHTML = titleHtml;
+
                     // Update comparison
                     const targetTempStr = document.getElementById('wc-temp').innerText;
                     if (targetTempStr !== '--°') {
@@ -2599,6 +2739,12 @@
                 } catch (e) {
                     console.error(e);
                     tempEl.innerText = 'Err';
+                    // 恢復標題
+                    titleEl.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            我的位置 (重試)
+                        </div>`;
                     openModal('讀取氣象數據失敗，請手動輸入城市：');
                 }
             }, (err) => {
@@ -2606,14 +2752,16 @@
                 console.warn('Geolocation Error:', err);
                 
                 let shortMsg = '定位失敗';
-                if (err.code === 1) shortMsg = '無權限'; 
+                // 區分錯誤原因顯示在小框框中
+                if (err.code === 1) shortMsg = '無權限'; // 使用者或瀏覽器拒絕
                 if (err.code === 2) shortMsg = '訊號不良'; 
                 if (err.code === 3) shortMsg = '逾時'; 
                 
-                tempEl.innerText = '--';
-                locDisplay.innerHTML = `<span style="color:#EF4444; font-size:0.9rem;">${shortMsg}</span>`;
+                tempEl.innerText = shortMsg;
+                tempEl.style.fontSize = '1rem'; 
+                tempEl.style.color = '#EF4444'; 
                 
-                // 使用自定義 Modal 詢問
+                // 使用自定義 Modal 詢問，避免原生 prompt 被擋
                 setTimeout(() => {
                      openModal(`定位受限 (${shortMsg})，改為手動輸入？`);
                 }, 300);
@@ -2638,10 +2786,9 @@
             closeModal();
             
             const tempEl = document.getElementById('wc-my-temp');
-            const locDisplay = document.getElementById('my-loc-display');
-            
-            tempEl.innerText = '..';
-            locDisplay.innerHTML = '<span style="color:#2563EB;">查詢中...</span>';
+            tempEl.innerText = '查詢中..';
+            tempEl.style.color = '#2563EB';
+            tempEl.style.fontSize = '1.2rem';
             
             // --- 新增：智慧翻譯邏輯 (與天氣查詢同步) ---
             let searchTerm = manualCity;
@@ -2659,7 +2806,7 @@
             // 2. AI 背景翻譯 (若對照表沒有)
             if (!isTranslated) {
                 // 提示使用者正在翻譯
-                locDisplay.innerHTML = '<span style="color:#2563EB;">翻譯地名...</span>';
+                tempEl.innerText = '翻譯中..';
                 
                 const translatePrompt = `
                     Task: Translate the place name "${manualCity}" into its official English Romanization name for using in a Weather API.
@@ -2680,12 +2827,13 @@
                 }
             }
             
+            tempEl.innerText = '連線中..';
             // --- 邏輯結束 ---
 
             try {
                 // 使用 Geocoding API 查詢
                 // 優先使用翻譯後的英文搜尋 (精準度較高)
-                // 修改：增加搜尋數量 count=10
+                // [修改] count=10
                 let geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchTerm)}&count=10&language=en&format=json`;
                 let geoRes = await fetch(geoUrl);
                 let geoData = await geoRes.json();
@@ -2698,17 +2846,22 @@
                 }
 
                 if (!geoData.results || geoData.results.length === 0) {
-                    tempEl.innerText = '--';
-                    locDisplay.innerHTML = '<span style="color:#EF4444;">查無此地</span>';
+                    tempEl.innerText = '查無此地';
                     // 恢復按鈕狀態並顯示錯誤
                     setTimeout(() => openModal(`找不到「${manualCity}」(翻譯: ${searchTerm})，請嘗試輸入其他名稱：`), 1000);
                     return;
                 }
 
-                // 修改：優先篩選日本 (JP) 的結果
-                const targetLocation = geoData.results.find(r => r.country_code === 'JP') || geoData.results[0];
-                const { latitude, longitude } = targetLocation;
+                // [新增] 篩選邏輯 (手動輸入也適用)
+                let targetLocation = geoData.results[0];
+                const jpLocation = geoData.results.find(r => r.country_code === 'JP' || r.country === 'Japan');
+                // 如果手動輸入的地點有找到日本的，且使用者輸入的是中文或跟日本行程相關，優先選日本
+                // (這裡簡單做：只要有日本選項就選日本，因為這是九州旅遊 App)
+                if (jpLocation) {
+                    targetLocation = jpLocation;
+                }
 
+                const { latitude, longitude } = targetLocation;
                 const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
                 const weatherRes = await fetch(weatherUrl);
                 const weatherData = await weatherRes.json();
@@ -2720,11 +2873,25 @@
                 tempEl.style.fontSize = '1.5rem';
                 tempEl.style.color = '#1F2937';
                 
-                // 優化版面：顯示中文與翻譯後的英文，垂直排列
-                locDisplay.innerHTML = `
-                    <span class="my-loc-zh">${manualCity}</span>
-                    <span class="my-loc-en">${searchTerm}</span>
+                // 更改標題讓人知道是手動的 (加入英文顯示，上下分層)
+                const titleEl = document.querySelector('.wc-mini-card .wc-mini-title');
+                
+                // 預設 HTML 結構
+                let titleHtml = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>${manualCity}</span>
+                        </div>
                 `;
+
+                // 若有英文翻譯且不同，則加入下一行
+                if (searchTerm && searchTerm.toLowerCase() !== manualCity.toLowerCase()) {
+                    titleHtml += `<span style="font-size: 0.75rem; color: #9CA3AF; font-weight: 400; font-family: sans-serif;">${searchTerm}</span>`;
+                }
+                
+                titleHtml += `</div>`; // Close container
+                titleEl.innerHTML = titleHtml;
 
                 const targetTempStr = document.getElementById('wc-temp').innerText;
                 if (targetTempStr !== '--°') {
@@ -2734,7 +2901,7 @@
             } catch (e) {
                 console.error(e);
                 tempEl.innerText = '失敗';
-                locDisplay.innerHTML = '<span style="color:#EF4444;">連線錯誤</span>';
+                tempEl.style.color = '#EF4444';
             }
         }
 
