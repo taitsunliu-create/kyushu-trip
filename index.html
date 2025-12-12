@@ -1262,8 +1262,8 @@
 
     <script>
         // API Configuration
-        const encodedKey = "QUl6YVN5QUVhODNFazVFczV6N1RoV0U5Nk50SGF4TUNQeXpUMDhj"; 
-        const apiKey = atob(encodedKey);
+            const encodedKey = "QUl6YVN5QUVhODNFazVFczV6N1RoV0U5Nk50SGF4TUNQeXpUMDhj"; 
+    const apiKey = atob(encodedKey);
 
 
         // Weather Data Configuration
@@ -1303,42 +1303,17 @@
             }
         }
 
-        // Updated safe switchTab function
         function switchTab(element) {
-            // Safety check: if element is null or undefined, stop here to prevent error
-            if (!element) return;
-
-            // Remove active from all nav items
-            document.querySelectorAll('.nav-item').forEach(item => {
-                if (item && item.classList) item.classList.remove('active');
-            });
-
-            // Remove active from all containers
-            document.querySelectorAll('.container').forEach(container => {
-                if (container && container.classList) container.classList.remove('active');
-            });
-
-            // Activate clicked item
-            if (element.classList) {
-                element.classList.add('active');
-            }
-
-            // Activate target content
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.container').forEach(container => container.classList.remove('active'));
+            element.classList.add('active');
             const targetId = element.getAttribute('data-target');
-            if (targetId) {
-                const targetContent = document.getElementById(targetId);
-                if (targetContent && targetContent.classList) {
-                    targetContent.classList.add('active');
-                }
-            }
-            
+            document.getElementById(targetId).classList.add('active');
             window.scrollTo(0, 0);
         }
 
         function toggleTimeline(id, toggleElement) {
             const timeline = document.getElementById(id);
-            if (!timeline) return; // Safety check
-
             // If opening a new day
             if (!timeline.classList.contains('show')) {
                 // Collapse others
@@ -1367,13 +1342,8 @@
 
         // Function to switch to AI tab programmatically
         function goToAiTab() {
-            // Use querySelector safely
             const aiTabBtn = document.querySelector('[data-target="view-ai"]');
-            if (aiTabBtn) {
-                switchTab(aiTabBtn);
-            } else {
-                console.error("AI Tab button not found");
-            }
+            switchTab(aiTabBtn);
         }
 
         function showAiTranslatorMode() {
