@@ -347,24 +347,22 @@
             background: linear-gradient(135deg, #2563EB, #3B82F6); /* Blue Gradient */
             color: white;
             border: none;
-            /* Icon Only Style */
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            padding: 0;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
             cursor: pointer;
             margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
             transition: transform 0.2s;
+            font-weight: 600;
         }
         .btn-ai-play:active { transform: scale(0.95); }
         .btn-ai-play svg { 
-            width: 20px; 
-            height: 20px; 
+            width: 18px; 
+            height: 18px; 
             fill: none; 
             stroke: currentColor; 
             stroke-width: 2; 
@@ -372,137 +370,29 @@
             stroke-linejoin: round; 
         }
 
-        /* New: Mini Icon Style for Weather Tab */
-        .icon-mini {
-            width: 18px;
-            height: 18px;
-            vertical-align: text-bottom;
-            margin-right: 4px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            display: inline-block;
-        }
-
         /* AI Container Styles */
         .ai-header { font-size: 1.4rem; font-weight: 700; margin-bottom: 15px; color: #4B5563; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #E5E7EB; padding-bottom: 10px; }
         
-        /* Chat History Box (Replaces old result box) */
-        .chat-history {
+        .ai-result-box {
             background: #F9FAFB;
             border: 1px solid #E5E7EB;
             border-radius: 16px;
             padding: 16px;
             min-height: 200px;
-            flex: 1;
             overflow-y: auto;
             margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        /* Chat Bubbles */
-        .chat-row { display: flex; width: 100%; animation: slideIn 0.2s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        .chat-row.user { justify-content: flex-end; }
-        .chat-row.ai { justify-content: flex-start; }
-
-        .chat-bubble {
-            max-width: 85%;
-            padding: 12px 16px;
             font-size: 1rem;
-            line-height: 1.6;
-            position: relative;
-            word-wrap: break-word;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .chat-bubble.user {
-            background: var(--primary);
-            color: white;
-            border-radius: 18px 18px 4px 18px;
-        }
-
-        .chat-bubble.ai {
-            background: white;
-            border: 1px solid #E5E7EB;
+            line-height: 1.7;
             color: #374151;
-            border-radius: 18px 18px 18px 4px;
+            white-space: pre-wrap;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            flex: 1; 
         }
+        .ai-result-box strong { color: #7C3AED; }
         
-        .chat-bubble strong { font-weight: 600; }
-        .chat-bubble.ai strong { color: var(--primary); }
-
-        /* Inline Audio Button in Bubble */
-        .btn-audio-inline {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            background: #E0F2FE;
-            color: var(--primary);
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            vertical-align: middle;
-            margin-left: 8px;
-            transition: transform 0.2s;
-        }
-        .btn-audio-inline:active { transform: scale(0.9); background: #BAE6FD; }
-        .btn-audio-inline svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-
         /* Updated Input Area Layout */
         .ai-input-wrapper { display: flex; flex-direction: column; gap: 10px; width: 100%; }
         
-        /* New: Voice Language Toggle */
-        .voice-lang-switch {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: -5px;
-            padding: 0 5px;
-            font-size: 0.85rem;
-            color: #4B5563;
-        }
-        .lang-option {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            padding: 6px 12px; /* 加大一點點擊範圍 */
-            border-radius: 20px; /* 圓角更明顯 */
-            border: 1px solid transparent; /* 預留邊框空間 */
-            transition: all 0.2s;
-            background: #fff;
-        }
-        .lang-option:hover { background: #F3F4F6; }
-        /* 隱藏原生 radio，改用樣式控制 */
-        .lang-option input { display: none; }
-        
-        /* 選中時的樣式 */
-        .lang-option:has(input:checked) {
-            background: #EFF6FF;
-            border-color: var(--primary);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-        
-        /* 國旗 SVG 樣式 - 改為圓形簡約風 */
-        .flag-icon {
-            width: 24px;  /* 正方形 */
-            height: 24px; /* 正方形 */
-            border-radius: 50%; /* 圓形 */
-            -o-object-fit: cover;
-               object-fit: cover;
-            display: block;
-            /* 移除陰影，改用 SVG 內部邊框，更扁平 */
-        }
-
         /* Mobile: Prevent Zoom on Input */
         .ai-input {
             width: 100%; padding: 14px; border: 2px solid #E5E7EB;
@@ -530,12 +420,12 @@
             transition: transform 0.1s, opacity 0.2s;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             min-height: 48px; /* Ensure touch target size */
-            /* Mobile touch fix: Prevent text selection/callout on long press */
-            -webkit-user-select: none;
+            
+            /* IMPORTANT: Prevent text selection/menu on long press */
             -moz-user-select: none;
                  user-select: none;
+            -webkit-user-select: none;
             -webkit-touch-callout: none;
-            touch-action: manipulation;
         }
         .btn-mode:active { transform: scale(0.96); opacity: 0.9; }
         
@@ -549,9 +439,25 @@
             stroke-linejoin: round;
         }
 
+        .inline-icon {
+            width: 1.1em;
+            height: 1.1em;
+            vertical-align: text-bottom;
+            margin-right: 4px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            display: inline-block;
+        }
+        .icon-consult { color: #2563EB; } 
+        .icon-trans { color: #0EA5E9; }   
+
         .btn-mode.consult { background: linear-gradient(135deg, #1D4ED8, #3B82F6); }
         .btn-mode.trans { background: linear-gradient(135deg, #0EA5E9, #38BDF8); }
         .btn-mode.voice { background: linear-gradient(135deg, #06B6D4, #22D3EE); }
+        .btn-mode.voice.disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; } /* Disabled state */
         
         .btn-mode.voice.recording {
             background: linear-gradient(135deg, #EF4444, #F87171); 
@@ -574,9 +480,6 @@
         }
         .btn-ai-reset:hover { background: #E5E7EB; }
 
-        .loading-bubble { 
-            color: #9CA3AF; font-style: italic; font-size: 0.9rem; display: flex; align-items: center; gap: 4px;
-        }
         .loading-dots:after {
             content: ' .';
             animation: dots 1.5s steps(5, end) infinite;
@@ -596,7 +499,7 @@
             .header-content { flex-direction: column; align-items: flex-start; gap: 10px; }
             .header-title-area h1 { font-size: 1.5rem; white-space: normal; line-height: 1.3; }
             
-            /* Compact Weather Box - Modified to show Advice */
+            /* Compact Weather Box */
             .header-weather-box { 
                 width: 100%; 
                 justify-content: space-between; 
@@ -604,24 +507,8 @@
                 border-radius: 12px;
                 background: rgba(255, 255, 255, 0.15);
                 min-height: auto;
-                flex-wrap: wrap; /* Allow items to wrap to next line */
-                gap: 8px; /* Gap between rows */
             }
-            
-            /* Show Advice on Mobile now */
-            .hw-col-advice { 
-                display: block; /* Force display */
-                width: 100%; /* Take full width */
-                border-left: none; /* Remove side separator */
-                border-top: 1px solid rgba(255,255,255,0.3); /* Add top separator */
-                padding-left: 0;
-                padding-top: 8px;
-                max-width: none;
-                min-height: auto;
-                font-size: 0.8rem;
-                line-height: 1.4;
-            }
-
+            .hw-col-advice { display: none; }
             .hw-col-main { flex-grow: 1; justify-content: flex-end; }
             .hw-col-loc { min-width: auto; border: none; padding-right: 0; text-align: left; }
             
@@ -1289,892 +1176,32 @@
         </div>
     </div>
 
-    <!-- TAB 2: 住宿資訊 (Updated Day 3) -->
-    <div id="view-stay" class="container">
-        <!-- Day 1: THE BLOSSOM -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 1: 熊本 - THE BLOSSOM KUMAMOTO</div>
-                <div class="tag tag-stay">市區/車站</div>
-            </div>
-            
-            <div class="info-grid">
-                <div class="info-label">地址</div>
-                <div class="info-val">熊本県熊本市西区春日3丁目15-26</div>
-            </div>
-            
-            <div class="info-detail-box">
-                <h4 style="color: var(--primary);">✨ 飯店特色與服務</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
-                    <li><b>絕佳位置：</b>與 JR 熊本站直結 (AMU PLAZA 樓上)，下樓即可逛街用餐。</li>
-                    <li><b>大浴場：</b>設有住客專用的大浴場與桑拿 (9F)，玩了一天可以好好放鬆。</li>
-                    <li><b>景觀大廳：</b>大廳位於 9 樓，視野開闊，可眺望熊本市區。</li>
-                    <li><b>親子友善：</b>提供兒童備品 (需向櫃台索取)，房間新穎寬敞。</li>
-                </ul>
-            </div>
-
-            <div class="info-detail-box" style="margin-top: 10px; background-color: #FFFBEB; border-color: #F59E0B;">
-                <h4 style="color: #D97706;">⚠️ 注意事項</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
-                    <li><b>入口位置：</b>飯店入口位於 AMU PLAZA 旁，需搭乘專用電梯至 9 樓 Check-in。</li>
-                    <li><b>停車資訊：</b>使用 AMU PLAZA 地下停車場 (住客優惠約 ¥1,000/晚)。請務必將停車券帶至櫃台消磁。</li>
-                    <li><b>早餐：</b>早餐評價極高，建議預留充裕時間享用。</li>
-                </ul>
-            </div>
-            <a href="https://www.google.com/maps/search/?api=1&query=THE+BLOSSOM+KUMAMOTO" target="_blank" class="btn-link">開啟地圖</a>
-        </div>
-
-        <!-- Day 2: Kurokawa -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 2: 黑川溫泉 (兩備選比較)</div>
-                <div class="tag tag-stay">溫泉鄉</div>
-            </div>
-            
-            <!-- 備選 A: 麓旅館 -->
-            <div class="info-detail-box">
-                <h4>備選 A: 麓旅館 (Fumoto Ryokan)</h4>
-                 <div class="info-grid">
-                    <div class="info-label">地址</div>
-                    <div class="info-val">熊本県阿蘇郡南小国町満願寺6618</div>
-                </div>
-                
-                <div style="margin-top: 10px;">
-                    <strong style="color: #059669;">✨ 特色與服務：</strong>
-                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
-                        <li><b>湯池巡禮：</b>擁有 15 個湯池，包含多個「貸切風呂 (私人湯屋)」供住客免費使用，不需預約，看燈號即可進入。</li>
-                        <li><b>餐食：</b>通常提供部屋食 (在房間內用餐) 或包廂，適合帶小孩的家庭。</li>
-                    </ul>
-                </div>
-
-                <div style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 5px;">
-                    <strong style="color: #D97706;">⚠️ 注意事項：</strong>
-                    <p style="font-size: 0.9rem; margin-top: 5px;">
-                        館內保留古老建築結構，<b>樓梯非常多且陡</b>，若有大型行李或推車會較吃力。建議將大行李留在車上，只帶輕便過夜包。
-                    </p>
-                </div>
-
-                <a href="tel:0967440103" class="btn-link-tel">撥打 0967-44-0103 (導航電話)</a>
-                <a href="https://www.google.com/maps/search/?api=1&query=麓旅館+黑川溫泉" target="_blank" class="btn-link-sub">開啟 Google 地圖導航 📍</a>
-            </div>
-
-            <!-- 備選 B: 湯本莊 -->
-            <div class="info-detail-box" style="margin-top: 15px; border-color: #F59E0B;">
-                <h4 style="color: #F59E0B;">備選 B: 湯本莊 (Yumoto So)</h4>
-                 <div class="info-grid">
-                    <div class="info-label">地址</div>
-                    <div class="info-val">熊本県阿蘇郡南小国町満願寺6692</div>
-                </div>
-                
-                <div style="margin-top: 10px;">
-                    <strong style="color: #D97706;">✨ 特色與服務：</strong>
-                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
-                        <li><b>位置絕佳：</b>位於溫泉街正中心，出門逛街最方便。</li>
-                        <li><b>特色溫泉：</b>以手工挖掘的「釜風呂」和視野好的露天風呂聞名。</li>
-                    </ul>
-                </div>
-
-                 <div style="margin-top: 10px; border-top: 1px dashed #F59E0B; padding-top: 5px;">
-                    <strong style="color: #D97706;">⚠️ 注意事項：</strong>
-                    <p style="font-size: 0.9rem; margin-top: 5px;">
-                        飯店門口道路狹窄，建議先將車停在溫泉街入口的共同停車場，再致電旅館派接駁車接送，或請旅館人員指引停車。
-                    </p>
-                </div>
-
-                <a href="tel:0967440211" class="btn-link-tel">撥打 0967-44-0211 (導航電話)</a>
-                <a href="https://www.google.com/maps/search/?api=1&query=湯本莊+黑川溫泉" target="_blank" class="btn-map">開啟 Google 地圖導航 📍</a>
-            </div>
-        </div>
-
-        <!-- Day 3: Yufuin -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 3: 由布院 - 湯布院 山燈館</div>
-                <div class="tag tag-stay">傳統日式</div>
-            </div>
-            <div class="info-grid">
-                <div class="info-label">地址</div>
-                <div class="info-val">大分県由布市湯布院町川上1553</div>
-            </div>
-            
-            <div class="info-detail-box">
-                <h4 style="color: var(--primary);">✨ 飯店特色與服務</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
-                    <li><b>純京風建築：</b>全館僅13間客房，全室檜木造，環境清幽雅致。</li>
-                    <li><b>金鱗湖旁：</b>步行至金鱗湖僅需 1-2 分鐘，非常適合清晨去欣賞晨霧。</li>
-                    <li><b>會席料理：</b>提供高品質的懷石料理，晚餐通常安排在房內或包廂享用。</li>
-                    <li><b>姊妹館溫泉：</b>可免費使用隔壁姊妹館「田乃倉」的露天溫泉。</li>
-                </ul>
-            </div>
-
-            <div class="info-detail-box" style="margin-top: 10px; background-color: #FFFBEB; border-color: #F59E0B;">
-                <h4 style="color: #D97706;">⚠️ 注意事項</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
-                    <li><b>抵達時間：</b>因包含晚餐，請務必於 17:30 - 18:00 前辦理入住。若會晚到請務必電話聯繫。</li>
-                    <li><b>停車：</b>旅館備有免費停車場。</li>
-                    <li><b>隔音：</b>日式木造建築隔音較弱，夜間請放輕腳步。</li>
-                </ul>
-            </div>
-
-            <a href="tel:0977845310" class="btn-link-tel">撥打 0977-84-5310 (導航電話)</a>
-            <a href="https://www.google.com/maps/search/?api=1&query=Yufuin+Santoukan" target="_blank" class="btn-link-sub">開啟 Google 地圖導航 📍</a>
-        </div>
-
-        <!-- Day 4-5: Fukuoka -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 4-5: 福岡 (兩備選比較)</div>
-                <div class="tag tag-stay">市區</div>
-            </div>
-            
-            <!-- 福岡選項 A -->
-            <div class="info-detail-box">
-                <h4>備選 A: 西鐵飯店 Croom 博多</h4>
-                <div class="info-grid">
-                    <div class="info-label">地址</div>
-                    <div class="info-val">福岡県福岡市博多区博多駅前1-17-6</div>
-                </div>
-                <div style="margin-top: 10px;">
-                    <strong style="color: #2563EB;">✨ 推薦理由 (親子首選)：</strong>
-                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
-                        <li><b>溫泉大浴場：</b>市區少見設有舒適大浴場的飯店，並提供泡湯後的免費冰棒/飲料。</li>
-                        <li><b>交通便利：</b>位於博多巴士總站對面，距離博多站博多口步行約 5 分鐘。</li>
-                        <li><b>便利商店：</b>飯店一樓即是 Lawson，補給非常方便。</li>
-                    </ul>
-                </div>
-                 <div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
-                    ⚠️ <b>注意：</b>停車場為立體機械式 (¥1,500/晚)，若車輛較大(如休旅車)可能需停至特約平面停車場。
-                </div>
-                 <a href="https://www.google.com/maps/search/?api=1&query=Nishitetsu+Hotel+Croom+Hakata" target="_blank" class="btn-link-sub">地圖</a>
-            </div>
-
-            <!-- 福岡選項 B -->
-            <div class="info-detail-box" style="margin-top: 15px; border-color: #EF4444;">
-                <h4 style="color: #EF4444;">備選 B: 日航飯店福岡 (Hotel Nikko)</h4>
-                <div class="info-grid">
-                    <div class="info-label">地址</div>
-                    <div class="info-val">福岡県福岡市博多区博多駅前2-18-25</div>
-                </div>
-                <div style="margin-top: 10px;">
-                    <strong style="color: #DC2626;">✨ 推薦理由 (舒適尊榮)：</strong>
-                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
-                        <li><b>地下連通：</b>有地下道直通博多車站，下雨天完全不用淋雨。</li>
-                        <li><b>服務一流：</b>五星級日式服務，房間相對較寬敞，隔音佳。</li>
-                        <li><b>早餐豐盛：</b>自助早餐種類豐富，品質穩定。</li>
-                    </ul>
-                </div>
-                 <div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
-                    ⚠️ <b>注意：</b>通常無免費大浴場 (除部分會員/房型外)。地下停車場費用較高 (約 ¥2,000/晚)。
-                </div>
-                 <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Nikko+Fukuoka" target="_blank" class="btn-link-sub">地圖</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB 3: 交通資訊 -->
-    <div id="view-car" class="container">
-        <!-- 航班資訊 -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">航班資訊 (熊本進/福岡出)</div>
-                <div class="tag tag-flight">星宇航空</div>
-            </div>
-            <div class="info-detail-box">
-                <h4>去程：1/25 台北(TPE) → 熊本(KMJ)</h4>
-                <div class="info-grid">
-                    <div class="info-label">班次參考</div>
-                    <div class="info-val">JX846</div>
-                </div>
-                <div class="info-grid">
-                    <div class="info-label">起飛時間</div>
-                    <div class="info-val">07:30 (TPE)</div>
-                </div>
-                <div class="info-grid">
-                    <div class="info-label">起飛航廈</div>
-                    <div class="info-val">TPE T2 (桃園機場第二航廈)</div>
-                </div>
-                <div class="info-grid">
-                    <div class="info-label">抵達時間</div>
-                    <div class="info-val">11:00 (KMJ 當地時間)</div>
-                </div>
-                <div class="info-grid">
-                    <div class="info-label">抵達航廈</div>
-                    <div class="info-val">KMJ 國際線航廈</div>
-                </div>
-            </div>
-            <div class="info-detail-box" style="margin-top: 15px;">
-                <h4>回程：1/30 福岡(FUK) → 台北(TPE)</h4>
-                <div class="info-grid">
-                    <div class="info-label">班次參考</div>
-                    <div class="info-val">JX847</div>
-                </div>
-                <div class="info-grid">
-                    <div class="info-label">起飛時間</div>
-                    <div class="info-val">19:10 (FUK 當地時間)</div>
-                </div>
-                <div class="info-grid">
-                    <div class="info-label">起飛航廈</div>
-                    <div class="info-val">FUK 國際線航廈</div>
-                </div>
-                <div class="info-grid">
-                    <div class="info-label">抵達時間</div>
-                    <div class="info-val">20:40 (TPE 當地時間)</div>
-                </div>
-                <div class="info-grid">
-                    <div class="info-label">抵達航廈</div>
-                    <div class="info-val">TPE T2 (桃園機場第二航廈)</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">租車資訊 (Day 2-4)</div>
-                <div class="tag tag-car">Toyota</div>
-            </div>
-            <div class="info-grid">
-                <div class="info-label">租車公司</div>
-                <div class="info-val">Toyota Rent a Car</div>
-            </div>
-            <div class="info-grid">
-                <div class="info-label">取車地點</div>
-                <div class="info-val">阿蘇站前店</div>
-            </div>
-            <div class="info-grid">
-                <div class="info-label">還車地點</div>
-                <div class="info-val">博多駅博多口店</div>
-            </div>
-            <div class="info-grid">
-                <div class="info-label">導航電話</div>
-                <div class="info-val">092-441-0100</div>
-            </div>
-            <a href="https://www.google.com/maps/search/?api=1&query=Toyota+Rent+a+Car+阿蘇駅前店" target="_blank" class="btn-link">導航至取車點</a>
-            <a href="https://www.google.com/maps/search/?api=1&query=Toyota+Rent+a+Car+Hakata+Station+Hakata+Exit" target="_blank" class="btn-link" style="margin-top: 5px;">導航至還車點</a>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 2 (1/26) 必搭：阿蘇男孩!</div>
-                <div class="tag tag-move">觀光列車</div>
-            </div>
-             <div class="info-grid">
-                <div class="info-label">車次</div>
-                <div class="info-val">ASO BOY! 1號</div>
-            </div>
-            <div class="info-grid">
-                <div class="info-label">區間</div>
-                <div class="info-val">熊本 (09:57) → 阿蘇 (11:27)</div>
-            </div>
-            
-            <div class="info-detail-box">
-                <h4>🐶 列車吉祥物：小黑 KURO</h4>
-                <p style="font-size: 0.9rem;">KURO 是阿蘇男孩的看板犬，車內外共有**101隻不同造型的 KURO 圖案**，可以讓孩子們尋找，增添旅途樂趣！</p>
-                <p style="font-size: 0.8rem; color: #9CA3AF; margin-top: 5px;"></p>
-            </div>
-            
-            <div class="info-detail-box" style="margin-top: 15px;">
-                <h4>🎉 親子娛樂設施 (第3節車廂)</h4>
-                <p style="font-size: 0.9rem; margin-bottom: 5px;">
-                    第3節車廂後方是兒童專屬空間，設有**木球池**（請注意開放時間）和**兒童圖書室**。
-                </p>
-                <p style="font-size: 0.9rem; margin-bottom: 5px;">
-                    此外，還有**哺乳室**和多功能廁所，確保帶著小小孩的家長也能舒適搭乘。
-                </p>
-            </div>
-            
-            <div class="info-detail-box" style="margin-top: 15px;">
-                <h4>👨‍👩‍👧‍👦 獨特全景席位</h4>
-                <p style="font-size: 0.9rem; margin-bottom: 5px;">
-                    **景觀車廂 (第1和第4節)**：設有全景大窗戶，視野絕佳，能欣賞阿蘇沿線風景。
-                </p>
-                <p style="font-size: 0.9rem;">
-                    **親子座位 (White Seats)**：有面對面、附桌子的座位，非常適合家庭用餐或互動，是預訂時的首選！
-                </p>
-            </div>
-        </div>
-
-        <!-- [新增] Map Code 一覽表 -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">📍 導航必備：行程景點 Map Code 一覽</div>
-                <div class="tag tag-car">車機輸入用</div>
-            </div>
-            
-            <div class="info-section" style="background-color: #F3F4F6; border-color: #9CA3AF;">
-                <p style="font-size: 0.85rem; color: #4B5563; margin-bottom: 10px;">
-                    💡 <b>使用小撇步：</b>日本車載導航輸入 Map Code 最為精準。若 Map Code 查無地點，使用下方提供的<b>電話號碼 (Tel)</b> 導航是最佳備案。
-                </p>
-
-                <!-- 熊本區域 -->
-                <h4 style="color: #3B82F6; margin: 15px 0 5px 0; border-left: 4px solid #3B82F6; padding-left: 8px;">🐻 熊本區域 (Day 1-2)</h4>
-                <div class="price-table" style="grid-template-columns: 1.5fr 1fr;">
-                    <div class="price-item" style="font-weight:600;">景點名稱</div>
-                    <div class="price-item" style="font-weight:600; font-family:monospace;">Map Code / Tel</div>
-
-                    <div class="price-item">熊本機場 (KMJ)</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#2563EB; font-weight:600;">29 434 250*85</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 096-232-2810</div>
-                    </div>
-
-                    <div class="price-item">熊本站 (The Blossom)</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#2563EB; font-weight:600;">29 459 270*76</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 096-327-8777</div>
-                    </div>
-
-                    <div class="price-item">櫻之馬場 城彩苑</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#2563EB; font-weight:600;">29 489 328*36</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 096-288-5600</div>
-                    </div>
-                </div>
-
-                <!-- 阿蘇/黑川區域 -->
-                <h4 style="color: #10B981; margin: 20px 0 5px 0; border-left: 4px solid #10B981; padding-left: 8px;">⛰️ 阿蘇與黑川 (Day 2-3)</h4>
-                <div class="price-table" style="grid-template-columns: 1.5fr 1fr;">
-                    <div class="price-item">Toyota 租車 (阿蘇站前)</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#059669; font-weight:600;">256 386 414*43</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0967-35-5100</div>
-                    </div>
-
-                    <div class="price-item">草千里 (阿蘇火山博物館)</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#059669; font-weight:600;">256 456 833*60</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0967-34-2111</div>
-                    </div>
-
-                    <div class="price-item">大觀峰展望所</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#059669; font-weight:600;">256 688 642*31</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0967-32-3856</div>
-                    </div>
-
-                    <div class="price-item">黑川溫泉 (遊客中心)</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#059669; font-weight:600;">440 542 567*14</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0967-44-0076</div>
-                    </div>
-                </div>
-
-                <!-- 別府/由布院區域 -->
-                <h4 style="color: #F59E0B; margin: 20px 0 5px 0; border-left: 4px solid #F59E0B; padding-left: 8px;">♨️ 別府與由布院 (Day 3-4)</h4>
-                <div class="price-table" style="grid-template-columns: 1.5fr 1fr;">
-                    <div class="price-item">別府 海地獄</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#D97706; font-weight:600;">46 521 440*43</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0977-66-0121</div>
-                    </div>
-
-                    <div class="price-item">九州自然動物公園</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#D97706; font-weight:600;">46 434 225*85</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0978-48-2331</div>
-                    </div>
-
-                    <div class="price-item">由布院車站</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#D97706; font-weight:600;">269 357 442*11</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0977-84-2446</div>
-                    </div>
-
-                    <div class="price-item">金鱗湖 (附近地標)</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#D97706; font-weight:600;">269 359 586*66</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0977-28-8500</div>
-                    </div>
-                </div>
-
-                <!-- 福岡區域 -->
-                <h4 style="color: #EF4444; margin: 20px 0 5px 0; border-left: 4px solid #EF4444; padding-left: 8px;">🍜 福岡與太宰府 (Day 4-6)</h4>
-                <div class="price-table" style="grid-template-columns: 1.5fr 1fr;">
-                    <!-- 新增山田休息站 -->
-                    <div class="price-item">山田服務區 (往福岡)</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#DC2626; font-weight:600;">55 136 580*55</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 0946-52-3103</div>
-                    </div>
-
-                    <div class="price-item">Toyota 租車 (博多站)</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#DC2626; font-weight:600;">13 320 644*85</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 092-441-0100</div>
-                    </div>
-
-                    <div class="price-item">太宰府天滿宮 (停車場)</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#DC2626; font-weight:600;">55 364 046*12</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 092-922-8225</div>
-                    </div>
-
-                    <div class="price-item">九州國立博物館</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#DC2626; font-weight:600;">55 334 895*88</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 092-918-2807</div>
-                    </div>
-                    
-                    <div class="price-item">LaLaport 福岡</div>
-                    <div class="price-item">
-                        <div style="font-family:monospace; color:#DC2626; font-weight:600;">13 133 766*55</div>
-                        <div style="font-size:0.85rem; color:#666; margin-top:2px;">Tel: 092-707-9820</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- [新增結束] -->
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">🇯🇵 自駕與加油須知</div>
-                <div class="tag tag-car">必讀</div>
-            </div>
-            
-            <div class="info-section" style="margin-bottom: 15px;">
-                <h3 style="color: var(--primary); border-bottom-color: var(--primary);">🚗 自駕重點提示</h3>
-                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6; color: #444;">
-                    <li><b>靠左行駛：</b>日本為右駕左行，雨刷和方向燈位置通常與台灣相反（雨刷在左，方向燈在右）。轉彎時請口訣默唸「左小圈、右大圈」。</li>
-                    <li><b>禮讓行人：</b>轉彎遇斑馬線有行人時，**必須完全停車**禮讓。</li>
-                    <li><b>停止標誌 (止まれ)：</b>看到倒三角形紅色標誌，車輪必須**完全靜止**（數3秒）確認無車後再開，這是日本警察取締重點。</li>
-                    <li><b>平交道：</b>通過前必須**完全停車**，開窗聽聲音確認無火車後再通過。</li>
-                </ul>
-            </div>
-
-            <div class="info-section" style="background-color: #FFFBEB; border-color: #F59E0B;">
-                <h3 style="color: #D97706; border-bottom-color: #F59E0B;">⛽ 加油站使用指南</h3>
-                <div class="method-detail">
-                    <p style="margin-bottom: 8px;">租車通常需<b>「加滿油還車 (満タン返し)」</b>，請保留最後一次加油收據。</p>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; text-align: center; margin-bottom: 10px;">
-                        <div style="background:#FFCCCC; padding:5px; border-radius:5px; color:#CC0000; font-weight:bold;">紅色<br><span style="font-size:0.8rem">92無鉛<br>(Regular)</span></div>
-                        <div style="background:#FFFFCC; padding:5px; border-radius:5px; color:#999900; font-weight:bold;">黃色<br><span style="font-size:0.8rem">98無鉛<br>(High Octane)</span></div>
-                        <div style="background:#CCFFCC; padding:5px; border-radius:5px; color:#006600; font-weight:bold;">綠色<br><span style="font-size:0.8rem">柴油<br>(Diesel)</span></div>
-                    </div>
-                    <p>一般租賃轎車（如 Toyota Corolla/Yaris）通常加 <b style="color:#CC0000;">紅色 Regular (レギュラー)</b>。請務必確認租車合約。</p>
-                </div>
-
-                <!-- 新增：自助加油教學區塊 -->
-                <div style="margin-top: 15px; border-top: 1px dashed #F59E0B; padding-top: 15px;">
-                    <h4 style="color: #D97706; margin: 0 0 10px 0;">🤖 自助加油 (Self) 操作步驟</h4>
-                    <ul class="step-list" style="padding-left: 20px;">
-                        <li><b>停車熄火：</b> 認明招牌寫有「セルフ (Self)」的加油站。停妥後請務必熄火。</li>
-                        <li><b>消除靜電：</b> 觸摸加油機上的「靜電除去 (靜電除去シート)」黑色觸摸板。</li>
-                        <li><b>選擇支付：</b> 螢幕點選「クレジットカード (信用卡)」或「現金」。</li>
-                        <li><b>選擇油種：</b> 點選紅色 <b style="color:#CC0000;">Regular (レギュラー)</b>。</li>
-                        <li><b>設定油量：</b> 還車請選擇 <b style="color:#2563EB;">「満タン (滿油)」</b>。</li>
-                        <li><b>加油：</b> 插入油槍，扣下扳機。跳停後請不要硬加，掛回油槍。</li>
-                        <li><b>領取收據：</b> 務必領取收據 (領収書) 以供還車查驗。</li>
-                    </ul>
-                </div>
-
-                <!-- 新增：付款與找零注意事項 -->
-                <div style="margin-top: 15px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #FCD34D;">
-                    <h4 style="color: #B45309; margin: 0 0 5px 0; font-size: 0.95rem;">💰 付款與找零重要提示</h4>
-                    <ul style="padding-left: 20px; font-size: 0.9rem; color: #444; margin-bottom: 0;">
-                        <li style="margin-bottom: 5px;"><b>現金找零陷阱：</b> 部分舊式機台加油後只會吐出收據（或找零單），**不會直接吐鈔票**！需拿著單子去旁邊的<b>「精算機」</b>掃描條碼才會退錢。</li>
-                        <li><b>信用卡預授權：</b> 選擇「滿油」時，系統可能會先預扣一筆金額（如1萬日圓），實際扣款會依加油量計算，無需擔心。</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="info-section" style="margin-top: 15px; border-color: #EF4444;">
-                <h3 style="color: #EF4444; border-bottom-color: #EF4444;">⛓️ 雪鍊安裝教學</h3>
-                <div class="method-detail">
-                    <p style="font-weight:bold; margin-bottom:5px;">⚠️ 出發前確認驅動輪 (前驅/後驅/四驅)</p>
-                    <ul class="step-list" style="padding-left: 20px;">
-                        <li><b>步驟 1：</b>將雪鍊攤平在輪胎後方，確認無打結。</li>
-                        <li><b>步驟 2：</b>將雪鍊兩端拉起，包覆輪胎。</li>
-                        <li><b>步驟 3：</b>先扣上內側掛勾 (通常在輪胎後方上方)。</li>
-                        <li><b>步驟 4：</b>調整外側鍊條位置，扣上外側掛勾。</li>
-                        <li><b>步驟 5：</b>使用橡皮圈或緊繃器拉緊鍊條，確保貼合輪胎。</li>
-                        <li><b>步驟 6：</b>行駛約 50 公尺後停車檢查，再次拉緊。</li>
-                    </ul>
-                    <p style="font-size:0.85rem; color:#666; margin-top:5px;">*行駛雪鍊路段請保持時速 30-50km/h 以下。</p>
-                </div>
-            </div>
-            
-             <div class="info-section winter-drive" style="margin-top: 15px;">
-                <h3>❄️ 冬季自駕與安全提示</h3>
-                <p style="font-size: 0.95rem; margin-bottom: 10px; font-weight: 500;">您的行程經過阿蘇山、黑川溫泉、由布院等山區，1月下旬為冬季旺季，請務必留意：</p>
-                
-                <div class="info-detail-box" style="border-color: #FCA5A5; background-color: #FFF6F6;">
-                    <h4 style="color: #B91C1C;">胎紋與雪鏈 (重要)</h4>
-                     <p class="method-detail">
-                        <span style="font-weight: 600; color: #B91C1C;">雪胎：</span> 請務必與租車公司確認您的車輛是否配備**雪胎 (Snow Tires)**。若無雪胎，可能無法進入部分積雪的山區。
-                    </p>
-                    <p class="method-detail" style="margin-top: 5px;">
-                        <span style="font-weight: 600; color: #B91C1C;">雪鏈：</span> 在租車時，確認是否備有雪鏈並知道如何使用。部分路段如遇大雪，會強制要求加裝雪鏈。
-                    </p>
-                </div>
-                
-                <div class="info-detail-box" style="margin-top: 15px; border-color: #FCA5A5; background-color: #FFF6F6;">
-                    <h4 style="color: #B91C1C;">山區駕車時間</h4>
-                     <p class="method-detail">
-                        **黑川至別府/由布院：** 山路較多，下午 5 點後天色會完全變暗。Day 3 的行程需要跨越山區，請盡量在白天完成大部分移動。
-                    </p>
-                     <p class="method-detail" style="margin-top: 5px;">
-                        **結冰風險：** 早晨或深夜，橋樑和山區背光路段容易結冰，請減速慢行，與前車保持安全距離。
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB 4: 旅遊資訊 -->
-    <div id="view-info" class="container">
-        
-        <!-- 熊本 上/下通 攻略 -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 1: 熊本 上通/下通 逛街攻略</div>
-                <div class="tag tag-shop">購物美食</div>
-            </div>
-
-            <div class="info-section kumamoto">
-                <h3>🛍️ 上通 (Kamitori) 與 下通 (Shimodori)</h3>
-                <p style="font-size: 0.95rem;">
-                    這是熊本最主要的兩條拱廊商店街，皆為室內空間，即使下雨也不怕。搭乘熊本市電至「通町筋」或「辛島町」站即可到達核心區域。
-                </p>
-
-                <div class="safari-method" style="border-color: #90CDF4; margin-top: 15px;">
-                    <span class="method-title" style="color: var(--kumamoto-info-text);">上通 (北段) - 悠閒與質感</span>
-                    <div class="method-detail">
-                        <p>上通偏向**文青、精品、咖啡廳**和**本地老店**，氣氛相對安靜優雅。適合想找特色小店、書店或喝下午茶的家庭。</p>
-                        <ul style="list-style-type: disc; margin-top: 5px; padding-left: 20px;">
-                            <li>**重點店家：** 鶴屋百貨、個性雜貨店、書店。</li>
-                            <li>**備註：** 這裡連接著熊本城，通常從熊本城方向走過來是第一站。</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="safari-method" style="margin-top: 15px; border-color: #90CDF4;">
-                    <span class="method-title" style="color: var(--kumamoto-info-text);">下通 (南段) - 庶民與美食</span>
-                    <div class="method-detail">
-                        <p>下通是最熱鬧的一段，以**藥妝店、服飾連鎖店、電玩店**和**餐飲店**為主，充滿庶民活力。大部分知名的熊本拉麵店（如天外天）和豬排店（如勝烈亭）都在附近巷弄中。</p>
-                        <ul style="list-style-type: disc; margin-top: 5px; padding-left: 20px;">
-                            <li>**重點店家：** 唐吉訶德（ドンキ）、大型藥妝店、電影院。</li>
-                            <li>**備註：** 這裡靠近辛島町，可搭乘市電返回熊本站，交通便利。</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 新增：Day 2 黑川溫泉散步攻略 -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 2: 黑川溫泉 散策與入湯手形</div>
-                <div class="tag tag-relax">溫泉氣氛</div>
-            </div>
-
-            <div class="info-section" style="background-color: #FDF4F1; border-color: #78350F;">
-                <h3 style="color: #78350F; border-bottom-color: #78350F;">♨️ 入湯手形 (Onsen Hopping Pass)</h3>
-                <p style="font-size: 0.95rem; color: #444;">
-                    這是黑川溫泉最大的特色！只要購買一枚木製的「入湯手形」(約 1,500円)，即可任選 3 間旅館的露天溫泉泡湯。
-                </p>
-                <div class="safari-method" style="margin-top: 10px; border-color: #78350F;">
-                    <span class="method-title" style="color: #78350F;">使用小撇步</span>
-                    <div class="method-detail">
-                        <ul style="padding-left: 20px; line-height: 1.6;">
-                            <li><b>作為紀念品：</b>使用完畢後，手形可以蓋上印章帶回家當杯墊或掛飾，非常有質感。</li>
-                            <li><b>優惠折扣：</b>掛著手形在溫泉街上的部分商店消費或用餐，出示可享折扣。</li>
-                            <li><b>推薦湯池：</b>除了您住宿的旅館外，推薦體驗「山梅花 (Yamamizuki)」的溪流露天風呂，或「新明館」的洞窟風呂。</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-section" style="margin-top: 15px;">
-                <h3>🌲 溫泉街必吃與氛圍</h3>
-                <p style="font-size: 0.9rem; margin-bottom: 10px;">
-                    黑川全村為了維護景觀，建築統一使用黑色與木質調，沒有霓虹燈，只有柔和的燈籠，非常適合穿著浴衣拍照。
-                </p>
-                <div class="price-table">
-                    <div class="price-header" style="color: #78350F; border-color: #78350F;">必吃甜點</div>
-                    <div class="price-header" style="color: #78350F; border-color: #78350F;">特色</div>
-                    <div class="price-header" style="color: #78350F; border-color: #78350F;">位置</div>
-                    
-                    <div class="price-item"><b>Patisserie Roku</b></div>
-                    <div class="price-item">超人氣「鹽麴泡芙」，外酥脆內餡濃郁。</div>
-                    <div class="price-item">地藏堂附近</div>
-                    
-                    <div class="price-item"><b>白玉子 (白玉ッ子)</b></div>
-                    <div class="price-item">現煮白玉湯圓，口感Q彈，搭配黑蜜黃豆粉。</div>
-                    <div class="price-item">川端通</div>
-                    
-                    <div class="price-item"><b>銅鑼燒 (Dora Dora)</b></div>
-                    <div class="price-item">夾著布丁或冰淇淋的創意銅鑼燒。</div>
-                    <div class="price-item">溫泉街中心</div>
-                </div>
-                <a href="https://www.google.com/maps/search/?api=1&query=Patisserie+Roku+Kurokawa" target="_blank" class="btn-link" style="background-color: #78350F;">導航至 Patisserie Roku 🍰</a>
-            </div>
-        </div>
-
-        <!-- 新增：Day 3/4 由布院散步攻略 -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 3-4: 由布院 湯之坪街道攻略</div>
-                <div class="tag tag-spot">超好逛</div>
-            </div>
-
-            <div class="info-section" style="background-color: #F0FDF4; border-color: #15803D;">
-                <h3 style="color: #15803D; border-bottom-color: #15803D;">🚶 經典散步路線</h3>
-                <p style="font-size: 0.95rem; color: #444;">
-                    從由布院車站出來，沿著正前方的道路直走，雖然會看到壯觀的由布岳，但精華區其實在右前方的<b>「湯之坪街道」</b>。
-                </p>
-                <div class="method-detail" style="margin-top: 10px;">
-                    <p><b>建議動線：</b> 車站 → B-speak (蛋糕捲) → 湯之坪街道 (主戰場) → Floral Village (童話村) → 金鱗湖。</p>
-                    <p style="margin-top:5px; font-size:0.85rem; color:#666;">*全程步行單趟約 20-30 分鐘 (不含逛街)，沿路非常平坦好走，適合推車。</p>
-                </div>
-            </div>
-
-            <div class="info-section" style="margin-top: 15px;">
-                <h3>🍰 排隊美食 & 特色店鋪</h3>
-                
-                <div class="safari-method" style="margin-top: 10px;">
-                    <span class="method-title" style="color: var(--primary);">B-speak 蛋糕捲 (P-roll)</span>
-                    <div class="method-detail">
-                        由布院最知名的甜點！口感蓬鬆蛋香濃郁。
-                        <br><span style="color: var(--danger); font-weight:bold;">⚠️ 注意：</span> 小條裝通常早上 10:30 前就會賣光。若想買，建議第一天抵達時先去預訂隔天取貨，或一早去排隊。
-                    </div>
-                </div>
-
-                <div class="safari-method" style="margin-top: 10px;">
-                    <span class="method-title" style="color: var(--primary);">Milch (ミルヒ) 起司杯</span>
-                    <div class="method-detail">
-                        必吃！推薦點<b>「熱的 (Hot)」</b>起司蛋糕杯，半熟流心的口感非常銷魂。也有冷的可以選擇。
-                    </div>
-                </div>
-
-                <div class="safari-method" style="margin-top: 10px;">
-                    <span class="method-title" style="color: var(--primary);">金賞可樂餅 (金賞コロッケ)</span>
-                    <div class="method-detail">
-                        曾獲全日本可樂餅大賽金賞。外皮酥脆，內餡調味較重，適合邊走邊吃。
-                    </div>
-                </div>
-
-                <div class="info-detail-box" style="margin-top: 15px; border-color: #F472B6; background-color: #FFF1F2;">
-                    <h4 style="color: #DB2777;">🍄 Yufuin Floral Village (童話村)</h4>
-                    <p style="font-size: 0.9rem;">
-                        仿照英國科茨沃爾德 (Cotswolds) 打造的黃色矮房聚落。這裡有：
-                    </p>
-                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
-                        <li><b>Miffy 麵包店：</b>造型麵包超可愛，二樓有咖啡廳。</li>
-                        <li><b>龍貓商店 (どんぐりの森)：</b>吉卜力粉絲必逛。</li>
-                        <li><b>動物餵食：</b>園區內有養山羊、兔子甚至松鼠，小朋友會很愛。</li>
-                    </ul>
-                </div>
-                <a href="https://www.google.com/maps/search/?api=1&query=Yufuin+Floral+Village" target="_blank" class="btn-link">導航至童話村 📍</a>
-            </div>
-        </div>
-
-
-        <!-- 九州自然動物公園 攻略 -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 3: 九州自然動物公園 (攻略)</div>
-                <div class="tag tag-tip">重點資訊</div>
-            </div>
-
-            <!-- 門票資訊 -->
-            <div class="info-section" style="border-color: #F59E0B;">
-                <h3 style="color: var(--secondary);">💰 門票與費用 (參考)</h3>
-                <div class="price-table">
-                    <div class="price-header">項目</div>
-                    <div class="price-header">成人</div>
-                    <div class="price-header">4歲~中學生</div>
-                    
-                    <div class="price-item">入園費</div>
-                    <div class="price-item">¥2,600</div>
-                    <div class="price-item">¥1,500</div>
-                    
-                    <div class="price-item">叢林巴士 (Jungle Bus)</div>
-                    <div class="price-item">¥1,400</div>
-                    <div class="price-item">¥1,200</div>
-                    
-                    <div class="price-item" style="font-weight: 700;">自駕車導覽收音機</div>
-                    <div class="price-item" colspan="2">¥600 (每台車)</div>
-                </div>
-                <p class="detail" style="margin-top: 10px; font-size: 0.85rem; color: var(--danger);">
-                    **費用總計：** 若選擇「入園 + 叢林巴士」，每位成人約 ¥4,000。
-                </p>
-            </div>
-            
-            <!-- 叢林巴士預約教學 -->
-            <div class="info-section">
-                <h3>🚌 叢林巴士 (Jungle Bus) 預約教學</h3>
-                 
-                <p style="font-size: 0.95rem; font-weight: 600;">
-                    叢林巴士是必玩項目！建議您提前預約，以確保有位子，特別是週末或假期。
-                </p>
-                <ol style="font-size: 0.9rem; margin-top: 10px; padding-left: 20px;">
-                    <li>**線上預約 (推薦)：：** 官方網站通常會在出發日期的前 1 個月左右開放預約。選擇日期與時段，線上付費。</li>
-                    <li>**當日現場購票：：** 如果無法線上預訂，請務必在**一開園時**（或預計抵達時）立刻前往售票處購買當日的場次。熱門時段容易客滿。</li>
-                    <li>**選擇時段：：** 建議選擇剛入園後的時段（約 14:30-15:30），以免耽誤後續前往由布院的行程。</li>
-                </ol>
-            </div>
-
-
-            <!-- 混合體驗建議 -->
-            <div class="info-section" style="background-color: #FFFBEB; border-color: var(--secondary);">
-                <h3 style="color: var(--secondary);">🚗 如何兼顧自駕與叢林巴士 (完美體驗路線)</h3>
-                <p style="font-size: 0.95rem;">
-                    想要完整體驗動物園，建議將自駕觀賞與巴士餵食結合：
-                </p>
-                
-                <div class="safari-method" style="border-color: var(--secondary);">
-                    <span class="method-title" style="color: var(--secondary);">步驟一：自駕體驗 (免費，需租借導覽機)</span>
-                    <div class="method-detail">
-                        <p>
-                            **先開您自己的租賃車**進入 Safari Zone 逛一圈。這樣可以從容地用自己的速度觀賞動物，且車內空間大較為舒適。
-                        </p>
-                        <p style="margin-top: 5px;">
-                            **優點：** 感受動物靠近車輛的震撼感，不受時間限制。
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="safari-method" style="margin-top: 15px; border-color: var(--danger);">
-                    <span class="method-title recommended" style="color: var(--danger);">步驟二：叢林巴士 (餵食體驗，需預約)</span>
-                    <div class="method-detail">
-                        <p>
-                            **隨後再搭乘叢林巴士**。巴士會在車上定點停車，讓孩子們親手將飼料從防護網餵給動物。這是自駕無法取代的互動樂趣！
-                        </p>
-                        <p style="margin-top: 5px;">
-                            **時程安排：** 建議 14:30 抵達後，先快速自駕一圈 (約 30-40 分鐘)，再接著搭乘預約好的巴士場次 (約 50 分鐘)。
-                        </p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 親近區建議 -->
-            <div class="info-section" style="margin-top: 16px;">
-                 <h3>🐕 親近區 (Fureai Zone) 建議</h3>
-                 <div class="method-detail">
-                    <p>參觀完 Safari Zone 後，請務必到親近區走走。這裡有**袋鼠、天竺鼠**等可愛的小動物可以摸摸抱抱，還有**騎馬體驗**（需另外付費），非常適合小朋友玩樂，通常會花費 1-1.5 小時。</p>
-                    <a href="https://www.google.com/maps/search/?api=1&query=African+Safari+Oita" target="_blank" class="btn-link">查看動物公園官網 (搜尋)</a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 福岡麵包超人兒童博物館 攻略 -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">福岡麵包超人兒童博物館 (攻略)</div>
-                <div class="tag tag-kids">親子備案</div>
-            </div>
-            <div class="info-section" style="border-color: #F472B6;">
-                <h3 style="color: #DB2777; border-bottom-color: #F472B6;">🍞 麵包超人博物館重點</h3>
-                <div class="method-detail">
-                    <p>這是一個專為學齡前兒童設計的夢幻樂園，位於市中心，交通極度便利（地鐵直結）。</p>
-                    <ul style="list-style-type: disc; margin-top: 10px; padding-left: 20px;">
-                        <li><b>位置：</b>博多河畔城 (Hakata Riverain Mall) 5F/6F。</li>
-                        <li><b>交通：</b>地鐵空港線/箱崎線「中洲川端站」6號出口直達。</li>
-                        <li><b>門票：</b>1歲以上統一票價 (約 2,000-2,200円)，1歲以下免費。</li>
-                    </ul>
-                </div>
-                
-                <div class="safari-method" style="margin-top: 15px; border-color: #F472B6;">
-                    <span class="method-title" style="color: #DB2777;">必玩亮點</span>
-                    <div class="method-detail">
-                        <ul style="padding-left: 20px;">
-                            <li><b>麵包超人表演秀：</b>每天有固定場次，角色會出來跳舞互動。</li>
-                            <li><b>果醬爺爺的麵包工廠：</b>必買！還原度超高的造型麵包，雖然價格稍高但非常可愛。</li>
-                            <li><b>生日服務：</b>若孩子當月生日，可獲得生日貼紙和皇冠 (需向工作人員詢問)。</li>
-                        </ul>
-                    </div>
-                </div>
-                 <p class="detail" style="margin-top: 10px; font-size: 0.85rem; color: var(--danger);">
-                    **注意：** 館內通常禁止飲食（嬰兒副食品除外），且嬰兒車需寄放在入口處。
-                </p>
-            </div>
-        </div>
-
-        <!-- 伴手禮攻略 -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">🎁 福岡 & 熊本 必買伴手禮清單</div>
-                <div class="tag tag-shop">購物</div>
-            </div>
-            
-            <div class="info-section" style="border-color: #F87171;">
-                <h3 style="color: #DC2626; border-bottom-color: #F87171;">🍓 福岡 (博多站/機場)</h3>
-                <div class="method-detail">
-                    <ul style="padding-left: 20px; line-height: 1.6;">
-                        <li><b>博多通りもん (博多通饅頭)：</b>福岡No.1伴手禮，充滿奶香的白豆沙饅頭，必買！</li>
-                        <li><b>Menbei (明太仙貝)：</b>福太郎推出的明太子仙貝，鹹香酥脆，適合當下酒菜。</li>
-                        <li><b>努努雞 (冷炸雞)：</b>口感獨特的冰涼炸雞，適合在飯店享用或最後一天帶回 (需保冷)。</li>
-                        <li><b>筑紫麻糬 (筑紫もち)：</b>淋上黑糖蜜的黃豆粉麻糬，口感精緻。</li>
-                        <li><b>Tubu Tube 明太子醬：</b>管狀包裝的明太子，方便料理或塗抹麵包。</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="info-section kumamoto">
-                <h3 style="color: var(--kumamoto-info-text); border-bottom-color: #90CDF4;">🐻 熊本 (熊本站/城彩苑)</h3>
-                <div class="method-detail">
-                    <ul style="padding-left: 20px; line-height: 1.6;">
-                        <li><b>譽之陣太鼓 (誉の陣太鼓)：</b>紅豆羊羹包覆求肥(麻糬)的經典甜點，包裝精美。</li>
-                        <li><b>黑糖多納茲棒：</b>外酥內軟的黑糖條狀甜甜圈，配牛奶超搭。</li>
-                        <li><b>武者返 (武者がえし)：</b>以熊本城石牆命名的紅豆酥皮點心。</li>
-                        <li><b>熊本熊 (Kumamon) 周邊：</b>熊本限定的部長商品，在熊本站或機場都買得到。</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB 5: AI 助手 -->
+    <!-- TAB 5: AI 助手 (New Integrated Page) -->
     <div id="view-ai" class="container">
-        <!-- ... existing AI Tab content ... -->
-        <div class="card" style="height: calc(100vh - 140px); min-height: 500px; display: flex; flex-direction: column;">
+        <div class="card" style="min-height: 600px; display: flex; flex-direction: column;">
             <div class="ai-header" id="ai-modal-title">
-                <!-- 修正 1: 標題 Sparkles 換成 SVG -->
-                <svg class="icon-mini" style="width: 24px; height: 24px; color: #F59E0B;" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                <span>隨身 AI 翻譯與助手</span>
+                <span>✨ 隨身 AI 翻譯與助手</span>
             </div>
             
-            <div class="chat-history" id="chat-history">
-                <!-- Welcome Message Bubble (Injected by JS) -->
+            <div class="ai-result-box" id="ai-result" style="flex: 1;">
+                <div style="color: #4B5563; font-size: 1rem; line-height: 1.6;">
+                    你好！我是你的九州旅遊 AI 助手。<br><br>
+                    <b>請選擇下方功能按鍵：</b>
+                    <br>
+                    <svg class="inline-icon icon-consult" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg> 
+                    <b>行程諮詢：</b> 詢問路線、時間或景點建議。
+                    <br>
+                    <svg class="inline-icon icon-trans" viewBox="0 0 24 24"><path d="M7 10h14"></path><path d="M17 6l4 4-4 4"></path><path d="M17 14H3"></path><path d="M7 18l-4-4 4-4"></path></svg> 
+                    <b>中/日翻譯：</b> 輸入文字進行雙向翻譯。
+                    <br>
+                    <svg class="inline-icon" style="color: #06B6D4;" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    <b>聽日語：</b> <b>按住</b>讓日本人說話，翻譯成中文。
+                </div>
             </div>
 
             <div class="ai-input-group" id="ai-input-area" style="display: block; margin-top: auto;">
                 <div class="ai-input-wrapper">
                     <input type="text" class="ai-input" id="ai-user-input" placeholder="請輸入內容..." onkeypress="handleEnter(event)">
-                    
-                    <!-- 新增：語音辨識語言切換開關 -->
-                    <div class="voice-lang-switch">
-                        <span style="font-weight:600; color:#9CA3AF; font-size:0.75rem; display: flex; align-items: center; gap: 4px;">
-                            <svg class="icon-mini" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                            誰在說話:
-                        </span>
-                        
-                        <!-- 選項 1: 台灣 (中文) - 圓形簡約版 -->
-                        <label class="lang-option" title="我 (說中文)">
-                            <input type="radio" name="voice_lang" value="zh-TW" checked onchange="updatePlaceholder()">
-                            <!-- Simplified Taiwan Circle Flag -->
-                            <svg class="flag-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <mask id="maskTW"><circle cx="12" cy="12" r="12" fill="white"/></mask>
-                                <g mask="url(#maskTW)">
-                                    <rect width="24" height="24" fill="#FE0000"/>
-                                    <rect width="12" height="12" fill="#000095"/>
-                                    <!-- 簡化的青天白日 (同心圓風格) -->
-                                    <circle cx="6" cy="6" r="3.5" fill="white"/>
-                                    <circle cx="6" cy="6" r="2.5" fill="#000095"/>
-                                    <circle cx="6" cy="6" r="1.5" fill="white"/>
-                                </g>
-                            </svg>
-                        </label>
-                        
-                        <!-- 選項 2: 日本 (日文) - 圓形簡約版 -->
-                        <label class="lang-option" title="店員 (說日文)">
-                            <input type="radio" name="voice_lang" value="ja-JP" onchange="updatePlaceholder()">
-                            <!-- Simplified Japan Circle Flag -->
-                            <svg class="flag-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="12" r="11.5" fill="white" stroke="#E5E7EB"/>
-                                <circle cx="12" cy="12" r="5" fill="#BC002D"/>
-                            </svg>
-                        </label>
-                    </div>
-
                     <div class="ai-actions-row">
                         <button class="btn-mode consult" onclick="sendToGemini('consult')">
                             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
@@ -2184,22 +1211,22 @@
                             <svg viewBox="0 0 24 24"><path d="M7 10h14"></path><path d="M17 6l4 4-4 4"></path><path d="M17 14H3"></path><path d="M7 18l-4-4 4-4"></path></svg>
                             中/日翻譯
                         </button>
-                        <!-- Voice Button -->
+                        <!-- New Voice Button (Press and Hold) -->
                         <button class="btn-mode voice" id="btn-voice-ja">
                             <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                            語音輸入
+                            聽日語
                         </button>
                     </div>
                 </div>
             </div>
-            
+            <!-- Back button for specific guide mode -->
             <button id="btn-back-trans" class="btn-ai-reset" onclick="showAiTranslatorMode()">
                  ↩️ 返回一般模式
             </button>
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar (5 items now) -->
+    <!-- Bottom Navigation Bar (5 items) -->
     <nav class="nav-bar">
         <div class="nav-item active" data-target="view-schedule" onclick="switchTab(this)">
             <span class="nav-icon">
@@ -2225,10 +1252,8 @@
             </span>
             旅遊資訊
         </div>
-        
-        <!-- 調整順序: AI 助手放到最後 -->
         <div class="nav-item" data-target="view-ai" onclick="switchTab(this)">
-            <span class="nav-icon">
+            <span class="nav-icon" style="color: #3b82f6;">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
             </span>
             AI 助手
@@ -2277,42 +1302,43 @@
                 document.getElementById('hw-icon').innerHTML = fullSvg;
             }
         }
-                
-        // 新增：獨立的 Gemini 呼叫函數，只回傳文字，不操作 UI
-        async function getGeminiResponse(promptText) {
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: promptText }] }]
-                    })
-                });
 
-                const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
-                
-                let text = data.candidates[0].content.parts[0].text.trim();
-                // 清理可能的回傳格式
-                text = text.replace(/```(html|json)?/g, '').replace(/```/g, '').trim();
-                return text;
-            } catch (error) {
-                console.error("AI Fetch Error:", error);
-                throw error;
-            }
-        }
-
+        // Updated safe switchTab function
         function switchTab(element) {
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            document.querySelectorAll('.container').forEach(container => container.classList.remove('active'));
-            element.classList.add('active');
+            // Safety check: if element is null or undefined, stop here to prevent error
+            if (!element) return;
+
+            // Remove active from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (item && item.classList) item.classList.remove('active');
+            });
+
+            // Remove active from all containers
+            document.querySelectorAll('.container').forEach(container => {
+                if (container && container.classList) container.classList.remove('active');
+            });
+
+            // Activate clicked item
+            if (element.classList) {
+                element.classList.add('active');
+            }
+
+            // Activate target content
             const targetId = element.getAttribute('data-target');
-            document.getElementById(targetId).classList.add('active');
+            if (targetId) {
+                const targetContent = document.getElementById(targetId);
+                if (targetContent && targetContent.classList) {
+                    targetContent.classList.add('active');
+                }
+            }
+            
             window.scrollTo(0, 0);
         }
 
         function toggleTimeline(id, toggleElement) {
             const timeline = document.getElementById(id);
+            if (!timeline) return; // Safety check
+
             // If opening a new day
             if (!timeline.classList.contains('show')) {
                 // Collapse others
@@ -2332,199 +1358,134 @@
             }
         }
 
-        // AI Functions - UI Interaction Part
-        const chatHistory = document.getElementById('chat-history');
+        // AI Functions
+        const aiResult = document.getElementById('ai-result');
         const aiInput = document.getElementById('ai-user-input');
         const aiTitle = document.getElementById('ai-modal-title');
         const aiInputArea = document.getElementById('ai-input-area');
         const btnBackTrans = document.getElementById('btn-back-trans');
 
-        // Initial Greeting
-        function initAiChat() {
-            if (chatHistory.children.length === 0) {
-                const welcomeHtml = `
-                    你好！我是你的九州旅遊 AI 助手。
-                    <br><br>
-                    你可以點選下方的 <b>「行程諮詢」</b> 詢問路線，或使用 <b>「中/日翻譯」</b> 與當地人溝通。
-                `;
-                appendMessage('ai', welcomeHtml);
-            }
-        }
-
         // Function to switch to AI tab programmatically
         function goToAiTab() {
+            // Use querySelector safely
             const aiTabBtn = document.querySelector('[data-target="view-ai"]');
-            switchTab(aiTabBtn);
+            if (aiTabBtn) {
+                switchTab(aiTabBtn);
+            } else {
+                console.error("AI Tab button not found");
+            }
         }
 
         function showAiTranslatorMode() {
-            // 修正 3: JS 動態切換標題時也要用 SVG
-            const iconSvg = '<svg class="icon-mini" style="width: 24px; height: 24px; color: #F59E0B; margin-right: 8px;" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>';
-            aiTitle.innerHTML = iconSvg + '<span>隨身 AI 翻譯與助手</span>';
+            aiTitle.innerHTML = '<span>✨ 隨身 AI 翻譯與助手</span>';
+            aiResult.innerHTML = `
+                <div style="color: #4B5563; font-size: 1rem; line-height: 1.6;">
+                    你好！我是你的九州旅遊 AI 助手。<br><br>
+                    <b>請選擇下方功能按鍵：</b>
+                    <br>
+                    <svg class="inline-icon icon-consult" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg> 
+                    <b>行程諮詢：</b> 詢問路線、時間或景點建議。
+                    <br>
+                    <svg class="inline-icon icon-trans" viewBox="0 0 24 24"><path d="M7 10h14"></path><path d="M17 6l4 4-4 4"></path><path d="M17 14H3"></path><path d="M7 18l-4-4 4-4"></path></svg> 
+                    <b>中/日翻譯：</b> 輸入文字進行雙向翻譯。
+                    <br>
+                    <svg class="inline-icon" style="color: #06B6D4;" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    <b>聽日語：</b> <b>按住</b>讓日本人說話，翻譯成中文。
+                </div>
+            `;
             aiInputArea.style.display = 'block'; 
             btnBackTrans.style.display = 'none';
-            // Scroll to bottom
-            chatHistory.scrollTop = chatHistory.scrollHeight;
+            aiInput.value = '';
+            
+            // Re-attach listeners for the new DOM elements
             setupVoiceButton();
-        }
-        
-        // Append Message Bubble
-        function appendMessage(sender, htmlContent, isAudio = false) {
-            const row = document.createElement('div');
-            row.className = `chat-row ${sender}`;
-            
-            const bubble = document.createElement('div');
-            bubble.className = `chat-bubble ${sender}`;
-            bubble.innerHTML = htmlContent;
-            
-            // If it's an AI message with Japanese, add inline audio button
-            if (sender === 'ai' && isAudio) {
-                const btn = document.createElement('button');
-                btn.className = 'btn-audio-inline';
-                btn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
-                // Extract plain text for speaking (remove HTML tags)
-                const textToSpeak = bubble.innerText.replace('🔊', '').trim();
-                
-                btn.onclick = () => speakText(textToSpeak);
-                bubble.appendChild(btn);
-                
-                // Also auto-play once
-                setTimeout(() => speakText(textToSpeak), 200);
-            }
-
-            row.appendChild(bubble);
-            chatHistory.appendChild(row);
-            
-            // Scroll to bottom
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-            
-            return bubble; // Return in case we need to update it (loading state)
-        }
-        
-        function showLoading() {
-            const row = document.createElement('div');
-            row.className = 'chat-row ai loading-row';
-            row.id = 'loading-indicator';
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'chat-bubble ai loading-bubble';
-            bubble.innerHTML = 'AI 正在思考中<span class="loading-dots"></span>';
-            
-            row.appendChild(bubble);
-            chatHistory.appendChild(row);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }
-
-        function removeLoading() {
-            const loading = document.getElementById('loading-indicator');
-            if (loading) loading.remove();
-        }
-        
-        // Helper to update placeholder based on selection
-        function updatePlaceholder() {
-            const lang = document.querySelector('input[name="voice_lang"]:checked').value;
-            const input = document.getElementById('ai-user-input');
-            if (lang === 'zh-TW') {
-                input.placeholder = '請輸入中文 (或使用語音)...';
-            } else {
-                input.placeholder = '請輸入日文 (或切換語音)...';
-            }
-        }
-
-        function speakText(text) {
-             speechSynthesis.cancel();
-             const utterance = new SpeechSynthesisUtterance(text);
-             utterance.lang = 'ja-JP'; 
-             utterance.rate = 0.9;
-             const voices = speechSynthesis.getVoices();
-             const jaVoice = voices.find(v => v.lang.includes('ja'));
-             if (jaVoice) utterance.voice = jaVoice;
-             speechSynthesis.speak(utterance);
         }
 
         // Voice Recognition Logic
         function setupVoiceButton() {
             const voiceBtn = document.getElementById('btn-voice-ja');
             if (!voiceBtn) return;
-            
-            voiceBtn.oncontextmenu = function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-                return false;
-            };
 
             let recognition;
             
-            if ('webkitSpeechRecognition' in window) {
-                recognition = new webkitSpeechRecognition();
-                // 關鍵修正：不再自動偵測，而是讀取使用者的選擇
-                recognition.continuous = false;
-                recognition.interimResults = false;
-
-                recognition.onstart = function() {
-                    // 在開始時動態設定語言
-                    const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
-                    recognition.lang = selectedLang;
-                    
-                    voiceBtn.classList.add('recording');
-                    const langText = selectedLang === 'zh-TW' ? '中文' : '日文';
-                    voiceBtn.innerHTML = `🔴 聽${langText}中...`;
-                    document.getElementById('ai-user-input').placeholder = `正在聆聽${langText}...`;
-                };
-
-                recognition.onend = function() {
-                    voiceBtn.classList.remove('recording');
-                    voiceBtn.innerHTML = `
-                        <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:2px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                        語音輸入
-                    `;
-                    updatePlaceholder();
-                };
-
-                recognition.onresult = function(event) {
-                    const transcript = event.results[0][0].transcript;
-                    document.getElementById('ai-user-input').value = transcript;
-                    sendToGemini('voice_auto');
-                };
-                
-                // Error handling for "no-speech" or "language mismatch"
-                recognition.onerror = function(event) {
-                    console.log('Voice Error:', event.error);
-                    voiceBtn.classList.remove('recording');
-                    voiceBtn.innerHTML = `
-                        <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:2px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                        重試
-                    `;
-                };
-
-                const startRec = (e) => {
-                    if (e.cancelable) e.preventDefault();
-                    // 每次點擊前先停止舊的 (避免重複開啟)
-                    try { recognition.stop(); } catch(err) {}
-                    try { recognition.start(); } catch(err) { console.log(err); }
-                };
-                
-                // 改為 Click 觸發即可，不用長按，因為現在有語言開關了
-                // 為了手機體驗，還是保留 touchstart
-                voiceBtn.onclick = startRec;
-                
-            } else {
-                voiceBtn.style.display = 'none'; 
-                console.log('Web Speech API not supported');
+            // Feature Detection
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                // Not supported (e.g., iOS Safari)
+                voiceBtn.classList.add('disabled');
+                voiceBtn.innerHTML = `
+                   <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                   手機不支援
+                `;
+                voiceBtn.onclick = () => alert('您的裝置（如 iOS Safari）不支援網頁語音辨識功能。');
+                return;
             }
+            
+            // Supported (e.g., Chrome on Android/Desktop)
+            recognition = new SpeechRecognition();
+            recognition.lang = 'ja-JP'; // Set to Japanese
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = function() {
+                voiceBtn.classList.add('recording');
+                voiceBtn.innerHTML = '🔴 收音中...';
+                aiInput.placeholder = '正在聆聽日語...';
+            };
+
+            recognition.onend = function() {
+                voiceBtn.classList.remove('recording');
+                voiceBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:2px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    聽日語
+                `;
+                aiInput.placeholder = '請輸入內容...';
+            };
+            
+            recognition.onerror = function(event) {
+                console.error("Speech Recognition Error:", event.error);
+                let msg = "收音失敗";
+                if (event.error === 'not-allowed') msg = "請允許麥克風權限";
+                if (event.error === 'no-speech') msg = "沒聽到聲音";
+                alert(msg);
+                recognition.stop();
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                aiInput.value = transcript;
+                // Auto send with 'voice_ja' mode
+                sendToGemini('voice_ja');
+            };
+
+            // Handling Mouse/Touch Events for "Press and Hold"
+            const startRec = (e) => {
+                // Prevent context menu on long press
+                if (e.type === 'touchstart' || e.type === 'contextmenu') e.preventDefault(); 
+                try { recognition.start(); } catch(err) { console.log(err); }
+            };
+            
+            const stopRec = (e) => {
+                e.preventDefault();
+                try { recognition.stop(); } catch(err) { console.log(err); }
+            };
+
+            // Bind events
+            voiceBtn.addEventListener('mousedown', startRec);
+            voiceBtn.addEventListener('mouseup', stopRec);
+            voiceBtn.addEventListener('touchstart', startRec, {passive: false});
+            voiceBtn.addEventListener('touchend', stopRec);
+            voiceBtn.addEventListener('contextmenu', (e) => e.preventDefault()); // Block right click/long press menu
         }
 
         function askGeminiGuide(spotName, customPrompt) {
-            goToAiTab();
-            // 修正 4: 導覽模式標題圖示也統一
-            const iconSvg = '<svg class="icon-mini" style="width: 24px; height: 24px; color: #F59E0B; margin-right: 8px;" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>';
-            aiTitle.innerHTML = iconSvg + `<span>${spotName} 小故事</span>`;
-            aiInputArea.style.display = 'none'; 
-            btnBackTrans.style.display = 'block'; 
+            goToAiTab(); // Switch to the AI tab
             
-            // Add system message to chat indicating start
-            appendMessage('ai', `正在為您生成關於「${spotName}」的故事...`);
-
+            aiTitle.innerHTML = `<span>✨ ${spotName} 小故事</span>`;
+            aiInputArea.style.display = 'none'; // Hide input for guide mode
+            btnBackTrans.style.display = 'block'; // Show back button
+            
             const prompt = `
                 你是一位帶領親子旅遊的九州導遊。
                 請針對景點「${spotName}」生成一段給 5-8 歲小孩聽的導覽詞。
@@ -2540,6 +1501,7 @@
         }
 
         function handleEnter(e) {
+            // If Enter is pressed, use 'auto' mode (legacy behavior)
             if (e.key === 'Enter') sendToGemini('auto');
         }
 
@@ -2547,58 +1509,63 @@
             const text = aiInput.value.trim();
             if (!text) return;
 
-            // Display User Message
-            appendMessage('user', text);
-            aiInput.value = ''; // Clear input
-
-            // 1. Grab Schedule Context
+            // 1. 抓取目前的行程表文字內容 (讓 AI 知道您的計畫)
             const scheduleContext = document.getElementById('view-schedule').innerText;
             
             let prompt = "";
 
             if (mode === 'consult') {
+                // 強制行程諮詢模式
                 prompt = `
                     你是一位專業的九州親子旅遊顧問。
-                    【行程表資訊】：${scheduleContext.substring(0, 8000)}
+                    
+                    【目前的行程表資訊】：
+                    ${scheduleContext.substring(0, 8000)}
+
                     【使用者問題】： "${text}"
+
                     任務：請根據行程表，針對使用者的問題提供具體、實用的建議。
                     注意：考慮到是親子旅遊，請注意體力分配與兒童需求。
                     請用台灣繁體中文回答。
                 `;
             } else if (mode === 'translate') {
+                // 強制翻譯模式
                 prompt = `
                     你是一個專業的中日翻譯機。
+                    
                     【使用者輸入】： "${text}"
+
                     任務：
                     1. 若輸入中文：請翻譯成自然的日文 (禮貌形)。只輸出翻譯後的日文。
                     2. 若輸入日文：請翻譯成繁體中文。
+                    
                     注意：不要任何解釋，只給我翻譯結果。不要羅馬拼音。
                 `;
-            } else if (mode === 'voice_auto') {
-                // 根據使用者選擇的語言，給 AI 更精準的指令
-                const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
-                const isInputZh = selectedLang === 'zh-TW';
-                
+            } else if (mode === 'voice_ja') {
+                // 新增：日語語音翻譯模式
                 prompt = `
-                    你是一個中日雙向口譯員。
-                    【輸入語言】：${isInputZh ? '中文 (台灣)' : '日文'}
-                    【輸入內容】： "${text}"
+                    你是一個即時口譯員。使用者正在日本旅遊，對方(日本人)說了一段話。
                     
+                    【對方說的日文】： "${text}"
+
                     任務：
-                    ${isInputZh ? '1. 使用者說中文，請翻譯成日文 (禮貌形)。' : '1. 使用者說日文，請翻譯成台灣繁體中文。'}
+                    請將這段日文翻譯成**台灣繁體中文**，讓使用者能聽懂。
                     
                     注意：
-                    - 只輸出翻譯結果，不要解釋。
-                    - 若語意不清，請根據旅遊情境推測最可能的句子。
+                    1. 只輸出中文翻譯結果。
+                    2. 若日文內容不完整或含糊，請嘗試根據旅遊情境推測並翻譯。
                 `;
             } else {
+                // Auto 模式 (保留給 Enter 鍵使用)
                 prompt = `
                     你是一位專業的九州親子旅遊顧問與隨身翻譯。
                     【行程表資訊】：${scheduleContext.substring(0, 5000)}
                     【使用者輸入】： "${text}"
+
                     請自動判斷：
                     1. 若是問問題/尋求建議 -> 執行行程諮詢模式。
                     2. 若是短句/單詞 -> 執行翻譯模式 (中翻日或日翻中)。
+                    
                     請直接給出結果，不要解釋你的判斷邏輯。
                 `;
             }
@@ -2607,26 +1574,78 @@
         }
 
         async function callGemini(promptText) {
-            showLoading();
+            aiResult.innerHTML = '<span class="loading-dots">AI 正在思考中</span>';
             
             try {
-                // 改用新的共用函數 getGeminiResponse
-                let rawText = await getGeminiResponse(promptText);
-                removeLoading();
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }]
+                    })
+                });
 
-                // Check for Japanese chars to decide if we show audio button
-                const hasJapanese = /[\u3040-\u309F\u30A0-\u30FF]/.test(rawText);
-                const isTranslation = hasJapanese && rawText.length < 500;
-
-                // Format text (convert newlines to <br>)
-                const formattedText = rawText.replace(/\n/g, '<br>');
+                const data = await response.json();
                 
-                appendMessage('ai', formattedText, isTranslation);
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
+
+                let rawText = data.candidates[0].content.parts[0].text.trim();
+                
+                // Remove any accidental Markdown code blocks if Gemini ignores instruction
+                rawText = rawText.replace(/```(html|json)?/g, '').replace(/```/g, '').trim();
+
+                // Display Logic: Wrap in a nice style since AI returns raw text now
+                aiResult.innerHTML = `
+                    <div style="font-size: 1.1rem; font-weight: 500; color: #374151; margin-bottom: 15px; line-height: 1.6;">
+                        ${rawText.replace(/\n/g, '<br>')}
+                    </div>
+                `;
+                
+                // TTS Logic: Check if the result looks like Japanese (Translation Mode)
+                // Regex checks for Hiragana or Katakana.
+                const hasJapanese = /[\u3040-\u309F\u30A0-\u30FF]/.test(rawText);
+                
+                // 放寬限制：只要偵測到日文假名，且在 AI 翻譯頁面中，就視為翻譯結果
+                // 移除嚴格的長度限制 (rawText.length < 100)，改為較寬鬆的 500 字，避免長篇導遊詞被朗讀
+                const isTranslationResult = hasJapanese && rawText.length < 500;
+
+                if (aiInputArea.style.display !== 'none' && isTranslationResult) {
+                     const speak = () => {
+                         // Stop any current speech first
+                         speechSynthesis.cancel();
+                         
+                         const utterance = new SpeechSynthesisUtterance(rawText);
+                         utterance.lang = 'ja-JP'; 
+                         utterance.rate = 0.9; // Slightly slower
+                         
+                         // Mobile Safari specific: sometimes voices need to be loaded
+                         const voices = speechSynthesis.getVoices();
+                         const jaVoice = voices.find(v => v.lang.includes('ja'));
+                         if (jaVoice) utterance.voice = jaVoice;
+
+                         speechSynthesis.speak(utterance);
+                     };
+
+                     // Try auto-play (might be blocked by browser on mobile)
+                     setTimeout(speak, 100);
+                     
+                     // Always show the replay button if it's Japanese
+                     const speakBtn = document.createElement('button');
+                     // Updated to Simple Icon and Blue Class
+                     speakBtn.innerHTML = `
+                        <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                        再次播放
+                     `;
+                     speakBtn.className = 'btn-ai-play'; // New Blue Class
+                     speakBtn.onclick = speak;
+                     aiResult.appendChild(speakBtn);
+                } 
 
             } catch (error) {
-                removeLoading();
                 console.error('Gemini API Error:', error);
-                appendMessage('ai', `<span style="color:red">發生錯誤，請稍後再試。<br>Error: ${error.message}</span>`);
+                aiResult.innerHTML = `<span style="color:red">發生錯誤，請稍後再試。<br>Error: ${error.message}</span>`;
             }
         }
         
@@ -2637,10 +1656,11 @@
             if (d1Timeline) { 
                 d1Timeline.classList.add('show');
                 d1Toggle.classList.add('open');
-                updateWeatherWidget('d1'); 
+                updateWeatherWidget('d1'); // Initialize weather
             }
-            initAiChat();
-            setupVoiceButton(); // Init voice listener
+            
+            // Check for initial view
+            showAiTranslatorMode(); // Initialize AI view state
         });
     </script>
 </body>
