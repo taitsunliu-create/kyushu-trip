@@ -2231,6 +2231,16 @@
             </div>
 
             <div class="ai-input-group" id="ai-input-area" style="display: block; margin-top: auto;">
+                <div class="ai-header" id="ai-modal-title">
+    </div>
+
+<div style="text-align: right; padding-bottom: 10px;">
+    <button onclick="resetAppPassword()" style="background:none; border:none; color:#9CA3AF; font-size:0.8rem; cursor:pointer; text-decoration:underline;">
+        🔄 重設金鑰密碼
+    </button>
+</div>
+
+<div class="chat-history" id="chat-history">
                 <div class="ai-input-wrapper">
                     <input type="text" class="ai-input" id="ai-user-input" placeholder="請輸入內容..." onkeypress="handleEnter(event)">
                     
@@ -3336,5 +3346,15 @@ function getDecryptedKey() {
             setupVoiceButton(); // Init voice listener
         });
     </script>
+
+// [新增] 強制清除密碼並重新整理
+function resetAppPassword() {
+    if(confirm("確定要清除記憶的密碼並重新輸入嗎？")) {
+        localStorage.removeItem("app_password"); // 清除 LocalStorage
+        apiKey = ""; // 清除記憶體中的 Key
+        alert("密碼記憶已清除，頁面將重新整理。");
+        window.location.reload(); // 重新整理頁面，就會再次跳出輸入視窗
+    }
+}
 </body>
 </html>
