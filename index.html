@@ -2225,22 +2225,26 @@
                 <svg class="icon-mini" style="width: 24px; height: 24px; color: #F59E0B;" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
                 <span>隨身 AI 翻譯與助手</span>
             </div>
-            
+            <div id="view-ai" class="container">
+    <div class="card" style="height: calc(100vh - 140px); min-height: 500px; display: flex; flex-direction: column;">
+        
+        <div class="ai-header" id="ai-modal-title">
+            <svg class="icon-mini" ... (略) ...></svg>
+            <span>隨身 AI 翻譯與助手</span>
+        </div>
+
+        <div style="text-align: right; margin-bottom: 5px; padding-right: 5px;">
+            <button onclick="resetAppPassword()" style="border: none; background: none; color: #EF4444; font-size: 0.85rem; cursor: pointer; text-decoration: underline;">
+                🔐 重設金鑰密碼
+            </button>
+        </div>
+        <div class="chat-history" id="chat-history">
+            </div>
             <div class="chat-history" id="chat-history">
                 <!-- Welcome Message Bubble (Injected by JS) -->
             </div>
 
             <div class="ai-input-group" id="ai-input-area" style="display: block; margin-top: auto;">
-                <div class="ai-header" id="ai-modal-title">
-    </div>
-
-<div style="text-align: right; padding-bottom: 10px;">
-    <button onclick="resetAppPassword()" style="background:none; border:none; color:#9CA3AF; font-size:0.8rem; cursor:pointer; text-decoration:underline;">
-        🔄 重設金鑰密碼
-    </button>
-</div>
-
-<div class="chat-history" id="chat-history">
                 <div class="ai-input-wrapper">
                     <input type="text" class="ai-input" id="ai-user-input" placeholder="請輸入內容..." onkeypress="handleEnter(event)">
                     
@@ -3332,7 +3336,13 @@ function getDecryptedKey() {
                 appendMessage('ai', `<span style="color:red">發生錯誤，請稍後再試。<br>Error: ${error.message}</span>`);
             }
         }
-        
+        function resetAppPassword() {
+        if (confirm("您確定要清除已記憶的密碼並重新輸入嗎？")) {
+            localStorage.removeItem("app_password"); // 清除瀏覽器記憶
+            alert("密碼已清除！頁面將重新整理，請重新輸入新密碼。");
+            window.location.reload(); // 重新整理網頁
+        }
+    }
         document.addEventListener('DOMContentLoaded', () => {
             // Default: Open Day 1
             const d1Toggle = document.getElementById('toggle-d1');
@@ -3346,15 +3356,5 @@ function getDecryptedKey() {
             setupVoiceButton(); // Init voice listener
         });
     </script>
-
-// [新增] 強制清除密碼並重新整理
-function resetAppPassword() {
-    if(confirm("確定要清除記憶的密碼並重新輸入嗎？")) {
-        localStorage.removeItem("app_password"); // 清除 LocalStorage
-        apiKey = ""; // 清除記憶體中的 Key
-        alert("密碼記憶已清除，頁面將重新整理。");
-        window.location.reload(); // 重新整理頁面，就會再次跳出輸入視窗
-    }
-}
 </body>
 </html>
