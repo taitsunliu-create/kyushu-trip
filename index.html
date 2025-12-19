@@ -83,45 +83,53 @@
         }   
      /* [修改] SOS 浮動分享按鈕 (層級加強版) */
      /* [新增] 行前檢查清單樣式 */
+        /* [修改] 行前檢查清單樣式 (加入折疊功能) */
+        .checklist-card-header {
+            border-bottom: 1px dashed #E5E7EB; 
+            padding-bottom: 10px; 
+            margin-bottom: 0;
+            /* 新增: 讓標題可點擊並對齊箭頭 */
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* 收合容器 (預設隱藏 max-height: 0) */
+        .checklist-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+            opacity: 0;
+        }
+        /* 展開狀態 (加上 .show 類別時) */
+        .checklist-container.show {
+            max-height: 800px; /* 設定一個足夠的高度讓內容顯示 */
+            opacity: 1;
+            margin-top: 15px; /* 展開時才給上方間距 */
+        }
+
+        /* 沿用原本的格線與項目樣式 */
         .checklist-grid { 
             display: grid; 
-            grid-template-columns: 1fr 1fr; /* 兩欄並排 */
+            grid-template-columns: 1fr 1fr; 
             gap: 10px; 
-            margin-top: 10px;
+            /* margin-top: 10px; <-- 移除這行，改由 container 控制 */
         }
         .check-item {
-            display: flex; 
-            align-items: center; 
-            gap: 8px;
-            background: #F9FAFB; 
-            padding: 10px 12px; 
-            border-radius: 8px;
-            cursor: pointer; 
-            font-size: 0.9rem; 
-            transition: all 0.2s;
-            border: 1px solid #E5E7EB;
-            -webkit-user-select: none;
-               -moz-user-select: none;
-                    user-select: none; /* 防止連點選取文字 */
+            display: flex; align-items: center; gap: 8px;
+            background: #F9FAFB; padding: 10px 12px; border-radius: 8px;
+            cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+            border: 1px solid #E5E7EB; -webkit-user-select: none; -moz-user-select: none; user-select: none;
         }
-        /* 手機版改為單欄，比較好點 */
-        @media (max-width: 600px) {
-            .checklist-grid { grid-template-columns: 1fr; }
-        }
-        /* 勾選後的樣式變化 (綠色) */
+        /* 手機版改為單欄 */
+        @media (max-width: 600px) { .checklist-grid { grid-template-columns: 1fr; } }
+        
         .check-item:has(input:checked) {
-            background: #ECFDF5; 
-            border-color: #10B981; 
-            color: #065F46; 
-            font-weight: 600;
+            background: #ECFDF5; border-color: #10B981; color: #065F46; font-weight: 600;
             box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1);
         }
-        .check-item input { 
-            accent-color: #10B981; 
-            width: 18px; 
-            height: 18px; 
-            cursor: pointer;
-        }
+        .check-item input { accent-color: #10B981; width: 18px; height: 18px; cursor: pointer; }
         .float-share-btn {
             position: fixed;
             bottom: 90px; /* 位於底部導航欄上方 */
@@ -1023,22 +1031,28 @@
         <div id="view-schedule" class="container active">
 
         <div class="card" style="border-left: 5px solid #F59E0B; margin-bottom: 20px;">
-            <div class="card-header" style="border-bottom: 1px dashed #E5E7EB; padding-bottom: 10px; margin-bottom: 0;">
+            <div class="card-header checklist-card-header" onclick="toggleChecklist(this)">
                 <div class="card-title" style="display: flex; align-items: center; gap: 6px;">
                     <svg class="icon-mini" style="color: #F59E0B;" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
                     行前準備 Check List
                 </div>
-                <div class="tag tag-tip" id="checklist-progress" style="background:#FFFBEB; color:#D97706; font-weight:700;">0/6</div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="tag tag-tip" id="checklist-progress" style="background:#FFFBEB; color:#D97706; font-weight:700;">0/8</div>
+                    <svg class="toggle-icon" style="width: 20px; height: 20px; transition: transform 0.3s; color: #6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
             </div>
-            <div class="checklist-grid">
-                <label class="check-item"><input type="checkbox" data-id="c1"> <span>護照 & 機票 (截圖備份)</span></label>
-                <label class="check-item"><input type="checkbox" data-id="c2"> <span>旅遊保險單 (紙本/電子)</span></label>
-                <label class="check-item"><input type="checkbox" data-id="c3"> <span>日幣現金 & 信用卡</span></label>
-                <label class="check-item"><input type="checkbox" data-id="c4"> <span>SIM卡 / 漫遊開通</span></label>
-                <label class="check-item"><input type="checkbox" data-id="c5"> <span>Visit Japan Web 填寫</span></label>
-                <label class="check-item"><input type="checkbox" data-id="c6"> <span>行動電源 & 充電線</span></label>
-                <label class="check-item"><input type="checkbox" data-id="c7"> <span>國際駕照 (日文譯本)</span></label>
-                <label class="check-item"><input type="checkbox" data-id="c8"> <span>牙刷/常備藥品</span></label>
+            
+            <div id="checklist-container" class="checklist-container">
+                <div class="checklist-grid">
+                    <label class="check-item"><input type="checkbox" data-id="c1"> <span>護照 & 機票 (截圖備份)</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c2"> <span>旅遊保險單 (紙本/電子)</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c3"> <span>日幣現金 & 信用卡</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c4"> <span>SIM卡 / 漫遊開通</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c5"> <span>Visit Japan Web 填寫</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c6"> <span>行動電源 & 充電線</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c7"> <span>國際駕照 (日文譯本)</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c8"> <span>牙刷/常備藥品</span></label>
+                </div>
             </div>
         </div>
 
@@ -3854,6 +3868,23 @@ function getLocalWeather() {
             // 3. 初始更新一次 UI
             updateProgress();
         }
+        function toggleChecklist(headerEl) {
+        const container = document.getElementById('checklist-container');
+        const icon = headerEl.querySelector('.toggle-icon');
+        
+        // 切換顯示容器 (加上或移除 .show 類別)
+        const isClosed = !container.classList.contains('show');
+        
+        if (isClosed) {
+            container.classList.add('show');
+            icon.style.transform = 'rotate(180deg)'; // 箭頭轉向上
+            icon.style.color = '#2563EB'; // 變色 (選用)
+        } else {
+            container.classList.remove('show');
+            icon.style.transform = 'rotate(0deg)'; // 箭頭轉回向下
+            icon.style.color = '#6B7280';
+        }
+    }
         document.addEventListener('DOMContentLoaded', () => {
             // Default: Open Day 1
             const d1Toggle = document.getElementById('toggle-d1');
