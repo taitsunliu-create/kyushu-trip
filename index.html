@@ -413,6 +413,23 @@
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 10H4a7 7 0 1 1 7-7v.5'%3E%3C/path%3E%3Cpath d='M10 14a6 6 0 0 0-6-6'%3E%3C/path%3E%3Cline x1='12' y1='16' x2='12' y2='22'%3E%3C/line%3E%3Cline x1='12' y1='22' x2='9' y2='19'%3E%3C/line%3E%3Cline x1='12' y1='22' x2='15' y2='19'%3E%3C/line%3E%3Cline x1='18.5' y1='12' x2='22' y2='12'%3E%3C/line%3E%3Cline x1='22' y1='12' x2='19.5' y2='9.5'%3E%3C/line%3E%3Cline x1='22' y1='12' x2='19.5' y2='14.5'%3E%3C/line%3E%3Cline x1='5' y1='18.5' x2='2' y2='18.5'%3E%3C/line%3E%3Cline x1='2' y1='18.5' x2='4.5' y2='21'%3E%3C/line%3E%3Cline x1='2' y1='18.5' x2='4.5' y2='16'%3E%3C/line%3E%3Cline x1='17.5' y1='18.5' x2='20.5' y2='21'%3E%3C/line%3E%3Cline x1='17.5' y1='18.5' x2='20.5' y2='16'%3E%3C/line%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 10H4a7 7 0 1 1 7-7v.5'%3E%3C/path%3E%3Cpath d='M10 14a6 6 0 0 0-6-6'%3E%3C/path%3E%3Cline x1='12' y1='16' x2='12' y2='22'%3E%3C/line%3E%3Cline x1='12' y1='22' x2='9' y2='19'%3E%3C/line%3E%3Cline x1='12' y1='22' x2='15' y2='19'%3E%3C/line%3E%3Cline x1='18.5' y1='12' x2='22' y2='12'%3E%3C/line%3E%3Cline x1='22' y1='12' x2='19.5' y2='9.5'%3E%3C/line%3E%3Cline x1='22' y1='12' x2='19.5' y2='14.5'%3E%3C/line%3E%3Cline x1='5' y1='18.5' x2='2' y2='18.5'%3E%3C/line%3E%3Cline x1='2' y1='18.5' x2='4.5' y2='21'%3E%3C/line%3E%3Cline x1='2' y1='18.5' x2='4.5' y2='16'%3E%3C/line%3E%3Cline x1='17.5' y1='18.5' x2='20.5' y2='21'%3E%3C/line%3E%3Cline x1='17.5' y1='18.5' x2='20.5' y2='16'%3E%3C/line%3E%3C/svg%3E");
 }
+
+.weather-icon.rain {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 13v8'%3E%3C/path%3E%3Cpath d='M8 13v8'%3E%3C/path%3E%3Cpath d='M12 15v8'%3E%3C/path%3E%3Cpath d='M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25'%3E%3C/path%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 13v8'%3E%3C/path%3E%3Cpath d='M8 13v8'%3E%3C/path%3E%3Cpath d='M12 15v8'%3E%3C/path%3E%3Cpath d='M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25'%3E%3C/path%3E%3C/svg%3E");
+}
+
+/* 2. 霧 (Fog) - 預防之後遇到霧天也變方塊 */
+.weather-icon.fog {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 6h14M4 10h16M6 14h12M4 18h16'%3E%3C/path%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 6h14M4 10h16M6 14h12M4 18h16'%3E%3C/path%3E%3C/svg%3E");
+}
+
+/* 3. 雷雨 (Lightning) - 預防遇到雷雨變方塊 */
+.weather-icon.lightning {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9'%3E%3C/path%3E%3Cpolyline points='13 11 9 17 15 17 11 23'%3E%3C/polyline%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9'%3E%3C/path%3E%3Cpolyline points='13 11 9 17 15 17 11 23'%3E%3C/polyline%3E%3C/svg%3E");
+}
 /* Day 2: 計時器/碼表圖示 (Timer) */
 .alert-icon.time {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='13' r='8'%3E%3C/circle%3E%3Cpath d='M12 9v4l2 2'%3E%3C/path%3E%3Cpath d='M5 3 2 6'%3E%3C/path%3E%3Cpath d='m22 6-3-3'%3E%3C/path%3E%3Cpath d='M12 2v4'%3E%3C/path%3E%3C/svg%3E");
@@ -2576,30 +2593,174 @@ function getDecryptedKey() {
         // Icons: Using simple SVG strings for white icons
 
 
-        const weatherData = {
-            'd1': { loc: '熊本市', date: '1/25 (Day 1)', temp: '10°C', range: '2°C ~ 11°C', desc: '晴時多雲', advice: '氣溫適中但早晚偏涼，長袖配外套。', icon: 'cloud-sun' },
-            'd2': { loc: '阿蘇/黑川', date: '1/26 (Day 2)', temp: '5°C', range: '-3°C ~ 6°C', desc: '多雲/飄雪', advice: '山區極冷，務必穿著羽絨外套保暖。', icon: 'snow' },
-            'd3': { loc: '別府/由布院', date: '1/27 (Day 3)', temp: '7°C', range: '0°C ~ 8°C', desc: '多雲', advice: '濕度較高體感寒冷，請穿防滑鞋。', icon: 'cloud' },
-            'd4': { loc: '福岡市', date: '1/28 (Day 4)', temp: '9°C', range: '4°C ~ 10°C', desc: '陰天', advice: '市區風大，建議穿著防風外套。', icon: 'cloud' },
-            'd5': { loc: '福岡市', date: '1/29 (Day 5)', temp: '10°C', range: '3°C ~ 11°C', desc: '晴朗', advice: '早晚溫差大，洋蔥式穿法最佳。', icon: 'sun' },
-            'd6': { loc: '福岡市', date: '1/30 (Day 6)', temp: '9°C', range: '4°C ~ 10°C', desc: '多雲時晴', advice: '室內暖氣強，內搭不宜過厚。', icon: 'cloud-sun' }
-        };
+        const tripConfig = {
+    'd1': {
+        dateStr: '2025-12-18', // 務必確認年份日期正確
+        loc: '熊本市',
+        lat: 32.803, lon: 130.707,
+        backup: { temp: '10°C', range: '2°C ~ 11°C', desc: '晴時多雲', advice: '氣溫適中但早晚偏涼，長袖配外套。', icon: 'cloud-sun' }
+    },
+    'd2': {
+        dateStr: '2025-12-19',
+        loc: '阿蘇/黑川',
+        lat: 33.096, lon: 131.096, // 黑川溫泉附近座標
+        backup: { temp: '5°C', range: '-3°C ~ 6°C', desc: '多雲/飄雪', advice: '山區極冷，務必穿著羽絨外套保暖。', icon: 'snow' }
+    },
+    'd3': {
+        dateStr: '2025-12-20',
+        loc: '別府/由布院',
+        lat: 33.265, lon: 131.360, // 由布院座標
+        backup: { temp: '7°C', range: '0°C ~ 8°C', desc: '多雲', advice: '濕度較高體感寒冷，請穿防滑鞋。', icon: 'cloud' }
+    },
+    'd4': {
+        dateStr: '2025-12-21',
+        loc: '福岡市',
+        lat: 33.590, lon: 130.401,
+        backup: { temp: '9°C', range: '4°C ~ 10°C', desc: '陰天', advice: '市區風大，建議穿著防風外套。', icon: 'cloud' }
+    },
+    'd5': {
+        dateStr: '2025-12-22',
+        loc: '福岡市',
+        lat: 33.590, lon: 130.401,
+        backup: { temp: '10°C', range: '3°C ~ 11°C', desc: '晴朗', advice: '早晚溫差大，洋蔥式穿法最佳。', icon: 'sun' }
+    },
+    'd6': {
+        dateStr: '2025-12-23',
+        loc: '福岡市',
+        lat: 33.590, lon: 130.401,
+        backup: { temp: '9°C', range: '4°C ~ 10°C', desc: '多雲時晴', advice: '室內暖氣強，內搭不宜過厚。', icon: 'cloud-sun' }
+    }
+};
 
-        function updateWeatherWidget(dayId) {
-            const data = weatherData[dayId];
-            if (data) {
-                document.getElementById('hw-loc').innerText = data.loc;
-                document.getElementById('hw-date').innerText = data.date;
-                document.getElementById('hw-temp').innerText = data.temp; 
-                document.getElementById('hw-desc').innerText = data.desc;
-                document.getElementById('hw-range').innerText = data.range;
-                document.getElementById('hw-advice').innerText = data.advice;
+        // [修改 2] 讓 Widget 支援非同步讀取與 Loading 狀態
+async function updateWeatherWidget(dayId) {
+    const config = tripConfig[dayId];
+    if (!config) return;
+
+    // 1. 先顯示 Loading 狀態 (提升使用者體驗)
+    document.getElementById('hw-loc').innerText = config.loc;
+    document.getElementById('hw-date').innerText = config.dateStr.slice(5); // 只顯示 MM-DD
+    document.getElementById('hw-temp').innerText = '--';
+    document.getElementById('hw-desc').innerText = '讀取中...';
+    document.getElementById('hw-range').innerText = '';
+    document.getElementById('hw-advice').innerText = '資料更新中...';
+    // 顯示一個簡單的載入圖示
+    document.getElementById('hw-icon').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: rotate 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>`;
+
+    // 2. 呼叫智慧判斷函數取得資料
+    const data = await getSmartWeatherData(config);
+
+    // 3. 更新畫面
+    document.getElementById('hw-temp').innerText = data.temp;
+    document.getElementById('hw-desc').innerText = data.desc;
+    document.getElementById('hw-range').innerText = data.range;
+    document.getElementById('hw-advice').innerText = data.advice;
+    
+    // 處理 Icon
+    const iconType = data.icon || 'cloud';
+    // 如果是 API 回傳的，我們只給代碼 (如 sun, cloud, rain)，如果沒對應到就給 cloud
+    const validIcons = ['sun', 'cloud', 'cloud-sun', 'snow', 'rain', 'fog', 'lightning'];
+    const finalIcon = validIcons.includes(iconType) ? iconType : 'cloud';
+    
+    document.getElementById('hw-icon').innerHTML = `<div class="weather-icon ${finalIcon}"></div>`;
+}
+  // [修改 3] 新增核心智慧判斷與 API 呼叫函數
+async function getSmartWeatherData(config) {
+    const tripDate = new Date(config.dateStr);
+    tripDate.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // --- 情境 A: 過去式 (直接回傳備用資料) ---
+    if (tripDate < today) {
+        console.log(`[${config.loc}] 是過去行程，使用靜態紀錄。`);
+        return config.backup;
+    }
+
+    // --- 情境 B & C: 今天或未來 (呼叫 API) ---
+    try {
+        console.log(`[${config.loc}] 呼叫 API 更新天氣...`);
+        
+        // 使用 Open-Meteo 免費 API (含 Forecast 功能)
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${config.lat}&longitude=${config.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=Asia%2FTokyo`;
+        
+        const res = await fetch(url);
+        const json = await res.json();
+        
+        // 判斷是要拿「即時(Current)」還是「預報(Daily)」
+        let displayData = {};
+
+        if (tripDate.getTime() === today.getTime()) {
+            // == 今天：以 Current 為主，但高低溫還是要拿 Daily ==
+            const current = json.current_weather;
+            const dailyToday = json.daily.time.indexOf(config.dateStr); // 找到今天的 index
+            
+            const max = dailyToday !== -1 ? json.daily.temperature_2m_max[dailyToday] : current.temperature;
+            const min = dailyToday !== -1 ? json.daily.temperature_2m_min[dailyToday] : current.temperature;
+
+            displayData = {
+                temp: `${Math.round(current.temperature)}°C`,
+                range: `${Math.round(min)}°C ~ ${Math.round(max)}°C`,
+                desc: getWeatherDescText(current.weathercode), // 轉換代碼為文字
+                icon: getWeatherIconClass(current.weathercode), // 轉換代碼為 CSS Class
+                advice: `(即時更新) 目前氣溫 ${current.temperature}°，${getWeatherDescText(current.weathercode)}。`
+            };
+        } else {
+            // == 未來：從 Daily 陣列中找到對應日期 ==
+            // Open-Meteo 預設給 7 天預報
+            const index = json.daily.time.indexOf(config.dateStr);
+            
+            if (index !== -1) {
+                const code = json.daily.weathercode[index];
+                const max = json.daily.temperature_2m_max[index];
+                const min = json.daily.temperature_2m_min[index];
                 
-                const iconType = data.icon || 'cloud'; // 預設為 cloud
-        document.getElementById('hw-icon').innerHTML = `<div class="weather-icon ${iconType}"></div>`;
+                displayData = {
+                    temp: `${Math.round((max + min) / 2)}°C`, // 顯示均溫
+                    range: `${Math.round(min)}°C ~ ${Math.round(max)}°C`,
+                    desc: getWeatherDescText(code),
+                    icon: getWeatherIconClass(code),
+                    advice: `(預報) 當日天氣預測為${getWeatherDescText(code)}。`
+                };
+            } else {
+                // 如果超出預報範圍 (例如 7 天後)，回傳備用資料
+                console.log('超出預報範圍，使用備用資料');
+                return { ...config.backup, advice: config.backup.advice + ' (預報尚早)' };
+            }
+        }
+        
+        return displayData;
+
+    } catch (e) {
+        console.error("API 獲取失敗", e);
+        // API 失敗時，優雅降級回傳備用資料
+        return { ...config.backup, desc: config.backup.desc + ' (離線)', advice: '網路連線異常，顯示離線資料。' };
     }
 }
-                
+
+// 輔助函式：將 WMO Code 轉成中文描述
+function getWeatherDescText(code) {
+    if (code === 0) return '晴朗';
+    if (code <= 3) return '多雲';
+    if (code <= 48) return '有霧';
+    if (code <= 67) return '有雨';
+    if (code <= 77) return '有雪';
+    if (code <= 82) return '陣雨';
+    if (code <= 99) return '雷雨';
+    return '多雲';
+}
+
+// 輔助函式：將 WMO Code 轉成你的 CSS Icon Class
+function getWeatherIconClass(code) {
+    if (code === 0) return 'sun';
+    if (code <= 3) return 'cloud-sun'; // 或 cloud
+    if (code <= 48) return 'fog'; // 你可能需要新增 fog 樣式，或用 cloud 代替
+    if (code <= 67) return 'rain';
+    if (code <= 77) return 'snow';
+    if (code <= 82) return 'rain';
+    if (code <= 99) return 'lightning'; // 你可能需要新增 lightning 樣式
+    return 'cloud';
+}              
         // --- REAL-TIME WEATHER FUNCTIONS (Using Open-Meteo Free API) ---
         let currentMyTemp = null;
 
@@ -2804,9 +2965,9 @@ function getDecryptedKey() {
 
         function getLocalWeather() {
             const tempEl = document.getElementById('wc-my-temp');
-            const titleEl = document.querySelector('.wc-mini-card .wc-mini-title'); // 取得標題元素
+            const titleEl = document.querySelector('.wc-mini-card .wc-mini-title'); 
             
-            // 狀態 1: 檢查瀏覽器支援
+            // 1. 檢查瀏覽器支援
             if (!navigator.geolocation) {
                 openModal('瀏覽器不支援定位，請手動輸入城市：');
                 return;
@@ -2816,11 +2977,11 @@ function getDecryptedKey() {
             tempEl.innerText = '定位中..';
             tempEl.style.fontSize = '1.2rem';
             tempEl.style.color = '#2563EB'; 
-            titleEl.innerHTML = '正在讀取 GPS...'; // 提示使用者
+            titleEl.innerHTML = '正在讀取 GPS...'; 
 
             const options = {
                 enableHighAccuracy: false, 
-                timeout: 5000, 
+                timeout: 10000, // 放寬超時時間到 10秒
                 maximumAge: 0
             };
 
@@ -2830,43 +2991,49 @@ function getDecryptedKey() {
                 const lon = position.coords.longitude;
                 
                 try {
-                    // 平行處理：同時取得天氣 與 解析地名
-                    // 1. 取得天氣
-                    const weatherPromise = fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
-                        .then(res => res.json());
-
-                    // 2. [新增] 呼叫 AI 解析經緯度對應的地名 (反向地理編碼)
-                    const locationPrompt = `
-                        Task: Identify the city/district name for coordinates: ${lat}, ${lon}.
-                        Output Format: "Traditional Chinese Name|English Name"
-                        Rule: Output ONLY the names separated by a pipe. No labels.
-                        Example: "竹北市|Zhubei City", "熊本市|Kumamoto City", "台北市|Taipei City".
-                    `;
-                    const locationPromise = getGeminiResponse(locationPrompt);
-
-                    // 等待兩者完成
-                    const [weatherData, locationStr] = await Promise.all([weatherPromise, locationPromise]);
+                    // 【修正重點 1】優先取得天氣 (這是最重要的)
+                    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                    const weatherData = await weatherRes.json();
                     
-                    // --- 更新天氣數值 ---
+                    // 拿到天氣就先顯示，不用等 AI
                     currentMyTemp = weatherData.current_weather.temperature;
                     tempEl.innerText = `${currentMyTemp}°C`;
                     tempEl.style.fontSize = '1.5rem';
                     tempEl.style.color = '#1F2937'; 
                     
-                    // --- 更新地名顯示 (上下分層) ---
+                    // 更新溫差比對
+                    const targetTempStr = document.getElementById('wc-temp').innerText;
+                    if (targetTempStr !== '--°') {
+                        updateComparison(parseFloat(targetTempStr));
+                    }
+
+                    // 【修正重點 2】地名部分獨立處理 (就算失敗也不影響溫度)
                     let displayZh = "我的位置";
                     let displayEn = "";
                     
-                    // 解析 AI 回傳的 "中文|英文" 格式
-                    if (locationStr && locationStr.includes('|')) {
-                        const parts = locationStr.split('|');
-                        displayZh = parts[0].trim();
-                        displayEn = parts[1].trim();
-                    } else if (locationStr) {
-                        displayZh = locationStr.trim(); // Fallback
+                    try {
+                        titleEl.innerHTML = '解析地名中...';
+                        const locationPrompt = `
+                            Task: Identify the city/district name for coordinates: ${lat}, ${lon}.
+                            Output Format: "Traditional Chinese Name|English Name"
+                            Rule: Output ONLY the names separated by a pipe. No labels.
+                            Example: "竹北市|Zhubei City", "熊本市|Kumamoto City".
+                        `;
+                        const locationStr = await getGeminiResponse(locationPrompt);
+
+                        if (locationStr && locationStr.includes('|')) {
+                            const parts = locationStr.split('|');
+                            displayZh = parts[0].trim();
+                            displayEn = parts[1].trim();
+                        } else if (locationStr) {
+                            displayZh = locationStr.trim();
+                        }
+                    } catch (aiError) {
+                        console.warn("AI 地名解析失敗，使用預設名稱", aiError);
+                        // 失敗了就保持 "我的位置"
                     }
 
-                    // 組合 HTML
+                    // 更新地名 UI
                     let titleHtml = `
                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
                             <div style="display: flex; align-items: center; gap: 4px;">
@@ -2878,18 +3045,11 @@ function getDecryptedKey() {
                         titleHtml += `<span style="font-size: 0.75rem; color: #9CA3AF; font-weight: 400; font-family: sans-serif;">${displayEn}</span>`;
                     }
                     titleHtml += `</div>`;
-                    
                     titleEl.innerHTML = titleHtml;
 
-                    // Update comparison
-                    const targetTempStr = document.getElementById('wc-temp').innerText;
-                    if (targetTempStr !== '--°') {
-                        updateComparison(parseFloat(targetTempStr));
-                    }
                 } catch (e) {
                     console.error(e);
                     tempEl.innerText = 'Err';
-                    // 恢復標題
                     titleEl.innerHTML = `
                         <div style="display: flex; align-items: center; justify-content: center;">
                             <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -2898,12 +3058,10 @@ function getDecryptedKey() {
                     openModal('讀取氣象數據失敗，請手動輸入城市：');
                 }
             }, (err) => {
-                // --- 定位失敗 ---
+                // --- 定位失敗 (GPS 層級) ---
                 console.warn('Geolocation Error:', err);
-                
                 let shortMsg = '定位失敗';
-                // 區分錯誤原因顯示在小框框中
-                if (err.code === 1) shortMsg = '無權限'; // 使用者或瀏覽器拒絕
+                if (err.code === 1) shortMsg = '無權限'; 
                 if (err.code === 2) shortMsg = '訊號不良'; 
                 if (err.code === 3) shortMsg = '逾時'; 
                 
@@ -2911,10 +3069,9 @@ function getDecryptedKey() {
                 tempEl.style.fontSize = '1rem'; 
                 tempEl.style.color = '#EF4444'; 
                 
-                // 使用自定義 Modal 詢問，避免原生 prompt 被擋
                 setTimeout(() => {
                      openModal(`定位受限 (${shortMsg})，改為手動輸入？`);
-                }, 300);
+                }, 500);
             }, options);
         }
 
