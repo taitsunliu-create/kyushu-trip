@@ -2576,38 +2576,156 @@ function getDecryptedKey() {
         // Icons: Using simple SVG strings for white icons
 
 
-       // 1. 基礎設定：只保留地點、日期與預設建議（靜態資料）
-const itineraryConfig = {
-    'd1': { dateStr: '2026-01-25', loc: '熊本市', lat: 32.80, lon: 130.70, defaultAdvice: '氣溫適中...' },
-    'd2': { dateStr: '2026-01-26', loc: '阿蘇/黑川', lat: 32.93, lon: 131.12, defaultAdvice: '山區極冷...' },
-    // ... 其他天
+       // ==========================================
+// 1. 行程設定檔 (tripConfig)
+// 這裡只存「不會變」的資訊：日期、地點、座標
+// 以及「離線/過去式」使用的靜態備用資料
+// ==========================================
+const tripConfig = {
+    'd1': {
+        id: 'd1',
+        dateStr: '2026-01-25', // 格式必須是 YYYY-MM-DD
+        loc: '熊本市',
+        lat: 32.803, lon: 130.707, // 經緯度 (為之後 API 預留)
+        // 靜態備用資料 (當天變成過去式，或網路不通時顯示這些)
+        backup: { 
+            temp: '10°C', 
+            range: '2°C ~ 11°C', 
+            desc: '晴時多雲', 
+            advice: '氣溫適中但早晚偏涼，長袖配外套。', 
+            icon: 'cloud-sun' 
+        }
+    },
+    'd2': {
+        id: 'd2',
+        dateStr: '2026-01-26',
+        loc: '阿蘇/黑川',
+        lat: 32.938, lon: 131.118,
+        backup: { 
+            temp: '5°C', 
+            range: '-3°C ~ 6°C', 
+            desc: '多雲/飄雪', 
+            advice: '山區極冷，務必穿著羽絨外套保暖。', 
+            icon: 'snow' 
+        }
+    },
+    'd3': {
+        id: 'd3',
+        dateStr: '2026-01-27',
+        loc: '別府/由布院',
+        lat: 33.265, lon: 131.360,
+        backup: { 
+            temp: '7°C', 
+            range: '0°C ~ 8°C', 
+            desc: '多雲', 
+            advice: '濕度較高體感寒冷，請穿防滑鞋。', 
+            icon: 'cloud' 
+        }
+    },
+    'd4': {
+        id: 'd4',
+        dateStr: '2026-01-28',
+        loc: '福岡市',
+        lat: 33.590, lon: 130.401,
+        backup: { 
+            temp: '9°C', 
+            range: '4°C ~ 10°C', 
+            desc: '陰天', 
+            advice: '市區風大，建議穿著防風外套。', 
+            icon: 'cloud' 
+        }
+    },
+    'd5': {
+        id: 'd5',
+        dateStr: '2026-01-29',
+        loc: '福岡市',
+        lat: 33.590, lon: 130.401,
+        backup: { 
+            temp: '10°C', 
+            range: '3°C ~ 11°C', 
+            desc: '晴朗', 
+            advice: '早晚溫差大，洋蔥式穿法最佳。', 
+            icon: 'sun' 
+        }
+    },
+    'd6': {
+        id: 'd6',
+        dateStr: '2026-01-30',
+        loc: '福岡市',
+        lat: 33.590, lon: 130.401,
+        backup: { 
+            temp: '9°C', 
+            range: '4°C ~ 10°C', 
+            desc: '多雲時晴', 
+            advice: '室內暖氣強，內搭不宜過厚。', 
+            icon: 'cloud-sun' 
+        }
+    }
 };
 
-// 2. 判斷邏輯函數 (示意)
-function getWeatherDataForDay(dayKey) {
-    const targetDayConfig = itineraryConfig[dayKey];
-    const targetDate = new Date(targetDayConfig.dateStr).setHours(0,0,0,0);
-    const today = new Date().setHours(0,0,0,0); // 取得今日零時
+// ==========================================
+// 2. 核心控制大腦 (Controller)
+// ==========================================
 
-    // A. 過去式 (已過完的行程)
-    if (targetDate < today) {
-        // 從 LocalStorage 讀取之前存下來的紀錄，如果沒有則顯示預設靜態資料
-        return getSavedHistory(dayKey) || "顯示預設靜態資料";
-    }
-    
-    // B. 就是今天 (旅程進行中)
-    else if (targetDate === today) {
-        // 呼叫 API: Current Weather (以節省 Token 為原則，可設定 1小時更新一次)
-        return fetchCurrentWeather(targetDayConfig.lat, targetDayConfig.lon);
-    }
-    
-    // C. 未來式 (還沒發生的行程)
+// ★ 測試用變數：你可以修改這個日期來測試不同情境
+// 如果設為 null，就會使用真實的「今天日期」
+// 測試範例：設為 '2026-01-26'，那 d1 會是過去，d2 是今天，d3 是未來
+const debugDate = '2026-01-26'; 
+
+function getWeatherData(dayKey) {
+    const config = tripConfig[dayKey];
+    if (!config) return null;
+
+    // 1. 設定時間基準
+    // 如果有 debugDate 就用它，否則用真正的 new Date()
+    const todayObj = debugDate ? new Date(debugDate) : new Date();
+    todayObj.setHours(0, 0, 0, 0); // 歸零，只比對日期
+
+    const tripDateObj = new Date(config.dateStr);
+    tripDateObj.setHours(0, 0, 0, 0);
+
+    // 2. 判斷情境
+    if (tripDateObj < todayObj) {
+        // --- 情境 A: 過去 (Past) ---
+        console.log(`[系統] ${config.dateStr} 是過去式，讀取靜態紀錄。`);
+        return {
+            status: 'past',
+            ...config.backup // 直接回傳備用資料
+        };
+    } 
+    else if (tripDateObj.getTime() === todayObj.getTime()) {
+        // --- 情境 B: 今天 (Today) ---
+        console.log(`[系統] ${config.dateStr} 就是今天！準備呼叫 Current API。`);
+        
+        // 【暫時】先回傳備用資料，加上一個標記
+        // 等我們下一階段串接 API 時，這裡會改成 fetch()
+        return {
+            status: 'today',
+            ...config.backup, 
+            desc: `(即時) ${config.backup.desc}` // 故意加個字讓你看出差異
+        };
+    } 
     else {
-        // 呼叫 API: 5 Day / 3 Hour Forecast
-        // 計算 targetDate 是今天的第幾天後，從預報資料中抓取對應的那一天
-        return fetchForecastWeather(targetDayConfig.lat, targetDayConfig.lon, targetDayConfig.dateStr);
+        // --- 情境 C: 未來 (Future) ---
+        console.log(`[系統] ${config.dateStr} 是未來，準備呼叫 Forecast API。`);
+        
+        // 【暫時】先回傳備用資料
+        // 等下一階段串接 API 時，這裡會改成 fetch()
+        return {
+            status: 'future',
+            ...config.backup,
+            desc: `(預報) ${config.backup.desc}` // 故意加個字讓你看出差異
+        };
     }
 }
+
+// ==========================================
+// 3. 使用範例 (模擬你在 UI 點擊)
+// ==========================================
+
+// 假設你點擊了 Day 2
+const currentViewData = getWeatherData('d2');
+console.log('顯示資料:', currentViewData);
 
         function updateWeatherWidget(dayId) {
             const data = weatherData[dayId];
