@@ -80,6 +80,32 @@
              gap: 6px; 
     
             margin-top: 8px;
+     /* [新增] SOS 浮動分享按鈕 */
+        .float-share-btn {
+            position: fixed;
+            bottom: 90px; /* 位於底部導航欄上方 */
+            right: 20px;
+            background: linear-gradient(135deg, #EF4444, #DC2626); /* 警示紅 */
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000; /* 確保在最上層 */
+            cursor: pointer;
+            transition: transform 0.2s;
+            /* 手機防誤觸優化 */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+                 user-select: none;
+        }
+        .float-share-btn:active { transform: scale(0.95); }
+        .float-share-btn svg { width: 20px; height: 20px; stroke-width: 2.5; }
         }
 .header-title-area .badge-trip::before {
     content: '';
@@ -2552,7 +2578,10 @@
             </div>
         </div>
     </div>
-
+<button id="btn-share-loc" class="float-share-btn" onclick="shareCurrentLocation()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        <span>分享定位</span>
+    </button>
     <!-- Bottom Navigation Bar (6 items now) -->
     <nav class="nav-bar">
         <div class="nav-item active" data-target="view-schedule" onclick="switchTab(this)">
@@ -3161,7 +3190,61 @@ function getLocalWeather() {
         function closeModal() {
             document.getElementById('location-modal').style.display = 'none';
         }
+// [新增] 獲取 GPS 並透過 LINE/簡訊 分享 Google Maps 連結
+        function shareCurrentLocation() {
+            // 1. 檢查支援度
+            if (!navigator.geolocation) {
+                alert("您的裝置不支援定位功能。");
+                return;
+            }
 
+            const btn = document.getElementById('btn-share-loc');
+            const originalContent = btn.innerHTML;
+            
+            // 2. 顯示讀取中狀態
+            btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:rotate 1s linear infinite;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" fill="none" stroke="currentColor" stroke-width="2"></path></svg> 定位中...`;
+            btn.style.opacity = "0.8";
+
+            // 3. 獲取高精確度位置
+            navigator.geolocation.getCurrentPosition(position => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                
+                // 產生 Google Maps 連結
+                const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+                const shareText = `【緊急/報平安】我目前的位置在這裡，請點擊連結查看：`;
+
+                // 4. 呼叫原生分享選單 (Web Share API)
+                if (navigator.share) {
+                    navigator.share({
+                        title: '我的即時位置',
+                        text: shareText,
+                        url: mapUrl
+                    }).then(() => {
+                        console.log('分享成功');
+                    }).catch((error) => {
+                        console.log('分享取消', error);
+                    });
+                } else {
+                    // 電腦版或不支援分享的瀏覽器 -> 改為複製連結
+                    prompt("請複製以下連結發送給朋友：", mapUrl);
+                }
+
+                // 復原按鈕
+                btn.innerHTML = originalContent;
+                btn.style.opacity = "1";
+
+            }, error => {
+                console.error(error);
+                alert("無法取得位置，請確認 GPS 已開啟，並允許網頁存取位置。");
+                btn.innerHTML = originalContent;
+                btn.style.opacity = "1";
+            }, { 
+                enableHighAccuracy: true, // 要求高精確度 (重要!)
+                timeout: 10000, 
+                maximumAge: 0 
+            });
+        }
         async function submitManualLocation() {
             const manualCity = document.getElementById('modal-city-input').value.trim();
             if (!manualCity) return;
