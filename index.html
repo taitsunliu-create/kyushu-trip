@@ -3900,9 +3900,9 @@ function getLocalWeather() {
             };
 
             // 2. 取得今日日期 (格式 YYYY-MM-DD)
-            const now = new Date();
+            //const now = new Date();
             // ★ 測試用：若想現在測試「旅途中」的效果，請取消下行註解並修改日期
-            // const now = new Date('2026-01-26'); 
+             const now = new Date('2026-01-26'); 
 
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
