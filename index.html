@@ -2665,16 +2665,25 @@ async function updateWeatherWidget(dayId) {
     
     document.getElementById('hw-icon').innerHTML = `<div class="weather-icon ${finalIcon}"></div>`;
 }
-  // [修改 3] 新增核心智慧判斷與 API 呼叫函數
-// [修改 3] 新增核心智慧判斷與 API 呼叫函數 (含監控即時天氣功能)
+// [修改] 智慧判斷函式：加入「今天」的優先判斷
 async function getSmartWeatherData(config) {
+    // 1. 處理日期物件
+    // 為了避免時區問題導致日期判斷錯誤，我們直接用字串比對會最準確
+    // 取得「今天的日期字串」，格式如 "2025-12-19"
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${year}-${month}-${day}`;
+    
+    // 用來比較過去/未來的 Date 物件
     const tripDate = new Date(config.dateStr);
     tripDate.setHours(0, 0, 0, 0);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
 
     // --- 情境 A: 過去式 (直接回傳備用資料) ---
-    if (tripDate < today) {
+    if (tripDate < todayDate) {
         console.log(`[${config.loc}] 是過去行程，使用靜態紀錄。`);
         return config.backup;
     }
@@ -2683,19 +2692,32 @@ async function getSmartWeatherData(config) {
     try {
         console.log(`[${config.loc}] 呼叫 API 更新天氣...`);
         
-        // 使用 Open-Meteo 免費 API (同時抓取 預報daily 和 即時current)
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${config.lat}&longitude=${config.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=Asia%2FTokyo`;
         
         const res = await fetch(url);
         const json = await res.json();
         
-        // 嘗試在 API 回傳的「未來 7 天預報」中，尋找你的行程日期
         const index = json.daily.time.indexOf(config.dateStr);
         let displayData = {};
 
-        if (index !== -1) {
-            // === 情境 1: 預報範圍內 (出發前 7 天內會自動變這個) ===
-            // 抓取「那一天」的預報數據
+        // ★★★ 修正重點：優先判斷「是不是今天」 ★★★
+        if (config.dateStr === todayStr) {
+            // === 情境 B: 就是今天 (顯示即時) ===
+            const current = json.current_weather;
+            // 今天的最高最低溫，通常在 daily 陣列的第 0 筆
+            const todayMax = json.daily.temperature_2m_max[0];
+            const todayMin = json.daily.temperature_2m_min[0];
+
+            displayData = {
+                temp: `${Math.round(current.temperature)}°C`, // 這是現在這一刻的溫度
+                range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`,
+                desc: getWeatherDescText(current.weathercode),
+                icon: getWeatherIconClass(current.weathercode),
+                advice: `(即時) 目前氣溫 ${current.temperature}°，${getWeatherDescText(current.weathercode)}。`
+            };
+        } 
+        else if (index !== -1) {
+            // === 情境 C-1: 近期未來預報 (明天~7天後) ===
             const code = json.daily.weathercode[index];
             const max = json.daily.temperature_2m_max[index];
             const min = json.daily.temperature_2m_min[index];
@@ -2707,21 +2729,19 @@ async function getSmartWeatherData(config) {
                 icon: getWeatherIconClass(code),
                 advice: `(預報) ${config.dateStr.slice(5)} 當日天氣預測為${getWeatherDescText(code)}。`
             };
-        } else {
-            // === 情境 2: 超出預報範圍 (例如現在看 2026年) ===
-            // ★ 重點修改：改為顯示「當地即時天氣」供您監控現況
+        } 
+        else {
+            // === 情境 C-2: 遠期未來監控 (7天以後，例如 2026年) ===
+            // 雖然是未來，但為了讓您有感，顯示「當地現在」的狀況
             const current = json.current_weather;
-            
-            // 拿「今天」的高低溫當參考
             const todayMax = json.daily.temperature_2m_max[0];
             const todayMin = json.daily.temperature_2m_min[0];
 
             displayData = {
-                temp: `${Math.round(current.temperature)}°C`, // 顯示現在溫度
-                range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`, // 今天的溫差
+                temp: `${Math.round(current.temperature)}°C`,
+                range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`,
                 desc: getWeatherDescText(current.weathercode),
                 icon: getWeatherIconClass(current.weathercode),
-                // 提示文字改為說明這是「目前狀況」
                 advice: `(目前狀況) 離出發日尚早，顯示當地「現在」的天氣供參考。`
             };
         }
@@ -2730,7 +2750,6 @@ async function getSmartWeatherData(config) {
 
     } catch (e) {
         console.error("API 獲取失敗", e);
-        // 只有在真正斷網或 API 掛掉時，才顯示離線備用資料
         return { ...config.backup, desc: config.backup.desc + ' (離線)', advice: '網路連線異常，顯示離線資料。' };
     }
 }
