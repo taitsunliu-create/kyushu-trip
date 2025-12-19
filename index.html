@@ -114,6 +114,45 @@
         }
 
         /* Weather Columns */
+        /* [新增] Header 我的位置區塊樣式 */
+        .hw-col-my-loc {
+            padding-right: 10px;
+            margin-right: 5px;
+            border-right: 1px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 60px;
+            text-align: left;
+        }
+
+        .hw-sub-label {
+            font-size: 0.65rem;
+            opacity: 0.8;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .hw-my-data {
+            font-size: 0.9rem;
+            font-weight: 700;
+            white-space: nowrap;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        /* 手機版微調 */
+        @media (max-width: 600px) {
+            .hw-col-my-loc {
+                padding-right: 8px;
+                margin-right: 0;
+                border-right: 1px solid rgba(255,255,255,0.2); /* 手機版保留分隔線 */
+            }
+        }
         .hw-col-loc {
             padding-right: 15px;
             border-right: 1px solid rgba(255,255,255,0.3);
@@ -875,7 +914,18 @@
 
             <!-- 天氣資訊盒 (擺放在右側，三欄式設計) -->
             <div class="header-weather-box" id="header-weather">
-                <!-- 1. 地點日期 -->
+                
+                <div class="hw-col-my-loc" id="hw-my-loc-box" onclick="getLocalWeather()">
+                    <div class="hw-sub-label">
+                        <svg class="icon-mini" style="width:12px;height:12px;vertical-align:text-top;" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                        我的位置
+                    </div>
+                    <div class="hw-my-data">
+                        <span id="header-my-loc">定位中..</span>
+                        <span id="header-my-temp" style="color: var(--secondary);">--</span>
+                    </div>
+                </div>
+
                 <div class="hw-col-loc">
                     <span class="hw-loc" id="hw-loc">熊本市</span>
                     <span class="hw-date" id="hw-date">1/25 (Day 1)</span>
@@ -3003,117 +3053,103 @@ function getSmartAdviceText(temp, weatherCode) {
             return `多雲 ${simpleIcons.cloud}`;
         }
 
-        function getLocalWeather() {
-            const tempEl = document.getElementById('wc-my-temp');
-            const titleEl = document.querySelector('.wc-mini-card .wc-mini-title'); 
+// [修改] 取得定位天氣 (同步更新 Header 與 分頁)
+function getLocalWeather() {
+    // 1. 定義要更新的 UI 元件 (Header + Tab)
+    const els = {
+        headerLoc: document.getElementById('header-my-loc'),
+        headerTemp: document.getElementById('header-my-temp'),
+        tabTemp: document.getElementById('wc-my-temp'),
+        titleEl: document.querySelector('.wc-mini-card .wc-mini-title') 
+    };
+    
+    // 檢查瀏覽器支援
+    if (!navigator.geolocation) {
+        openModal('瀏覽器不支援定位，請手動輸入城市：');
+        return;
+    }
+    
+    // 視覺回饋 (Loading)
+    if(els.headerLoc) els.headerLoc.innerText = '...';
+    if(els.tabTemp) {
+        els.tabTemp.innerText = '定位中..';
+        els.tabTemp.style.fontSize = '1.2rem';
+        if(els.titleEl) els.titleEl.innerHTML = '讀取 GPS...'; 
+    }
+
+    const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
+        try {
+            // A. 取得天氣 (Open-Meteo)
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+            const weatherData = await weatherRes.json();
             
-            // 1. 檢查瀏覽器支援
-            if (!navigator.geolocation) {
-                openModal('瀏覽器不支援定位，請手動輸入城市：');
-                return;
+            // 數據處理
+            currentMyTemp = weatherData.current_weather.temperature;
+            const tempStr = `${Math.round(currentMyTemp)}°C`;
+            
+            // 更新 UI (Tab)
+            if(els.tabTemp) {
+                els.tabTemp.innerText = tempStr;
+                els.tabTemp.style.fontSize = '1.5rem';
+                els.tabTemp.style.color = '#1F2937';
             }
+            // 更新 UI (Header - 紅圈處)
+            if(els.headerTemp) els.headerTemp.innerText = tempStr;
             
-            // 視覺回饋
-            tempEl.innerText = '定位中..';
-            tempEl.style.fontSize = '1.2rem';
-            tempEl.style.color = '#2563EB'; 
-            titleEl.innerHTML = '正在讀取 GPS...'; 
+            // 更新溫差比對
+            const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
+            if (targetTempStr !== '--°' && typeof updateComparison === 'function') {
+                updateComparison(parseFloat(targetTempStr));
+            }
 
-            const options = {
-                enableHighAccuracy: false, 
-                timeout: 10000, // 放寬超時時間到 10秒
-                maximumAge: 0
-            };
-
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                // --- 成功取得定位 ---
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
+            // B. 解析地名 (AI 翻譯或預設)
+            let displayZh = "我的位置";
+            
+            try {
+                if(els.titleEl) els.titleEl.innerHTML = '解析地名...';
                 
-                try {
-                    // 【修正重點 1】優先取得天氣 (這是最重要的)
-                    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-                    const weatherData = await weatherRes.json();
-                    
-                    // 拿到天氣就先顯示，不用等 AI
-                    currentMyTemp = weatherData.current_weather.temperature;
-                    tempEl.innerText = `${currentMyTemp}°C`;
-                    tempEl.style.fontSize = '1.5rem';
-                    tempEl.style.color = '#1F2937'; 
-                    
-                    // 更新溫差比對
-                    const targetTempStr = document.getElementById('wc-temp').innerText;
-                    if (targetTempStr !== '--°') {
-                        updateComparison(parseFloat(targetTempStr));
-                    }
+                // 嘗試使用 AI 解析 (若有金鑰)
+                const locationPrompt = `Task: Identify city name for ${lat},${lon}. Output: "中文|English". Example: "台北|Taipei"`;
+                const locationStr = await getGeminiResponse(locationPrompt);
 
-                    // 【修正重點 2】地名部分獨立處理 (就算失敗也不影響溫度)
-                    let displayZh = "我的位置";
-                    let displayEn = "";
-                    
-                    try {
-                        titleEl.innerHTML = '解析地名中...';
-                        const locationPrompt = `
-                            Task: Identify the city/district name for coordinates: ${lat}, ${lon}.
-                            Output Format: "Traditional Chinese Name|English Name"
-                            Rule: Output ONLY the names separated by a pipe. No labels.
-                            Example: "竹北市|Zhubei City", "熊本市|Kumamoto City".
-                        `;
-                        const locationStr = await getGeminiResponse(locationPrompt);
-
-                        if (locationStr && locationStr.includes('|')) {
-                            const parts = locationStr.split('|');
-                            displayZh = parts[0].trim();
-                            displayEn = parts[1].trim();
-                        } else if (locationStr) {
-                            displayZh = locationStr.trim();
-                        }
-                    } catch (aiError) {
-                        console.warn("AI 地名解析失敗，使用預設名稱", aiError);
-                        // 失敗了就保持 "我的位置"
-                    }
-
-                    // 更新地名 UI
-                    let titleHtml = `
-                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                                <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                <span>${displayZh}</span>
-                            </div>
-                    `;
-                    if (displayEn) {
-                        titleHtml += `<span style="font-size: 0.75rem; color: #9CA3AF; font-weight: 400; font-family: sans-serif;">${displayEn}</span>`;
-                    }
-                    titleHtml += `</div>`;
-                    titleEl.innerHTML = titleHtml;
-
-                } catch (e) {
-                    console.error(e);
-                    tempEl.innerText = 'Err';
-                    titleEl.innerHTML = `
-                        <div style="display: flex; align-items: center; justify-content: center;">
-                            <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            我的位置 (重試)
-                        </div>`;
-                    openModal('讀取氣象數據失敗，請手動輸入城市：');
+                if (locationStr && locationStr.includes('|')) {
+                    displayZh = locationStr.split('|')[0].trim();
+                } else if (locationStr) {
+                    displayZh = locationStr.trim();
                 }
-            }, (err) => {
-                // --- 定位失敗 (GPS 層級) ---
-                console.warn('Geolocation Error:', err);
-                let shortMsg = '定位失敗';
-                if (err.code === 1) shortMsg = '無權限'; 
-                if (err.code === 2) shortMsg = '訊號不良'; 
-                if (err.code === 3) shortMsg = '逾時'; 
-                
-                tempEl.innerText = shortMsg;
-                tempEl.style.fontSize = '1rem'; 
-                tempEl.style.color = '#EF4444'; 
-                
-                setTimeout(() => {
-                     openModal(`定位受限 (${shortMsg})，改為手動輸入？`);
-                }, 500);
-            }, options);
+            } catch (aiError) {
+                console.warn("AI 解析略過 (無 Key 或 失敗)，將顯示座標或預設文字");
+                displayZh = "我的位置"; // 降級顯示
+            }
+
+            // 更新 UI (Header 地名)
+            if(els.headerLoc) els.headerLoc.innerText = displayZh;
+
+            // 更新 UI (Tab 地名)
+            if(els.titleEl) {
+                els.titleEl.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                        <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>${displayZh}</span>
+                    </div>`;
+            }
+
+        } catch (e) {
+            console.error(e);
+            if(els.headerLoc) els.headerLoc.innerText = 'Err';
+            if(els.tabTemp) els.tabTemp.innerText = 'Err';
         }
+    }, (err) => {
+        console.warn('定位失敗:', err);
+        if(els.headerLoc) els.headerLoc.innerText = '定位失敗';
+        if(els.tabTemp) els.tabTemp.innerText = '無權限';
+    }, options);
+}
 
         // --- Modal Functions (取代原生 alert/prompt) ---
         function openModal(msg) {
@@ -3639,6 +3675,7 @@ function getSmartAdviceText(temp, weatherCode) {
             }
             initAiChat();
             setupVoiceButton(); // Init voice listener
+            getLocalWeather(); // Fetch local weather on load
         });
     </script>
 </body>
