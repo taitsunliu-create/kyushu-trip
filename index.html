@@ -1044,14 +1044,21 @@
             
             <div id="checklist-container" class="checklist-container">
                 <div class="checklist-grid">
-                    <label class="check-item"><input type="checkbox" data-id="c1"> <span>護照 & 機票 (截圖備份)</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c2"> <span>旅遊保險單 (紙本/電子)</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c3"> <span>日幣現金 & 信用卡</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c4"> <span>SIM卡 / 漫遊開通</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c5"> <span>Visit Japan Web 填寫</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c6"> <span>行動電源 & 充電線</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c7"> <span>國際駕照 (日文譯本)</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c8"> <span>牙刷/常備藥品</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c1"> <span>機場停車預約 (截圖備份)</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c2"> <span>護照 & 機票 (截圖備份)</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c3"> <span>旅遊保險單 (紙本/電子)</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c4"> <span>日幣現金 & 信用卡 & 西瓜卡</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c5"> <span>eSIM / 漫遊開通</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c6"> <span>Visit Japan Web 填寫</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c7"> <span>行動電源 & 充電線</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c8"> <span>國際駕照 (日文譯本) / 租車資料</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c9"> <span>牙刷/常備藥品</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c10"> <span>健保卡</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c11"> <span>小工具醫療箱 / 雪松</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c12"> <span>耳溫槍 / 刮鬍刀</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c13"> <span>大頭照</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c14"> <span>相機 / 讀卡機 / 拍立得</span></label>
+
                 </div>
             </div>
         </div>
@@ -3900,9 +3907,9 @@ function getLocalWeather() {
             };
 
             // 2. 取得今日日期 (格式 YYYY-MM-DD)
-            //const now = new Date();
+            const now = new Date();
             // ★ 測試用：若想現在測試「旅途中」的效果，請取消下行註解並修改日期
-             const now = new Date('2026-01-28'); 
+             //const now = new Date('2026-01-28'); 
 
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
