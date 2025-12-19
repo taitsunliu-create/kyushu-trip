@@ -361,6 +361,33 @@
         }
 
         .alert-box { background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; padding: 10px; border-radius: 8px; font-size: 0.85rem; margin-top: 8px; display: flex; gap: 8px; align-items: start; margin-bottom: 15px; }
+        /* 通用 Alert 圖示設定 */
+.alert-icon {
+    width: 20px;
+    height: 20px;
+    background-color: currentColor; /* 自動抓取提示框的文字顏色 (綠/藍) */
+    flex-shrink: 0; /* 防止圖示被文字擠壓變形 */
+    margin-top: 1px; /* 微調垂直對齊 */
+    
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+
+/* Day 2: 計時器/碼表圖示 (Timer) */
+.alert-icon.time {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='13' r='8'%3E%3C/circle%3E%3Cpath d='M12 9v4l2 2'%3E%3C/path%3E%3Cpath d='M5 3 2 6'%3E%3C/path%3E%3Cpath d='m22 6-3-3'%3E%3C/path%3E%3Cpath d='M12 2v4'%3E%3C/path%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='13' r='8'%3E%3C/circle%3E%3Cpath d='M12 9v4l2 2'%3E%3C/path%3E%3Cpath d='M5 3 2 6'%3E%3C/path%3E%3Cpath d='m22 6-3-3'%3E%3C/path%3E%3Cpath d='M12 2v4'%3E%3C/path%3E%3C/svg%3E");
+}
+
+/* Day 3: 溫泉/熱氣圖示 (Hot Springs) */
+.alert-icon.onsen {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20a4 4 0 1 1 0-8 4 4 0 0 1 0 8z'%3E%3C/path%3E%3Cpath d='M8 8c0-2.5 2-3 2-3s2 0.5 2 3'%3E%3C/path%3E%3Cpath d='M12 6c0-2.5 2-3 2-3s2 0.5 2 3'%3E%3C/path%3E%3Cpath d='M16 8c0-2.5 2-3 2-3s2 0.5 2 3'%3E%3C/path%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20a4 4 0 1 1 0-8 4 4 0 0 1 0 8z'%3E%3C/path%3E%3Cpath d='M8 8c0-2.5 2-3 2-3s2 0.5 2 3'%3E%3C/path%3E%3Cpath d='M12 6c0-2.5 2-3 2-3s2 0.5 2 3'%3E%3C/path%3E%3Cpath d='M16 8c0-2.5 2-3 2-3s2 0.5 2 3'%3E%3C/path%3E%3C/svg%3E");
+}
         .event.optimized { border-left: 2px solid var(--secondary); padding-left: 28px; margin-left: -8px; background-color: #FFFDF5; padding-top: 5px; padding-bottom: 5px; border-radius: 4px; }
         
         /* AI Features Styles (Integrated) */
@@ -941,7 +968,7 @@
             </div>
             <div id="d2" class="timeline">
                 <div class="alert-box" style="background: #F7FCEF; border: 1px solid #D9F99D; color: #3F6212;">
-                    <span>⏱️</span> 
+                    <div class="alert-icon time"></div>
                     <div><b>優化目標：：</b>調整下午行程時間，確保 **17:05 從大觀峰出發**，於 **18:00 抵達黑川溫泉**。</div>
                 </div>
                 <div class="event">
@@ -1074,7 +1101,7 @@
             </div>
             <div id="d3" class="timeline">
                 <div class="alert-box" style="background: var(--beppu-bg); border: 1px solid var(--beppu-info); color: #075985;">
-                    <span>♨️</span> 
+                    <div class="alert-icon onsen"></div>
                     <div><b>行程提示：：</b>海地獄已加入此行程！您將從黑川溫泉出發，**在前往由布院的途中經過別府並參觀海地獄**，完美串聯行程。</div>
                 </div>
                 <div class="event event-meal">
