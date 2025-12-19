@@ -2574,13 +2574,7 @@ function getDecryptedKey() {
 }
         // Weather Data Configuration
         // Icons: Using simple SVG strings for white icons
-        const weatherIcons = {
-            'sun': '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>',
-            'cloud': '<svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>',
-            'cloud-sun': '<svg viewBox="0 0 24 24"><path d="M12 2v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="M20 12h2"></path><path d="m19.07 4.93-1.41 1.41"></path><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"></path><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"></path></svg>',
-            'rain': '<svg viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M16 14v6"></path><path d="M8 14v6"></path><path d="M12 16v6"></path></svg>',
-            'snow': '<svg viewBox="0 0 24 24"><path d="M4.5 10H4a7 7 0 1 1 7-7v.5"></path><path d="M10 14a6 6 0 0 0-6-6"></path><line x1="12" y1="16" x2="12" y2="22"></line><line x1="12" y1="22" x2="9" y2="19"></line><line x1="12" y1="22" x2="15" y2="19"></line><line x1="18.5" y1="12" x2="22" y2="12"></line><line x1="22" y1="12" x2="19.5" y2="9.5"></line><line x1="22" y1="12" x2="19.5" y2="14.5"></line><line x1="5" y1="18.5" x2="2" y2="18.5"></line><line x1="2" y1="18.5" x2="4.5" y2="21"></line><line x1="2" y1="18.5" x2="4.5" y2="16"></line><line x1="17.5" y1="18.5" x2="20.5" y2="21"></line><line x1="17.5" y1="18.5" x2="20.5" y2="16"></line></svg>'
-        };
+
 
         const weatherData = {
             'd1': { loc: '熊本市', date: '1/25 (Day 1)', temp: '10°C', range: '2°C ~ 11°C', desc: '晴時多雲', advice: '氣溫適中但早晚偏涼，長袖配外套。', icon: 'cloud-sun' },
@@ -2601,13 +2595,10 @@ function getDecryptedKey() {
                 document.getElementById('hw-range').innerText = data.range;
                 document.getElementById('hw-advice').innerText = data.advice;
                 
-                // Update Icon
-                const iconSvg = weatherIcons[data.icon] || weatherIcons['cloud'];
-                // Wrap in svg tag with stroke/fill settings
-                const fullSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconSvg.replace('<svg viewBox="0 0 24 24">', '').replace('</svg>', '')}</svg>`;
-                document.getElementById('hw-icon').innerHTML = fullSvg;
-            }
-        }
+                const iconType = data.icon || 'cloud'; // 預設為 cloud
+        document.getElementById('hw-icon').innerHTML = `<div class="weather-icon ${iconType}"></div>`;
+    }
+}
                 
         // --- REAL-TIME WEATHER FUNCTIONS (Using Open-Meteo Free API) ---
         let currentMyTemp = null;
