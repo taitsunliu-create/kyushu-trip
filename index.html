@@ -2576,14 +2576,38 @@ function getDecryptedKey() {
         // Icons: Using simple SVG strings for white icons
 
 
-        const weatherData = {
-            'd1': { loc: '熊本市', date: '1/25 (Day 1)', temp: '10°C', range: '2°C ~ 11°C', desc: '晴時多雲', advice: '氣溫適中但早晚偏涼，長袖配外套。', icon: 'cloud-sun' },
-            'd2': { loc: '阿蘇/黑川', date: '1/26 (Day 2)', temp: '5°C', range: '-3°C ~ 6°C', desc: '多雲/飄雪', advice: '山區極冷，務必穿著羽絨外套保暖。', icon: 'snow' },
-            'd3': { loc: '別府/由布院', date: '1/27 (Day 3)', temp: '7°C', range: '0°C ~ 8°C', desc: '多雲', advice: '濕度較高體感寒冷，請穿防滑鞋。', icon: 'cloud' },
-            'd4': { loc: '福岡市', date: '1/28 (Day 4)', temp: '9°C', range: '4°C ~ 10°C', desc: '陰天', advice: '市區風大，建議穿著防風外套。', icon: 'cloud' },
-            'd5': { loc: '福岡市', date: '1/29 (Day 5)', temp: '10°C', range: '3°C ~ 11°C', desc: '晴朗', advice: '早晚溫差大，洋蔥式穿法最佳。', icon: 'sun' },
-            'd6': { loc: '福岡市', date: '1/30 (Day 6)', temp: '9°C', range: '4°C ~ 10°C', desc: '多雲時晴', advice: '室內暖氣強，內搭不宜過厚。', icon: 'cloud-sun' }
-        };
+       // 1. 基礎設定：只保留地點、日期與預設建議（靜態資料）
+const itineraryConfig = {
+    'd1': { dateStr: '2026-01-25', loc: '熊本市', lat: 32.80, lon: 130.70, defaultAdvice: '氣溫適中...' },
+    'd2': { dateStr: '2026-01-26', loc: '阿蘇/黑川', lat: 32.93, lon: 131.12, defaultAdvice: '山區極冷...' },
+    // ... 其他天
+};
+
+// 2. 判斷邏輯函數 (示意)
+function getWeatherDataForDay(dayKey) {
+    const targetDayConfig = itineraryConfig[dayKey];
+    const targetDate = new Date(targetDayConfig.dateStr).setHours(0,0,0,0);
+    const today = new Date().setHours(0,0,0,0); // 取得今日零時
+
+    // A. 過去式 (已過完的行程)
+    if (targetDate < today) {
+        // 從 LocalStorage 讀取之前存下來的紀錄，如果沒有則顯示預設靜態資料
+        return getSavedHistory(dayKey) || "顯示預設靜態資料";
+    }
+    
+    // B. 就是今天 (旅程進行中)
+    else if (targetDate === today) {
+        // 呼叫 API: Current Weather (以節省 Token 為原則，可設定 1小時更新一次)
+        return fetchCurrentWeather(targetDayConfig.lat, targetDayConfig.lon);
+    }
+    
+    // C. 未來式 (還沒發生的行程)
+    else {
+        // 呼叫 API: 5 Day / 3 Hour Forecast
+        // 計算 targetDate 是今天的第幾天後，從預報資料中抓取對應的那一天
+        return fetchForecastWeather(targetDayConfig.lat, targetDayConfig.lon, targetDayConfig.dateStr);
+    }
+}
 
         function updateWeatherWidget(dayId) {
             const data = weatherData[dayId];
