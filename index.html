@@ -97,8 +97,8 @@
             align-items: center;
             gap: 8px;
             
-            /* 關鍵修改：層級設為 3000，確保比彈出視窗(2000)還高 */
-            z-index: 3000; 
+            
+            z-index: 9999; /* 設到最高，確保浮在所有內容之上 */
             
             cursor: pointer;
             transition: transform 0.2s;
@@ -2582,10 +2582,7 @@
     </div>
 
     <!-- Bottom Navigation Bar (6 items now) -->
-    <button id="btn-share-loc" class="float-share-btn" onclick="shareCurrentLocation()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-        <span>分享定位</span>
-    </button>
+    
     <nav class="nav-bar">
         <div class="nav-item active" data-target="view-schedule" onclick="switchTab(this)">
             <span class="nav-icon">
@@ -2627,7 +2624,10 @@
             </span>
             AI 助手
         </div>
-    </nav>
+    </nav> <button id="btn-share-loc" class="float-share-btn" onclick="shareCurrentLocation()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        <span>分享定位</span>
+    </button>
 
     <script>
        // [修改] 原本的 const apiKey = ""; 替換成以下內容：
