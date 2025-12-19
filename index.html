@@ -80,7 +80,107 @@
              gap: 6px; 
     
             margin-top: 8px;
+        }   
+     /* [修改] SOS 浮動分享按鈕 (層級加強版) */
+     /* [新增] 行前檢查清單樣式 */
+        /* [修改] 行前檢查清單樣式 (加入折疊功能) */
+        .checklist-card-header {
+            border-bottom: 1px dashed #E5E7EB; 
+            padding-bottom: 10px; 
+            margin-bottom: 0;
+            /* 新增: 讓標題可點擊並對齊箭頭 */
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+        
+        /* 收合容器 (預設隱藏 max-height: 0) */
+        .checklist-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+            opacity: 0;
+        }
+        /* 展開狀態 (加上 .show 類別時) */
+        .checklist-container.show {
+            max-height: 800px; /* 設定一個足夠的高度讓內容顯示 */
+            opacity: 1;
+            margin-top: 15px; /* 展開時才給上方間距 */
+        }
+
+        /* 沿用原本的格線與項目樣式 */
+        .checklist-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            /* margin-top: 10px; <-- 移除這行，改由 container 控制 */
+        }
+        .check-item {
+            display: flex; align-items: center; gap: 8px;
+            background: #F9FAFB; padding: 10px 12px; border-radius: 8px;
+            cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+            border: 1px solid #E5E7EB; -webkit-user-select: none; -moz-user-select: none; user-select: none;
+        }
+        /* 手機版改為單欄 */
+        @media (max-width: 600px) { .checklist-grid { grid-template-columns: 1fr; } }
+        
+        .check-item:has(input:checked) {
+            background: #ECFDF5; border-color: #10B981; color: #065F46; font-weight: 600;
+            box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1);
+        }
+        .check-item input { accent-color: #10B981; width: 18px; height: 18px; cursor: pointer; }
+        /* [新增] 隨身筆記浮動按鈕 (位於分享按鈕上方) */
+        .float-note-btn {
+            position: fixed;
+            bottom: 160px; /* 90px + 按鈕高度 + 間距 */
+            left: 20px;    /* 對齊下方的分享按鈕 */
+            background: linear-gradient(135deg, #3B82F6, #2563EB); /* 藍色系 */
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            padding: 16px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            z-index: 9999;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+                 user-select: none;
+        }
+        .float-note-btn:active { transform: scale(0.95); }
+        .float-note-btn svg { width: 20px; height: 20px; stroke-width: 2.5; }
+        .float-share-btn {
+            position: fixed;
+            bottom: 90px; /* 位於底部導航欄上方 */
+            left: 20px;
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
+            border: 2px solid white; /* 新增：白色邊框，增加辨識度 */
+            border-radius: 50px;
+            padding: 16px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.5); /* 陰影加深 */
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            
+            
+            z-index: 9999; /* 設到最高，確保浮在所有內容之上 */
+            
+            cursor: pointer;
+            transition: transform 0.2s;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+                 user-select: none;
+        }
+        .float-share-btn:active { transform: scale(0.95); }
+        .float-share-btn svg { width: 20px; height: 20px; stroke-width: 2.5; }
+        
 .header-title-area .badge-trip::before {
     content: '';
     display: block;
@@ -114,6 +214,45 @@
         }
 
         /* Weather Columns */
+        /* [新增] Header 我的位置區塊樣式 */
+        .hw-col-my-loc {
+            padding-right: 10px;
+            margin-right: 5px;
+            border-right: 1px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 60px;
+            text-align: left;
+        }
+
+        .hw-sub-label {
+            font-size: 0.65rem;
+            opacity: 0.8;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .hw-my-data {
+            font-size: 0.9rem;
+            font-weight: 700;
+            white-space: nowrap;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        /* 手機版微調 */
+        @media (max-width: 600px) {
+            .hw-col-my-loc {
+                padding-right: 8px;
+                margin-right: 0;
+                border-right: 1px solid rgba(255,255,255,0.2); /* 手機版保留分隔線 */
+            }
+        }
         .hw-col-loc {
             padding-right: 15px;
             border-right: 1px solid rgba(255,255,255,0.3);
@@ -875,7 +1014,18 @@
 
             <!-- 天氣資訊盒 (擺放在右側，三欄式設計) -->
             <div class="header-weather-box" id="header-weather">
-                <!-- 1. 地點日期 -->
+                
+                <div class="hw-col-my-loc" id="hw-my-loc-box" onclick="getLocalWeather()">
+                    <div class="hw-sub-label">
+                        <svg class="icon-mini" style="width:12px;height:12px;vertical-align:text-top;" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                        我的位置
+                    </div>
+                    <div class="hw-my-data">
+                        <span id="header-my-loc">定位中..</span>
+                        <span id="header-my-temp" style="color: var(--secondary);">--</span>
+                    </div>
+                </div>
+
                 <div class="hw-col-loc">
                     <span class="hw-loc" id="hw-loc">熊本市</span>
                     <span class="hw-date" id="hw-date">1/25 (Day 1)</span>
@@ -901,6 +1051,42 @@
 
     <!-- TAB 1: 行程表 -->
     <div id="view-schedule" class="container active">
+                <div class="card" style="border-left: 5px solid #F59E0B; margin-bottom: 20px;">
+            <div class="card-header checklist-card-header" onclick="toggleChecklist(this)">
+                <div class="card-title" style="display: flex; align-items: center; gap: 6px;">
+                    <svg class="icon-mini" style="color: #F59E0B;" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    行前準備 Check List
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="tag tag-tip" id="checklist-progress" style="background:#FFFBEB; color:#D97706; font-weight:700;">0/8</div>
+                    <div class="toggle-icon" style="font-size: 0.8rem; color: #6B7280; font-weight: 700; transition: transform 0.3s;">▼
+
+                    </div>
+                </div>
+            </div>
+            
+            <div id="checklist-container" class="checklist-container">
+                <div class="checklist-grid">
+                    <label class="check-item"><input type="checkbox" data-id="c1"> <span>機場停車預約 (截圖備份)</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c2"> <span>護照 & 機票 (截圖備份)</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c3"> <span>旅遊保險單 (紙本/電子)</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c4"> <span>日幣現金 & 信用卡 & 西瓜卡</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c5"> <span>eSIM / 漫遊開通</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c6"> <span>Visit Japan Web 填寫</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c7"> <span>行動電源 & 充電線</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c8"> <span>國際駕照 (日文譯本) / 租車資料</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c9"> <span>牙刷/常備藥品</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c10"> <span>健保卡 / 大頭照</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c11"> <span>小工具醫療箱 / 雪松</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c12"> <span>耳溫槍 / 刮鬍刀</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c13"> <span>相機 / 讀卡機 / 拍立得</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c14"> <span>手套 / 脖圍</span></label>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="day-wrapper">
         <!-- Day 1 -->
         <div class="day-wrapper">
             <div class="day-toggle" id="toggle-d1" onclick="toggleTimeline('d1', this)">
@@ -1504,7 +1690,7 @@
     </div>
 
     <!-- TAB 2: 住宿資訊 (Updated Day 3) -->
-    <div id="view-stay" class="container">
+    </div> <div id="view-stay" class="container">
         <!-- Day 1: THE BLOSSOM -->
         <div class="card">
             <div class="card-header">
@@ -2502,8 +2688,23 @@
             </div>
         </div>
     </div>
-
+<div id="note-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 350px; text-align: left;">
+            <div class="modal-title" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
+                <span style="display:flex; align-items:center; gap:6px;">
+                    <svg class="icon-mini" style="color:#2563EB;" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    隨身筆記
+                </span>
+                <span id="note-status" style="font-size:0.75rem; color:#10B981; font-weight:normal;"></span>
+            </div>
+            <textarea id="note-area" style="width:100%; height:200px; padding:12px; border:1px solid #E5E7EB; border-radius:8px; font-size:1rem; resize:none; outline:none; font-family:inherit; background:#F9FAFB;" placeholder="在這裡記下想記錄的事... (自動儲存)"></textarea>
+            <div class="modal-btns" style="margin-top:15px;">
+                <button class="modal-btn btn-confirm" onclick="closeNoteModal()">關閉</button>
+            </div>
+        </div>
+    </div>
     <!-- Bottom Navigation Bar (6 items now) -->
+    
     <nav class="nav-bar">
         <div class="nav-item active" data-target="view-schedule" onclick="switchTab(this)">
             <span class="nav-icon">
@@ -2513,7 +2714,7 @@
         </div>
         <div class="nav-item" data-target="view-stay" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2 22v-8c0-1.1.9-2 2-2h4v10H4c-1.1 0-2-.9-2-2zM22 22v-8c0-1.1-.9-2-2-2h-4v10h4c1.1 0 2-.9 2-2zM12 2L2 12h3v8h4v-6h6v6h4v-8h3L12 2z"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"></path></svg>
             </span>
             住宿資訊
         </div>
@@ -2545,7 +2746,14 @@
             </span>
             AI 助手
         </div>
-    </nav>
+    </nav> 
+    <button id="btn-quick-note" class="float-note-btn" onclick="openNoteModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+    </button>
+    <button id="btn-share-loc" class="float-share-btn" onclick="shareCurrentLocation()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        
+    </button>
 
     <script>
        // [修改] 原本的 const apiKey = ""; 替換成以下內容：
@@ -3003,117 +3211,103 @@ function getSmartAdviceText(temp, weatherCode) {
             return `多雲 ${simpleIcons.cloud}`;
         }
 
-        function getLocalWeather() {
-            const tempEl = document.getElementById('wc-my-temp');
-            const titleEl = document.querySelector('.wc-mini-card .wc-mini-title'); 
+// [修改] 取得定位天氣 (同步更新 Header 與 分頁)
+function getLocalWeather() {
+    // 1. 定義要更新的 UI 元件 (Header + Tab)
+    const els = {
+        headerLoc: document.getElementById('header-my-loc'),
+        headerTemp: document.getElementById('header-my-temp'),
+        tabTemp: document.getElementById('wc-my-temp'),
+        titleEl: document.querySelector('.wc-mini-card .wc-mini-title') 
+    };
+    
+    // 檢查瀏覽器支援
+    if (!navigator.geolocation) {
+        openModal('瀏覽器不支援定位，請手動輸入城市：');
+        return;
+    }
+    
+    // 視覺回饋 (Loading)
+    if(els.headerLoc) els.headerLoc.innerText = '...';
+    if(els.tabTemp) {
+        els.tabTemp.innerText = '定位中..';
+        els.tabTemp.style.fontSize = '1.2rem';
+        if(els.titleEl) els.titleEl.innerHTML = '讀取 GPS...'; 
+    }
+
+    const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
+        try {
+            // A. 取得天氣 (Open-Meteo)
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+            const weatherData = await weatherRes.json();
             
-            // 1. 檢查瀏覽器支援
-            if (!navigator.geolocation) {
-                openModal('瀏覽器不支援定位，請手動輸入城市：');
-                return;
+            // 數據處理
+            currentMyTemp = weatherData.current_weather.temperature;
+            const tempStr = `${Math.round(currentMyTemp)}°C`;
+            
+            // 更新 UI (Tab)
+            if(els.tabTemp) {
+                els.tabTemp.innerText = tempStr;
+                els.tabTemp.style.fontSize = '1.5rem';
+                els.tabTemp.style.color = '#1F2937';
             }
+            // 更新 UI (Header - 紅圈處)
+            if(els.headerTemp) els.headerTemp.innerText = tempStr;
             
-            // 視覺回饋
-            tempEl.innerText = '定位中..';
-            tempEl.style.fontSize = '1.2rem';
-            tempEl.style.color = '#2563EB'; 
-            titleEl.innerHTML = '正在讀取 GPS...'; 
+            // 更新溫差比對
+            const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
+            if (targetTempStr !== '--°' && typeof updateComparison === 'function') {
+                updateComparison(parseFloat(targetTempStr));
+            }
 
-            const options = {
-                enableHighAccuracy: false, 
-                timeout: 10000, // 放寬超時時間到 10秒
-                maximumAge: 0
-            };
-
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                // --- 成功取得定位 ---
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
+            // B. 解析地名 (AI 翻譯或預設)
+            let displayZh = "我的位置";
+            
+            try {
+                if(els.titleEl) els.titleEl.innerHTML = '解析地名...';
                 
-                try {
-                    // 【修正重點 1】優先取得天氣 (這是最重要的)
-                    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-                    const weatherData = await weatherRes.json();
-                    
-                    // 拿到天氣就先顯示，不用等 AI
-                    currentMyTemp = weatherData.current_weather.temperature;
-                    tempEl.innerText = `${currentMyTemp}°C`;
-                    tempEl.style.fontSize = '1.5rem';
-                    tempEl.style.color = '#1F2937'; 
-                    
-                    // 更新溫差比對
-                    const targetTempStr = document.getElementById('wc-temp').innerText;
-                    if (targetTempStr !== '--°') {
-                        updateComparison(parseFloat(targetTempStr));
-                    }
+                // 嘗試使用 AI 解析 (若有金鑰)
+                const locationPrompt = `Task: Identify city name for ${lat},${lon}. Output: "中文|English". Example: "台北|Taipei"`;
+                const locationStr = await getGeminiResponse(locationPrompt);
 
-                    // 【修正重點 2】地名部分獨立處理 (就算失敗也不影響溫度)
-                    let displayZh = "我的位置";
-                    let displayEn = "";
-                    
-                    try {
-                        titleEl.innerHTML = '解析地名中...';
-                        const locationPrompt = `
-                            Task: Identify the city/district name for coordinates: ${lat}, ${lon}.
-                            Output Format: "Traditional Chinese Name|English Name"
-                            Rule: Output ONLY the names separated by a pipe. No labels.
-                            Example: "竹北市|Zhubei City", "熊本市|Kumamoto City".
-                        `;
-                        const locationStr = await getGeminiResponse(locationPrompt);
-
-                        if (locationStr && locationStr.includes('|')) {
-                            const parts = locationStr.split('|');
-                            displayZh = parts[0].trim();
-                            displayEn = parts[1].trim();
-                        } else if (locationStr) {
-                            displayZh = locationStr.trim();
-                        }
-                    } catch (aiError) {
-                        console.warn("AI 地名解析失敗，使用預設名稱", aiError);
-                        // 失敗了就保持 "我的位置"
-                    }
-
-                    // 更新地名 UI
-                    let titleHtml = `
-                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                                <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                <span>${displayZh}</span>
-                            </div>
-                    `;
-                    if (displayEn) {
-                        titleHtml += `<span style="font-size: 0.75rem; color: #9CA3AF; font-weight: 400; font-family: sans-serif;">${displayEn}</span>`;
-                    }
-                    titleHtml += `</div>`;
-                    titleEl.innerHTML = titleHtml;
-
-                } catch (e) {
-                    console.error(e);
-                    tempEl.innerText = 'Err';
-                    titleEl.innerHTML = `
-                        <div style="display: flex; align-items: center; justify-content: center;">
-                            <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            我的位置 (重試)
-                        </div>`;
-                    openModal('讀取氣象數據失敗，請手動輸入城市：');
+                if (locationStr && locationStr.includes('|')) {
+                    displayZh = locationStr.split('|')[0].trim();
+                } else if (locationStr) {
+                    displayZh = locationStr.trim();
                 }
-            }, (err) => {
-                // --- 定位失敗 (GPS 層級) ---
-                console.warn('Geolocation Error:', err);
-                let shortMsg = '定位失敗';
-                if (err.code === 1) shortMsg = '無權限'; 
-                if (err.code === 2) shortMsg = '訊號不良'; 
-                if (err.code === 3) shortMsg = '逾時'; 
-                
-                tempEl.innerText = shortMsg;
-                tempEl.style.fontSize = '1rem'; 
-                tempEl.style.color = '#EF4444'; 
-                
-                setTimeout(() => {
-                     openModal(`定位受限 (${shortMsg})，改為手動輸入？`);
-                }, 500);
-            }, options);
+            } catch (aiError) {
+                console.warn("AI 解析略過 (無 Key 或 失敗)，將顯示座標或預設文字");
+                displayZh = "我的位置"; // 降級顯示
+            }
+
+            // 更新 UI (Header 地名)
+            if(els.headerLoc) els.headerLoc.innerText = displayZh;
+
+            // 更新 UI (Tab 地名)
+            if(els.titleEl) {
+                els.titleEl.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                        <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>${displayZh}</span>
+                    </div>`;
+            }
+
+        } catch (e) {
+            console.error(e);
+            if(els.headerLoc) els.headerLoc.innerText = 'Err';
+            if(els.tabTemp) els.tabTemp.innerText = 'Err';
         }
+    }, (err) => {
+        console.warn('定位失敗:', err);
+        if(els.headerLoc) els.headerLoc.innerText = '定位失敗';
+        if(els.tabTemp) els.tabTemp.innerText = '無權限';
+    }, options);
+}
 
         // --- Modal Functions (取代原生 alert/prompt) ---
         function openModal(msg) {
@@ -3125,7 +3319,94 @@ function getSmartAdviceText(temp, weatherCode) {
         function closeModal() {
             document.getElementById('location-modal').style.display = 'none';
         }
+        // [新增] 隨身筆記功能 (自動儲存)
+        const NOTE_STORAGE_KEY = 'kyushu_trip_note_2026';
 
+        function openNoteModal() {
+            const modal = document.getElementById('note-modal');
+            const area = document.getElementById('note-area');
+            const status = document.getElementById('note-status');
+            
+            // 1. 讀取舊筆記
+            area.value = localStorage.getItem(NOTE_STORAGE_KEY) || '';
+            status.innerText = '';
+            
+            modal.style.display = 'flex';
+            
+            // 2. 綁定輸入事件 (即時自動儲存)
+            area.oninput = function() {
+                localStorage.setItem(NOTE_STORAGE_KEY, area.value);
+                status.innerText = '已自動儲存 ✓';
+            };
+        }
+
+        function closeNoteModal() {
+            document.getElementById('note-modal').style.display = 'none';
+        }
+
+        // 點擊背景關閉視窗 (通用)
+        window.onclick = function(event) {
+            const nModal = document.getElementById('note-modal');
+            const lModal = document.getElementById('location-modal');
+            if (event.target == nModal) nModal.style.display = "none";
+            if (event.target == lModal) lModal.style.display = "none";
+        }
+// [新增] 獲取 GPS 並透過 LINE/簡訊 分享 Google Maps 連結
+        function shareCurrentLocation() {
+            // 1. 檢查支援度
+            if (!navigator.geolocation) {
+                alert("您的裝置不支援定位功能。");
+                return;
+            }
+
+            const btn = document.getElementById('btn-share-loc');
+            const originalContent = btn.innerHTML;
+            
+            // 2. 顯示讀取中狀態
+            // 2. 顯示讀取中狀態 (只留 loading 圖示)
+            btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:rotate 1s linear infinite;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" fill="none" stroke="currentColor" stroke-width="2"></path></svg>`;
+            btn.style.opacity = "0.8";
+
+            // 3. 獲取高精確度位置
+            navigator.geolocation.getCurrentPosition(position => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                
+                // 產生 Google Maps 連結
+                const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+                const shareText = `【緊急/報平安】我目前的位置在這裡，請點擊連結查看：`;
+
+                // 4. 呼叫原生分享選單 (Web Share API)
+                if (navigator.share) {
+                    navigator.share({
+                        title: '我的即時位置',
+                        text: shareText,
+                        url: mapUrl
+                    }).then(() => {
+                        console.log('分享成功');
+                    }).catch((error) => {
+                        console.log('分享取消', error);
+                    });
+                } else {
+                    // 電腦版或不支援分享的瀏覽器 -> 改為複製連結
+                    prompt("請複製以下連結發送給朋友：", mapUrl);
+                }
+
+                // 復原按鈕
+                btn.innerHTML = originalContent;
+                btn.style.opacity = "1";
+
+            }, error => {
+                console.error(error);
+                alert("無法取得位置，請確認 GPS 已開啟，並允許網頁存取位置。");
+                btn.innerHTML = originalContent;
+                btn.style.opacity = "1";
+            }, { 
+                enableHighAccuracy: true, // 要求高精確度 (重要!)
+                timeout: 10000, 
+                maximumAge: 0 
+            });
+        }
         async function submitManualLocation() {
             const manualCity = document.getElementById('modal-city-input').value.trim();
             if (!manualCity) return;
@@ -3489,16 +3770,23 @@ function getSmartAdviceText(temp, weatherCode) {
                     `;
                 };
 
-                const startRec = (e) => {
-                    if (e.cancelable) e.preventDefault();
-                    // 每次點擊前先停止舊的 (避免重複開啟)
-                    try { recognition.stop(); } catch(err) {}
-                    try { recognition.start(); } catch(err) { console.log(err); }
+                // [修改] 改為「開關式」邏輯：錄音中點擊則停止，未錄音點擊則開始
+                const toggleRec = (e) => {
+                    if (e && e.cancelable) e.preventDefault();
+                    
+                    // 檢查按鈕是否有 'recording' 類別 (表示正在錄音)
+                    if (voiceBtn.classList.contains('recording')) {
+                        console.log('手動停止錄音');
+                        try { recognition.stop(); } catch(err) {}
+                        // 這裡不呼叫 start，讓它自然停止，麥克風權限就會釋放
+                    } else {
+                        console.log('手動開始錄音');
+                        try { recognition.start(); } catch(err) { console.log(err); }
+                    }
                 };
                 
-                // 改為 Click 觸發即可，不用長按，因為現在有語言開關了
-                // 為了手機體驗，還是保留 touchstart
-                voiceBtn.onclick = startRec;
+                // 綁定新的開關函式
+                voiceBtn.onclick = toggleRec;
                 
             } else {
                 voiceBtn.style.display = 'none'; 
@@ -3628,17 +3916,143 @@ function getSmartAdviceText(temp, weatherCode) {
             window.location.reload(); // 重新整理網頁
         }
     }
-        document.addEventListener('DOMContentLoaded', () => {
-            // Default: Open Day 1
-            const d1Toggle = document.getElementById('toggle-d1');
-            const d1Timeline = document.getElementById('d1');
-            if (d1Timeline) { 
-                d1Timeline.classList.add('show');
-                d1Toggle.classList.add('open');
-                updateWeatherWidget('d1'); 
+    // [新增] 行前清單功能：自動儲存勾選狀態到手機
+        function initChecklist() {
+            const checkboxes = document.querySelectorAll('.check-item input');
+            const progressEl = document.getElementById('checklist-progress');
+            const STORAGE_KEY = 'kyushu_trip_checklist_2026'; // 本地儲存的專屬金鑰
+
+            function updateProgress() {
+                const checkedCount = document.querySelectorAll('.check-item input:checked').length;
+                const total = checkboxes.length;
+                
+                // 更新數字
+                if(progressEl) progressEl.innerText = `${checkedCount}/${total}`;
+                
+                // 視覺回饋：全選完變綠色
+                if(progressEl && checkedCount === total) {
+                    progressEl.style.background = '#ECFDF5';
+                    progressEl.style.color = '#059669';
+                    progressEl.innerText = '準備完成！';
+                }
+
+                // 儲存狀態
+                const states = {};
+                checkboxes.forEach(cb => states[cb.dataset.id] = cb.checked);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
             }
+
+            // 1. 讀取舊紀錄
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            
+            // 2. 恢復勾選狀態
+            checkboxes.forEach(cb => {
+                if(saved[cb.dataset.id]) cb.checked = true;
+                // 綁定點擊事件
+                cb.addEventListener('change', updateProgress);
+            });
+
+            // 3. 初始更新一次 UI
+            updateProgress();
+        }
+        function toggleChecklist(headerEl) {
+        const container = document.getElementById('checklist-container');
+        const icon = headerEl.querySelector('.toggle-icon');
+        
+        // 切換顯示容器 (加上或移除 .show 類別)
+        const isClosed = !container.classList.contains('show');
+        
+        if (isClosed) {
+            container.classList.add('show');
+            icon.style.transform = 'rotate(180deg)';
+            icon.style.color = '#2563EB'; // 這行可以改成 #F59E0B (配合清單的主色黃)
+        } else {
+            container.classList.remove('show');
+            icon.style.transform = 'rotate(0deg)';
+            icon.style.color = '#6B7280';
+        }
+    }
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 智慧自動展開邏輯開始 ---
+            
+            // 1. 定義日期與行程 ID 的對應表
+            const scheduleMap = {
+                '2026-01-25': 'd1',
+                '2026-01-26': 'd2',
+                '2026-01-27': 'd3',
+                '2026-01-28': 'd4',
+                '2026-01-29': 'd5',
+                '2026-01-30': 'd6'
+            };
+
+            // 2. 取得今日日期 (格式 YYYY-MM-DD)
+            const now = new Date();
+            // ★ 測試用：若想現在測試「旅途中」的效果，請取消下行註解並修改日期
+             //const now = new Date('2026-01-28'); 
+
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
+
+            // 3. 取得 DOM 元素
+            const checklistContainer = document.getElementById('checklist-container');
+            const checklistIcon = document.querySelector('.checklist-card-header .toggle-icon');
+
+            // 4. 執行判斷
+            if (todayStr < '2026-01-25') {
+                // 【情境 A：行前準備期】(現在 ~ 1/24)
+                // 動作：自動展開 Checklist，收合所有行程
+                
+                if (checklistContainer) {
+                    checklistContainer.classList.add('show');
+                    if(checklistIcon) {
+                        checklistIcon.style.transform = 'rotate(180deg)';
+                        checklistIcon.style.color = '#2563EB'; // 藍色箭頭表示展開
+                    }
+                }
+                // 預設載入 Day 1 天氣資訊供參考
+                updateWeatherWidget('d1');
+
+            } else if (scheduleMap[todayStr]) {
+                // 【情境 B：旅途中】(1/25 ~ 1/30)
+                // 動作：Checklist 保持關閉，自動展開「當天」的行程
+                
+                const targetDayId = scheduleMap[todayStr];
+                const dayTimeline = document.getElementById(targetDayId);
+                const dayToggle = document.getElementById('toggle-' + targetDayId);
+                const dayIcon = dayToggle ? dayToggle.querySelector('.toggle-icon') : null;
+
+                if (dayTimeline && dayToggle) {
+                    // 展開該日行程
+                    dayTimeline.classList.add('show');
+                    dayToggle.classList.add('open'); // 讓左邊框變色
+                    if (dayIcon) {
+                         // 這裡您使用 div 箭頭，我們透過 CSS class 控制旋轉，或者直接用 style
+                         // 您的 CSS .day-toggle.open .toggle-icon 已經有設定 transform，所以加上 open 類別即可
+                    }
+                    
+                    // 更新 Header 天氣為「當天」的地點
+                    updateWeatherWidget(targetDayId);
+
+                    // (選用) 自動捲動到當日行程，提升體驗
+                    setTimeout(() => {
+                        dayToggle.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 500);
+                }
+            } else {
+                // 【情境 C：旅程結束】
+                // 全部收合，或視需求顯示
+                updateWeatherWidget('d1'); // 預設回顯 D1
+            }
+            
+            // --- 智慧自動展開邏輯結束 ---
+
             initAiChat();
             setupVoiceButton(); // Init voice listener
+            getLocalWeather(); // Fetch local weather on load
+            initChecklist(); // Init checklist
         });
     </script>
 </body>
