@@ -2665,18 +2665,16 @@ async function updateWeatherWidget(dayId) {
     
     document.getElementById('hw-icon').innerHTML = `<div class="weather-icon ${finalIcon}"></div>`;
 }
-// [修改] 智慧判斷函式：加入「今天」的優先判斷
+// [修改] 智慧判斷函式：advice 改為回傳「狀態 + 您的穿衣建議」
 async function getSmartWeatherData(config) {
-    // 1. 處理日期物件
-    // 為了避免時區問題導致日期判斷錯誤，我們直接用字串比對會最準確
-    // 取得「今天的日期字串」，格式如 "2025-12-19"
+    // 1. 取得今日日期字串 (YYYY-MM-DD)
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     const todayStr = `${year}-${month}-${day}`;
     
-    // 用來比較過去/未來的 Date 物件
+    // Date 物件比較用
     const tripDate = new Date(config.dateStr);
     tripDate.setHours(0, 0, 0, 0);
     const todayDate = new Date();
@@ -2700,20 +2698,20 @@ async function getSmartWeatherData(config) {
         const index = json.daily.time.indexOf(config.dateStr);
         let displayData = {};
 
-        // ★★★ 修正重點：優先判斷「是不是今天」 ★★★
+        // ★★★ 優先判斷「是不是今天」 ★★★
         if (config.dateStr === todayStr) {
             // === 情境 B: 就是今天 (顯示即時) ===
             const current = json.current_weather;
-            // 今天的最高最低溫，通常在 daily 陣列的第 0 筆
             const todayMax = json.daily.temperature_2m_max[0];
             const todayMin = json.daily.temperature_2m_min[0];
 
             displayData = {
-                temp: `${Math.round(current.temperature)}°C`, // 這是現在這一刻的溫度
+                temp: `${Math.round(current.temperature)}°C`, 
                 range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`,
                 desc: getWeatherDescText(current.weathercode),
                 icon: getWeatherIconClass(current.weathercode),
-                advice: `(即時) 目前氣溫 ${current.temperature}°，${getWeatherDescText(current.weathercode)}。`
+                // [修改點 1] 改為顯示：(即時) + 您的穿衣建議
+                advice: `(即時) ${config.backup.advice}`
             };
         } 
         else if (index !== -1) {
@@ -2723,16 +2721,16 @@ async function getSmartWeatherData(config) {
             const min = json.daily.temperature_2m_min[index];
             
             displayData = {
-                temp: `${Math.round((max + min) / 2)}°C`, // 預報顯示均溫
+                temp: `${Math.round((max + min) / 2)}°C`,
                 range: `${Math.round(min)}°C ~ ${Math.round(max)}°C`,
                 desc: getWeatherDescText(code),
                 icon: getWeatherIconClass(code),
-                advice: `(預報) ${config.dateStr.slice(5)} 當日天氣預測為${getWeatherDescText(code)}。`
+                // [修改點 2] 改為顯示：(預報) + 您的穿衣建議
+                advice: `(預報) ${config.backup.advice}`
             };
         } 
         else {
-            // === 情境 C-2: 遠期未來監控 (7天以後，例如 2026年) ===
-            // 雖然是未來，但為了讓您有感，顯示「當地現在」的狀況
+            // === 情境 C-2: 遠期未來監控 (7天以後) ===
             const current = json.current_weather;
             const todayMax = json.daily.temperature_2m_max[0];
             const todayMin = json.daily.temperature_2m_min[0];
@@ -2742,7 +2740,8 @@ async function getSmartWeatherData(config) {
                 range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`,
                 desc: getWeatherDescText(current.weathercode),
                 icon: getWeatherIconClass(current.weathercode),
-                advice: `(目前狀況) 離出發日尚早，顯示當地「現在」的天氣供參考。`
+                // [修改點 3] 改為顯示：(目前狀況) + 您的穿衣建議
+                advice: `(目前狀況) ${config.backup.advice}`
             };
         }
         
