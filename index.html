@@ -2639,7 +2639,8 @@ async function updateWeatherWidget(dayId) {
 
     // 1. 先顯示 Loading 狀態 (提升使用者體驗)
     document.getElementById('hw-loc').innerText = config.loc;
-    document.getElementById('hw-date').innerText = config.dateStr.slice(5); // 只顯示 MM-DD
+    //document.getElementById('hw-date').innerText = config.dateStr.slice(5); // 只顯示 MM-DD
+    document.getElementById('hw-date').innerText = config.dateStr; // 只顯示 MM-DD
     document.getElementById('hw-temp').innerText = '--';
     document.getElementById('hw-desc').innerText = '讀取中...';
     document.getElementById('hw-range').innerText = '';
