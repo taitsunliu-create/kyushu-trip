@@ -3886,14 +3886,82 @@ function getLocalWeather() {
         }
     }
         document.addEventListener('DOMContentLoaded', () => {
-            // Default: Open Day 1
-            const d1Toggle = document.getElementById('toggle-d1');
-            const d1Timeline = document.getElementById('d1');
-            if (d1Timeline) { 
-                //d1Timeline.classList.add('show');
-                //d1Toggle.classList.add('open');
-                updateWeatherWidget('d1'); 
+            
+            // --- 智慧自動展開邏輯開始 ---
+            
+            // 1. 定義日期與行程 ID 的對應表
+            const scheduleMap = {
+                '2026-01-25': 'd1',
+                '2026-01-26': 'd2',
+                '2026-01-27': 'd3',
+                '2026-01-28': 'd4',
+                '2026-01-29': 'd5',
+                '2026-01-30': 'd6'
+            };
+
+            // 2. 取得今日日期 (格式 YYYY-MM-DD)
+            const now = new Date();
+            // ★ 測試用：若想現在測試「旅途中」的效果，請取消下行註解並修改日期
+            // const now = new Date('2026-01-26'); 
+
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
+
+            // 3. 取得 DOM 元素
+            const checklistContainer = document.getElementById('checklist-container');
+            const checklistIcon = document.querySelector('.checklist-card-header .toggle-icon');
+
+            // 4. 執行判斷
+            if (todayStr < '2026-01-25') {
+                // 【情境 A：行前準備期】(現在 ~ 1/24)
+                // 動作：自動展開 Checklist，收合所有行程
+                
+                if (checklistContainer) {
+                    checklistContainer.classList.add('show');
+                    if(checklistIcon) {
+                        checklistIcon.style.transform = 'rotate(180deg)';
+                        checklistIcon.style.color = '#2563EB'; // 藍色箭頭表示展開
+                    }
+                }
+                // 預設載入 Day 1 天氣資訊供參考
+                updateWeatherWidget('d1');
+
+            } else if (scheduleMap[todayStr]) {
+                // 【情境 B：旅途中】(1/25 ~ 1/30)
+                // 動作：Checklist 保持關閉，自動展開「當天」的行程
+                
+                const targetDayId = scheduleMap[todayStr];
+                const dayTimeline = document.getElementById(targetDayId);
+                const dayToggle = document.getElementById('toggle-' + targetDayId);
+                const dayIcon = dayToggle ? dayToggle.querySelector('.toggle-icon') : null;
+
+                if (dayTimeline && dayToggle) {
+                    // 展開該日行程
+                    dayTimeline.classList.add('show');
+                    dayToggle.classList.add('open'); // 讓左邊框變色
+                    if (dayIcon) {
+                         // 這裡您使用 div 箭頭，我們透過 CSS class 控制旋轉，或者直接用 style
+                         // 您的 CSS .day-toggle.open .toggle-icon 已經有設定 transform，所以加上 open 類別即可
+                    }
+                    
+                    // 更新 Header 天氣為「當天」的地點
+                    updateWeatherWidget(targetDayId);
+
+                    // (選用) 自動捲動到當日行程，提升體驗
+                    setTimeout(() => {
+                        dayToggle.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 500);
+                }
+            } else {
+                // 【情境 C：旅程結束】
+                // 全部收合，或視需求顯示
+                updateWeatherWidget('d1'); // 預設回顯 D1
             }
+            
+            // --- 智慧自動展開邏輯結束 ---
+
             initAiChat();
             setupVoiceButton(); // Init voice listener
             getLocalWeather(); // Fetch local weather on load
