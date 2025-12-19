@@ -80,26 +80,28 @@
              gap: 6px; 
     
             margin-top: 8px;
-     /* [新增] SOS 浮動分享按鈕 */
+     /* [修改] SOS 浮動分享按鈕 (層級加強版) */
         .float-share-btn {
             position: fixed;
             bottom: 90px; /* 位於底部導航欄上方 */
             right: 20px;
-            background: linear-gradient(135deg, #EF4444, #DC2626); /* 警示紅 */
+            background: linear-gradient(135deg, #EF4444, #DC2626);
             color: white;
-            border: none;
+            border: 2px solid white; /* 新增：白色邊框，增加辨識度 */
             border-radius: 50px;
             padding: 12px 20px;
             font-size: 0.9rem;
             font-weight: 700;
-            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.5); /* 陰影加深 */
             display: flex;
             align-items: center;
             gap: 8px;
-            z-index: 1000; /* 確保在最上層 */
+            
+            /* 關鍵修改：層級設為 3000，確保比彈出視窗(2000)還高 */
+            z-index: 3000; 
+            
             cursor: pointer;
             transition: transform 0.2s;
-            /* 手機防誤觸優化 */
             -webkit-user-select: none;
             -moz-user-select: none;
                  user-select: none;
@@ -2578,11 +2580,12 @@
             </div>
         </div>
     </div>
-<button id="btn-share-loc" class="float-share-btn" onclick="shareCurrentLocation()">
+
+    <!-- Bottom Navigation Bar (6 items now) -->
+    <button id="btn-share-loc" class="float-share-btn" onclick="shareCurrentLocation()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
         <span>分享定位</span>
     </button>
-    <!-- Bottom Navigation Bar (6 items now) -->
     <nav class="nav-bar">
         <div class="nav-item active" data-target="view-schedule" onclick="switchTab(this)">
             <span class="nav-icon">
