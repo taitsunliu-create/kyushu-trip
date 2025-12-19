@@ -2667,14 +2667,14 @@ async function updateWeatherWidget(dayId) {
 }
 // [修改] 智慧判斷函式：advice 改為回傳「狀態 + 您的穿衣建議」
 async function getSmartWeatherData(config) {
-    // 1. 取得今日日期字串 (YYYY-MM-DD)
+    // 1. 取得今日日期字串 (YYYY-MM-DD) 以便精準比對
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     const todayStr = `${year}-${month}-${day}`;
     
-    // Date 物件比較用
+    // Date 物件比較用 (處理過去式)
     const tripDate = new Date(config.dateStr);
     tripDate.setHours(0, 0, 0, 0);
     const todayDate = new Date();
@@ -2690,6 +2690,7 @@ async function getSmartWeatherData(config) {
     try {
         console.log(`[${config.loc}] 呼叫 API 更新天氣...`);
         
+        // 呼叫 Open-Meteo API
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${config.lat}&longitude=${config.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=Asia%2FTokyo`;
         
         const res = await fetch(url);
@@ -2700,7 +2701,7 @@ async function getSmartWeatherData(config) {
 
         // ★★★ 優先判斷「是不是今天」 ★★★
         if (config.dateStr === todayStr) {
-            // === 情境 B: 就是今天 (顯示即時) ===
+            // === 情境 B: 就是今天 (顯示即時溫度) ===
             const current = json.current_weather;
             const todayMax = json.daily.temperature_2m_max[0];
             const todayMin = json.daily.temperature_2m_min[0];
@@ -2710,7 +2711,7 @@ async function getSmartWeatherData(config) {
                 range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`,
                 desc: getWeatherDescText(current.weathercode),
                 icon: getWeatherIconClass(current.weathercode),
-                // [修改點 1] 改為顯示：(即時) + 您的穿衣建議
+                // [修改點 1] 強制顯示：(即時) + 您原本寫在 config 裡的建議
                 advice: `(即時) ${config.backup.advice}`
             };
         } 
@@ -2725,7 +2726,7 @@ async function getSmartWeatherData(config) {
                 range: `${Math.round(min)}°C ~ ${Math.round(max)}°C`,
                 desc: getWeatherDescText(code),
                 icon: getWeatherIconClass(code),
-                // [修改點 2] 改為顯示：(預報) + 您的穿衣建議
+                // [修改點 2] 強制顯示：(預報) + 您原本寫在 config 裡的建議
                 advice: `(預報) ${config.backup.advice}`
             };
         } 
@@ -2740,7 +2741,7 @@ async function getSmartWeatherData(config) {
                 range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`,
                 desc: getWeatherDescText(current.weathercode),
                 icon: getWeatherIconClass(current.weathercode),
-                // [修改點 3] 改為顯示：(目前狀況) + 您的穿衣建議
+                // [修改點 3] 強制顯示：(目前狀況) + 您原本寫在 config 裡的建議
                 advice: `(目前狀況) ${config.backup.advice}`
             };
         }
@@ -2749,6 +2750,7 @@ async function getSmartWeatherData(config) {
 
     } catch (e) {
         console.error("API 獲取失敗", e);
+        // API 失敗時的回退機制
         return { ...config.backup, desc: config.backup.desc + ' (離線)', advice: '網路連線異常，顯示離線資料。' };
     }
 }
