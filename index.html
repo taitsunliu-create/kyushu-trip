@@ -82,6 +82,46 @@
             margin-top: 8px;
         }   
      /* [修改] SOS 浮動分享按鈕 (層級加強版) */
+     /* [新增] 行前檢查清單樣式 */
+        .checklist-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; /* 兩欄並排 */
+            gap: 10px; 
+            margin-top: 10px;
+        }
+        .check-item {
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            background: #F9FAFB; 
+            padding: 10px 12px; 
+            border-radius: 8px;
+            cursor: pointer; 
+            font-size: 0.9rem; 
+            transition: all 0.2s;
+            border: 1px solid #E5E7EB;
+            -webkit-user-select: none;
+               -moz-user-select: none;
+                    user-select: none; /* 防止連點選取文字 */
+        }
+        /* 手機版改為單欄，比較好點 */
+        @media (max-width: 600px) {
+            .checklist-grid { grid-template-columns: 1fr; }
+        }
+        /* 勾選後的樣式變化 (綠色) */
+        .check-item:has(input:checked) {
+            background: #ECFDF5; 
+            border-color: #10B981; 
+            color: #065F46; 
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1);
+        }
+        .check-item input { 
+            accent-color: #10B981; 
+            width: 18px; 
+            height: 18px; 
+            cursor: pointer;
+        }
         .float-share-btn {
             position: fixed;
             bottom: 90px; /* 位於底部導航欄上方 */
@@ -980,6 +1020,29 @@
 
     <!-- TAB 1: 行程表 -->
     <div id="view-schedule" class="container active">
+        <div id="view-schedule" class="container active">
+
+        <div class="card" style="border-left: 5px solid #F59E0B; margin-bottom: 20px;">
+            <div class="card-header" style="border-bottom: 1px dashed #E5E7EB; padding-bottom: 10px; margin-bottom: 0;">
+                <div class="card-title" style="display: flex; align-items: center; gap: 6px;">
+                    <svg class="icon-mini" style="color: #F59E0B;" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    行前準備 Check List
+                </div>
+                <div class="tag tag-tip" id="checklist-progress" style="background:#FFFBEB; color:#D97706; font-weight:700;">0/6</div>
+            </div>
+            <div class="checklist-grid">
+                <label class="check-item"><input type="checkbox" data-id="c1"> <span>護照 & 機票 (截圖備份)</span></label>
+                <label class="check-item"><input type="checkbox" data-id="c2"> <span>旅遊保險單 (紙本/電子)</span></label>
+                <label class="check-item"><input type="checkbox" data-id="c3"> <span>日幣現金 & 信用卡</span></label>
+                <label class="check-item"><input type="checkbox" data-id="c4"> <span>SIM卡 / 漫遊開通</span></label>
+                <label class="check-item"><input type="checkbox" data-id="c5"> <span>Visit Japan Web 填寫</span></label>
+                <label class="check-item"><input type="checkbox" data-id="c6"> <span>行動電源 & 充電線</span></label>
+                <label class="check-item"><input type="checkbox" data-id="c7"> <span>國際駕照 (日文譯本)</span></label>
+                <label class="check-item"><input type="checkbox" data-id="c8"> <span>牙刷/常備藥品</span></label>
+            </div>
+        </div>
+
+        <div class="day-wrapper">
         <!-- Day 1 -->
         <div class="day-wrapper">
             <div class="day-toggle" id="toggle-d1" onclick="toggleTimeline('d1', this)">
@@ -3752,6 +3815,45 @@ function getLocalWeather() {
             window.location.reload(); // 重新整理網頁
         }
     }
+    // [新增] 行前清單功能：自動儲存勾選狀態到手機
+        function initChecklist() {
+            const checkboxes = document.querySelectorAll('.check-item input');
+            const progressEl = document.getElementById('checklist-progress');
+            const STORAGE_KEY = 'kyushu_trip_checklist_2026'; // 本地儲存的專屬金鑰
+
+            function updateProgress() {
+                const checkedCount = document.querySelectorAll('.check-item input:checked').length;
+                const total = checkboxes.length;
+                
+                // 更新數字
+                if(progressEl) progressEl.innerText = `${checkedCount}/${total}`;
+                
+                // 視覺回饋：全選完變綠色
+                if(progressEl && checkedCount === total) {
+                    progressEl.style.background = '#ECFDF5';
+                    progressEl.style.color = '#059669';
+                    progressEl.innerText = '準備完成！🎉';
+                }
+
+                // 儲存狀態
+                const states = {};
+                checkboxes.forEach(cb => states[cb.dataset.id] = cb.checked);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
+            }
+
+            // 1. 讀取舊紀錄
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            
+            // 2. 恢復勾選狀態
+            checkboxes.forEach(cb => {
+                if(saved[cb.dataset.id]) cb.checked = true;
+                // 綁定點擊事件
+                cb.addEventListener('change', updateProgress);
+            });
+
+            // 3. 初始更新一次 UI
+            updateProgress();
+        }
         document.addEventListener('DOMContentLoaded', () => {
             // Default: Open Day 1
             const d1Toggle = document.getElementById('toggle-d1');
@@ -3764,6 +3866,7 @@ function getLocalWeather() {
             initAiChat();
             setupVoiceButton(); // Init voice listener
             getLocalWeather(); // Fetch local weather on load
+            initChecklist(); // Init checklist
         });
     </script>
 </body>
