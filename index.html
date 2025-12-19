@@ -74,10 +74,29 @@
             padding: 4px 10px; 
             border-radius: 20px; 
             font-size: 0.8rem; 
-            display: inline-block;
+
+            display: inline-flex;
+            align-items: center;
+             gap: 6px; 
+    
             margin-top: 8px;
         }
-
+.header-title-area .badge-trip::before {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-color: currentColor; /* 自動變成白色 */
+    
+    /* 親子/群組 SVG 圖示 (Users Icon) */
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'%3E%3C/path%3E%3Ccircle cx='9' cy='7' r='4'%3E%3C/circle%3E%3Cpath d='M23 21v-2a4 4 0 0 0-3-3.87'%3E%3C/path%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'%3E%3C/path%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'%3E%3C/path%3E%3Ccircle cx='9' cy='7' r='4'%3E%3C/circle%3E%3Cpath d='M23 21v-2a4 4 0 0 0-3-3.87'%3E%3C/path%3E%3Cpath d='M16 3.13a4 4 0 0 1 0 7.75'%3E%3C/path%3E%3C/svg%3E");
+    
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
         /* New Header Weather Box - Side Layout */
         .header-weather-box {
             flex: 0 0 auto; 
@@ -771,7 +790,7 @@
             <div class="header-title-area">
                 <h1>九州親子自駕遊</h1>
                 <div class="subtitle">2026/01/25 - 01/30 (6天5夜)</div>
-                <div class="badge-trip">👨‍👩‍👦 親子自由行 • 熊本進福岡出</div>
+                <div class="badge-trip">親子自由行 • 熊本進福岡出</div>
             </div>
 
             <!-- 天氣資訊盒 (擺放在右側，三欄式設計) -->
