@@ -3764,19 +3764,24 @@ function getSmartAdviceText(temp, weatherCode) {
 
         // [修改] 文字轉語音函式 (過濾羅馬拼音，只唸日文)
         // [修改] 文字轉語音函式 (強力過濾版)
+        // [修改] 文字轉語音函式 (過濾羅馬拼音 + 過濾星號)
         function speakText(text) {
              speechSynthesis.cancel(); // 停止上一句
 
-             // ★ 關鍵修正：改用更通用的過濾規則
-             // 原本的寫法 /\([a-zA-Z...]+\)/ 會漏掉長音符號 (如 ō, ū)，導致過濾失敗
-             // 新寫法 /\([^\)]+\)/ 意思為：「刪除括號 (...) 裡面的所有內容」，不管裡面是什麼符號
-             const cleanText = text.replace(/\([^\)]+\)/g, '').trim();
+             // 1. 先移除括號內的羅馬拼音 (例如: "(Konnichiwa)")
+             let cleanText = text.replace(/\([^\)]+\)/g, '');
+             
+             // 2. ★ 新增：移除星號 (*)，不發音
+             cleanText = cleanText.replace(/\*/g, '');
+
+             // 3. 去除前後空白
+             cleanText = cleanText.trim();
 
              const utterance = new SpeechSynthesisUtterance(cleanText);
              utterance.lang = 'ja-JP'; // 設定語言為日文
-             utterance.rate = 0.9;     // 語速稍慢，方便聆聽
+             utterance.rate = 0.9;     // 語速稍慢
              
-             // 嘗試取得較自然的日文語音包 (若裝置支援)
+             // 嘗試取得較自然的日文語音包
              const voices = speechSynthesis.getVoices();
              const jaVoice = voices.find(v => v.lang.includes('ja'));
              if (jaVoice) utterance.voice = jaVoice;
