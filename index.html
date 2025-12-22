@@ -3698,13 +3698,35 @@ function getSmartAdviceText(temp, weatherCode) {
         const btnBackTrans = document.getElementById('btn-back-trans');
 
         // Initial Greeting
+        // [修改] 初始化歡迎訊息 (加入對應按鈕的顏色與圖示)
         function initAiChat() {
             if (chatHistory.children.length === 0) {
+                // 定義樣式變數，讓程式碼較整潔
+                const iconStyle = 'width:16px; height:16px; vertical-align:text-bottom; margin-right:2px; display:inline-block;';
+                const spanStyle = 'font-weight:700; display:inline-flex; align-items:center; vertical-align:middle; margin:0 2px;';
+                
+                // 1. 行程諮詢 (藍色)
+                const iconConsult = `<svg style="${iconStyle}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>`;
+                const txtConsult = `<span style="${spanStyle} color:#2563EB;">${iconConsult}行程諮詢</span>`;
+
+                // 2. 中/日翻譯 (天空藍)
+                const iconTrans = `<svg style="${iconStyle}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10h14"></path><path d="M17 6l4 4-4 4"></path><path d="M17 14H3"></path><path d="M7 18l-4-4 4-4"></path></svg>`;
+                const txtTrans = `<span style="${spanStyle} color:#0EA5E9;">${iconTrans}中/日翻譯</span>`;
+
+                // 3. 語音輸入 (青色)
+                const iconVoice = `<svg style="${iconStyle}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>`;
+                const txtVoice = `<span style="${spanStyle} color:#06B6D4;">${iconVoice}語音輸入</span>`;
+
+                // 4. 拍照辨識 (紫色/粉色)
+                const iconCam = `<svg style="${iconStyle}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`;
+                const txtCam = `<span style="${spanStyle} color:#D946EF;">${iconCam}拍照辨識</span>`;
+
                 const welcomeHtml = `
                     你好！我是你的九州旅遊 AI 助手。
                     <br><br>
-                    你可以點選下方的 <b>「行程諮詢」</b> 詢問路線，或使用 <b>「中/日翻譯」</b> 與當地人溝通。
-                    點選<b>「語音輸入」</b>搭配語言切換還能用說的喔！更有<b>「拍照辨識」</b>功能可以方便點餐及獲得商品資訊。
+                    你可以點選下方的 ${txtConsult} 詢問路線，或使用 ${txtTrans} 與當地人溝通。
+                    點選 ${txtVoice} 搭配語言切換還能用說的喔！
+                    更有 ${txtCam} 功能可以方便點餐及獲得商品資訊。
                 `;
                 appendMessage('ai', welcomeHtml);
             }
