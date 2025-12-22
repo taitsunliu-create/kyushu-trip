@@ -1690,7 +1690,7 @@
     </div>
 
     <!-- TAB 2: 住宿資訊 (Updated Day 3) -->
-    </div> <div id="view-stay" class="container">
+     <div id="view-stay" class="container">
         <!-- Day 1: THE BLOSSOM -->
         <div class="card">
             <div class="card-header">
@@ -2842,42 +2842,70 @@ function getDecryptedKey() {
 
         // [修改 2] 讓 Widget 支援非同步讀取與 Loading 狀態
 // [修改] 更新行程表上方的天氣小卡 (加入快取機制)
+        // [修正] 更新行程表上方的天氣小卡 (對應新版 hw-* ID)
         async function updateWeatherWidget(dayId) {
-            const widget = document.getElementById('header-weather-widget');
-            const dateEl = document.getElementById('header-date');
-            const locEl = document.getElementById('header-location');
-            const tempEl = document.getElementById('header-temp');
-            const iconEl = document.getElementById('header-weather-icon');
+            // 檢查 API Key
+            if (!apiKey) apiKey = getDecryptedKey();
+            if (!apiKey) return;
+
+            // 取得新版 HTML 元素
+            const locEl = document.getElementById('hw-loc');
+            const dateEl = document.getElementById('hw-date');
+            const tempEl = document.getElementById('hw-temp');
+            const descEl = document.getElementById('hw-desc');
+            const rangeEl = document.getElementById('hw-range');
+            const iconEl = document.getElementById('hw-icon');
+            const adviceEl = document.getElementById('hw-advice');
             
-            // 定義每天的座標
+            // 定義每天的座標與資訊
             const locations = {
-                'd1': { lat: 32.8031, lon: 130.7079, name: '熊本市' }, // 熊本
-                'd2': { lat: 33.1126, lon: 131.0969, name: '阿蘇/黑川' }, // 黑川溫泉/阿蘇
-                'd3': { lat: 33.2652, lon: 131.3621, name: '由布院' }, // 由布院/別府
-                'd4': { lat: 33.5902, lon: 130.4017, name: '福岡市' }, // 福岡
-                'd5': { lat: 33.5902, lon: 130.4017, name: '福岡市' },
-                'd6': { lat: 33.5902, lon: 130.4017, name: '福岡市' }
+                'd1': { lat: 32.8031, lon: 130.7079, name: '熊本市', date: '1/25 (Day 1)' },
+                'd2': { lat: 33.1126, lon: 131.0969, name: '阿蘇/黑川', date: '1/26 (Day 2)' },
+                'd3': { lat: 33.2652, lon: 131.3621, name: '由布院', date: '1/27 (Day 3)' },
+                'd4': { lat: 33.5902, lon: 130.4017, name: '福岡市', date: '1/28 (Day 4)' },
+                'd5': { lat: 33.5902, lon: 130.4017, name: '福岡市', date: '1/29 (Day 5)' },
+                'd6': { lat: 33.5902, lon: 130.4017, name: '福岡市', date: '1/30 (Day 6)' }
             };
 
             const loc = locations[dayId] || locations['d1'];
             
-            // 這裡我們不修改地名顯示，只更新天氣數據
+            // 1. 先更新靜態文字
+            if(locEl) locEl.innerText = loc.name;
+            if(dateEl) dateEl.innerText = loc.date;
+
+            // 2. 準備 API
             const url = `https://api.openweathermap.org/data/2.5/weather?lat=${loc.lat}&lon=${loc.lon}&units=metric&lang=zh_tw&appid=${apiKey}`;
-            
-            // ★ 產生該地點專屬的快取 Key (例如: weather_33.1_131.1)
             const uniqueKey = `weather_${loc.lat.toFixed(1)}_${loc.lon.toFixed(1)}`;
             
-            // ★ 改用快取函式
+            // 3. 呼叫快取 (10分鐘內不重抓)
             const data = await fetchWeatherWithCache(url, uniqueKey);
 
             if (data && data.main) {
                 const temp = Math.round(data.main.temp);
-                const iconCode = data.weather[0].icon;
-                const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`; 
+                const min = Math.round(data.main.temp_min);
+                const max = Math.round(data.main.temp_max);
+                const desc = data.weather[0].description;
+                const weatherCode = data.weather[0].id; // 取得天氣代碼
+                
+                // 4. 更新畫面 (確認元素存在才更新)
+                if(tempEl) tempEl.innerText = `${temp}°C`;
+                if(descEl) descEl.innerText = desc;
+                if(rangeEl) rangeEl.innerText = `${min}°C ~ ${max}°C`;
+                
+                // 使用您定義的 getWeatherDesc 函式來產生 SVG Icon
+                if(iconEl) iconEl.innerHTML = getWeatherDesc(getWeatherCodeFromId(weatherCode));
 
-                tempEl.innerText = `${temp}°C`;
-                iconEl.innerHTML = `<img src="${iconUrl}" style="width: 100%; height: 100%;">`;
+                // 產生穿衣建議
+                if(adviceEl) adviceEl.innerText = getSmartAdviceText(temp, getWeatherCodeFromId(weatherCode));
             }
+        }
+
+        // [輔助] 將 OpenWeatherMap ID 轉換為 WMO code 格式 (簡化版)
+        function getWeatherCodeFromId(id) {
+            if(id === 800) return 0; // 晴
+            if(id >= 801 && id <= 804) return 1; // 多雲
+            if(id >= 500 && id <= 531) return 60; // 雨
+            return 3; // 預設多雲
         }
 // 輔助函式：將 WMO Code 轉成中文描述
 function getWeatherDescText(code) {
@@ -3136,44 +3164,45 @@ function getSmartAdviceText(temp, weatherCode) {
 
 // [修改] 取得定位天氣 (同步更新 Header 與 分頁)
 // [修改] 取得當地天氣 (加入快取機制)
+       // [修正] 取得當地天氣 (對應新版 Header ID)
         async function getLocalWeather() {
+            // 檢查 API Key
+            if (!apiKey) apiKey = getDecryptedKey();
+            if (!apiKey) return;
+
+            const locText = document.getElementById('header-my-loc');
+            const tempText = document.getElementById('header-my-temp');
+
             if (!navigator.geolocation) {
-                document.getElementById('weather-info').innerHTML = "不支援定位";
+                locText.innerText = "未開啟";
                 return;
             }
+
+            locText.innerText = "定位中..";
 
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                // 使用 HTTPS 避免被瀏覽器阻擋
+                // 使用 HTTPS
                 const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=zh_tw&appid=${apiKey}`;
                 
-                // ★ 改用快取函式取得資料 (Key: weather_current_loc)
+                // 使用快取函式
                 const data = await fetchWeatherWithCache(url, 'weather_current_loc');
 
-                if (data && data.main) { // 確保有資料
+                if (data && data.main) {
                     const temp = Math.round(data.main.temp);
-                    const desc = data.weather[0].description;
-                    const iconCode = data.weather[0].icon;
-                    // OpenWeatherMap 官方圖示 URL
-                    const iconUrl = `https://openweathermap.org/img/wn/${iconCode}.png`;
-
-                    document.getElementById('weather-info').innerHTML = `
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
-                            <img src="${iconUrl}" alt="${desc}" style="width: 30px; height: 30px;">
-                            <span>${temp}°C ${desc}</span>
-                        </div>
-                    `;
+                    // 更新 UI (修正為新版 ID)
+                    locText.innerText = "我的位置";
+                    tempText.innerText = `${temp}°C`;
                     
-                    // 根據目前氣溫給予 AI 穿衣建議
-                    updateClothingAdvice(temp);
+                    // 根據氣溫給建議 (選擇性)
+                    // updateClothingAdvice(temp); 
                 }
             }, (error) => {
-                console.log("定位失敗或拒絕:", error);
-                document.getElementById('weather-info').innerHTML = "無法取得天氣";
+                console.log("定位失敗:", error);
+                locText.innerText = "無法定位";
             });
-        }
-        // --- Modal Functions (取代原生 alert/prompt) ---
+        }        // --- Modal Functions (取代原生 alert/prompt) ---
         function openModal(msg) {
             document.getElementById('modal-msg').innerText = msg;
             document.getElementById('location-modal').style.display = 'flex';
