@@ -248,10 +248,14 @@
         /* 手機版微調 */
         @media (max-width: 600px) {
             .hw-col-my-loc {
-                padding-right: 8px;
-                margin-right: 0;
-                border-right: 1px solid rgba(255,255,255,0.2); /* 手機版保留分隔線 */
-            }
+        padding-right: 8px;
+        margin-right: 0;
+        border-right: 1px solid rgba(255,255,255,0.2); /* 手機版保留分隔線 */
+        
+        /* [新增] 下面這兩行是解決擠壓的關鍵 */
+        min-width: 90px;  /* 強制給予足夠寬度，避免文字折行 */
+        white-space: nowrap; /* 禁止文字換行 */
+    }
         }
         .hw-col-loc {
             padding-right: 15px;
@@ -3347,8 +3351,13 @@ function getSmartAdviceText(temp, weatherCode) {
                         const locationPrompt = `Task: Identify city name for ${lat},${lon}. Output: "中文". Example: "台北"`;
                         // 設定一個 3秒 的競賽，如果 AI 太慢就直接放棄，避免卡住
                         const aiPromise = getGeminiResponse(locationPrompt);
-                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000));
-                        
+                        /* 修改前 (舊的) */
+//const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000));
+
+/* 修改後 (請複製貼上覆蓋此行) - 延長到 10 秒 */
+const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000));
+
+
                         const aiCity = await Promise.race([aiPromise, timeoutPromise]);
                         if (aiCity) displayZh = aiCity.trim();
                     } catch (e) {
