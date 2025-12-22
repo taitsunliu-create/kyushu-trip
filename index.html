@@ -4176,20 +4176,29 @@ const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Er
         const imgHtml = `<img src="data:image/jpeg;base64,${base64Image}" style="max-width:100%; border-radius:10px; border:1px solid #ccc; margin-top:5px;">`;
         appendMessage('user', imgHtml);
 
-        // 4. 設定 AI 提示詞
+        // [新增] 讀取目前位置 (從天氣模組獲取)
+        let curLoc = ""; 
+        if (window.appCache && window.appCache['my_location_combined']) {
+            curLoc = window.appCache['my_location_combined'].data.city;
+        }
+
+        // 4. 設定 AI 提示詞 (加入位置資訊)
         const visionPrompt = `
             ${systemPrompt}
             
             【使用者傳送了一張圖片】
-            任務：請擔任專業導遊與翻譯。
+            【使用者目前位置】：${curLoc}
+            
+            任務：請擔任專業導遊與購物助手。
             請判斷圖片內容並提供協助：
-            1. 若是菜單：翻譯菜名並推薦必吃。
-            2. 若是商品/藥妝：說明這是什麼、功效與是否值得購買。
-            3. 若是景點/路牌：告訴我這在哪裡，或上面寫什麼。
+            1. 若是商品/藥妝/零食：
+               - 說明這是什麼 (名稱與功效)。
+               - 針對「${curLoc}」這個地點，推薦我去哪裡買 (例如：${curLoc}的車站、藥妝店或超市)。
+            2. 若是菜單：翻譯菜名並推薦必吃。
+            3. 若是景點/路牌：告訴我這在哪裡。
             
             請用簡潔、像朋友般的口吻回答。
         `;
-
         // 5. 發送給 Gemini
         const responseText = await getGeminiResponse(visionPrompt, base64Image);
         
