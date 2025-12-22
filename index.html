@@ -3772,16 +3772,23 @@ function getSmartAdviceText(temp, weatherCode) {
         // [修改] 文字轉語音函式 (過濾羅馬拼音，只唸日文)
         // [修改] 文字轉語音函式 (強力過濾版)
         // [修改] 文字轉語音函式 (過濾羅馬拼音 + 過濾星號)
+        // [修改] 文字轉語音函式 (強力過濾：括號、星號、所有英文字母都不唸)
         function speakText(text) {
              speechSynthesis.cancel(); // 停止上一句
 
-             // 1. 先移除括號內的羅馬拼音 (例如: "(Konnichiwa)")
-             let cleanText = text.replace(/\([^\)]+\)/g, '');
+             let cleanText = text;
+
+             // 1. 移除括號 (...) 及其內容
+             cleanText = cleanText.replace(/\([^\)]+\)/g, '');
              
-             // 2. ★ 新增：移除星號 (*)，不發音
+             // 2. 移除星號 (*)
              cleanText = cleanText.replace(/\*/g, '');
 
-             // 3. 去除前後空白
+             // 3. ★ 關鍵修正：移除所有羅馬拼音/英文字母 (含長音符號)
+             // 這樣就算拼音沒有括號 (如 Bebīchea)，也會被刪除，不會唸出來
+             cleanText = cleanText.replace(/[a-zA-ZāēīōūĀĒĪŌŪ]+/g, '');
+
+             // 4. 去除前後與多餘空白
              cleanText = cleanText.trim();
 
              const utterance = new SpeechSynthesisUtterance(cleanText);
