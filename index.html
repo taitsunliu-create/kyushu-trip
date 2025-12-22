@@ -3263,102 +3263,80 @@ function getSmartAdviceText(temp, weatherCode) {
         }
 
 // [修改] 取得定位天氣 (同步更新 Header 與 分頁)
-function getLocalWeather() {
-    // 1. 定義要更新的 UI 元件 (Header + Tab)
-    const els = {
-        headerLoc: document.getElementById('header-my-loc'),
-        headerTemp: document.getElementById('header-my-temp'),
-        tabTemp: document.getElementById('wc-my-temp'),
-        titleEl: document.querySelector('.wc-mini-card .wc-mini-title') 
-    };
-    
-    // 檢查瀏覽器支援
-    if (!navigator.geolocation) {
-        openModal('瀏覽器不支援定位，請手動輸入城市：');
-        return;
-    }
-    
-    // 視覺回饋 (Loading)
-    if(els.headerLoc) els.headerLoc.innerText = '...';
-    if(els.tabTemp) {
-        els.tabTemp.innerText = '定位中..';
-        els.tabTemp.style.fontSize = '1.2rem';
-        if(els.titleEl) els.titleEl.innerHTML = '讀取 GPS...'; 
-    }
-
-    const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
-
-    navigator.geolocation.getCurrentPosition(async (position) => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        
-        try {
-            // A. 取得天氣 (Open-Meteo)
-            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
-            const weatherData = await weatherRes.json();
+// [修改] 取得定位天氣 (儲存天氣代碼供 AI 讀取)
+        function getLocalWeather() {
+            const els = {
+                headerLoc: document.getElementById('header-my-loc'),
+                headerTemp: document.getElementById('header-my-temp'),
+                tabTemp: document.getElementById('wc-my-temp'),
+                titleEl: document.querySelector('.wc-mini-card .wc-mini-title') 
+            };
             
-            // 數據處理
-            currentMyTemp = weatherData.current_weather.temperature;
-            const tempStr = `${Math.round(currentMyTemp)}°C`;
-            
-            // 更新 UI (Tab)
-            if(els.tabTemp) {
-                els.tabTemp.innerText = tempStr;
-                els.tabTemp.style.fontSize = '1.5rem';
-                els.tabTemp.style.color = '#1F2937';
+            if (!navigator.geolocation) {
+                openModal('瀏覽器不支援定位，請手動輸入城市：');
+                return;
             }
-            // 更新 UI (Header - 紅圈處)
-            if(els.headerTemp) els.headerTemp.innerText = tempStr;
             
-            // 更新溫差比對
-            const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
-            if (targetTempStr !== '--°' && typeof updateComparison === 'function') {
-                updateComparison(parseFloat(targetTempStr));
+            if(els.headerLoc) els.headerLoc.innerText = '...';
+            if(els.tabTemp) els.tabTemp.innerText = '定位中..';
+
+            const cacheKey = 'my_location_combined';
+            const CACHE_TIME = 10 * 60 * 1000;
+            const now = Date.now();
+
+            // 1. 檢查快取
+            if (window.appCache && window.appCache[cacheKey] && (now - window.appCache[cacheKey].timestamp < CACHE_TIME)) {
+                console.log("[省流] 使用快取定位資料");
+                updateMyLocUI(window.appCache[cacheKey].data, els);
+                return; 
             }
 
-            // B. 解析地名 (AI 翻譯或預設)
-            let displayZh = "我的位置";
-            
-            try {
-                if(els.titleEl) els.titleEl.innerHTML = '解析地名...';
+            const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
+
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
                 
-                // 嘗試使用 AI 解析 (若有金鑰)
-                const locationPrompt = `Task: Identify city name for ${lat},${lon}. Output: "中文|English". Example: "台北|Taipei"`;
-                const locationStr = await getGeminiResponse(locationPrompt);
+                try {
+                    // A. 抓天氣 (Open-Meteo)
+                    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                    const weatherData = await weatherRes.json();
+                    
+                    const temp = Math.round(weatherData.current_weather.temperature);
+                    const code = weatherData.current_weather.weathercode; // ★ 新增：取得天氣代碼 (如 0=晴, 61=雨)
+                    
+                    // B. 解析地名
+                    let cityName = "我的位置";
+                    try {
+                        const locationPrompt = `Task: Identify city name for ${lat},${lon}. Output: "中文". Example: "台北"`;
+                        const aiCity = await getGeminiResponse(locationPrompt);
+                        if (aiCity) cityName = aiCity.trim();
+                    } catch (e) {
+                        console.warn("AI 地名解析失敗");
+                    }
 
-                if (locationStr && locationStr.includes('|')) {
-                    displayZh = locationStr.split('|')[0].trim();
-                } else if (locationStr) {
-                    displayZh = locationStr.trim();
+                    // ★ 新增：將 code 一併存入資料結構
+                    const finalData = { temp: temp, city: cityName, code: code };
+
+                    // 存入快取
+                    window.appCache = window.appCache || {};
+                    window.appCache[cacheKey] = {
+                        timestamp: now,
+                        data: finalData
+                    };
+
+                    // 更新 UI
+                    updateMyLocUI(finalData, els);
+
+                } catch (e) {
+                    console.error(e);
+                    if(els.headerLoc) els.headerLoc.innerText = 'Err';
                 }
-            } catch (aiError) {
-                console.warn("AI 解析略過 (無 Key 或 失敗)，將顯示座標或預設文字");
-                displayZh = "我的位置"; // 降級顯示
-            }
-
-            // 更新 UI (Header 地名)
-            if(els.headerLoc) els.headerLoc.innerText = displayZh;
-
-            // 更新 UI (Tab 地名)
-            if(els.titleEl) {
-                els.titleEl.innerHTML = `
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-                        <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>${displayZh}</span>
-                    </div>`;
-            }
-
-        } catch (e) {
-            console.error(e);
-            if(els.headerLoc) els.headerLoc.innerText = 'Err';
-            if(els.tabTemp) els.tabTemp.innerText = 'Err';
+            }, (err) => {
+                console.warn('定位失敗:', err);
+                if(els.headerLoc) els.headerLoc.innerText = '定位失敗';
+            }, options);
         }
-    }, (err) => {
-        console.warn('定位失敗:', err);
-        if(els.headerLoc) els.headerLoc.innerText = '定位失敗';
-        if(els.tabTemp) els.tabTemp.innerText = '無權限';
-    }, options);
-}
 
         // --- Modal Functions (取代原生 alert/prompt) ---
         function openModal(msg) {
@@ -3875,67 +3853,67 @@ function getLocalWeather() {
         }
 
         // [修改] AI 發送邏輯：整合系統記憶與多種模式
+        // [修改] AI 發送邏輯：加入「情境感知」能力
         async function sendToGemini(mode) {
             const text = aiInput.value.trim();
             if (!text) return;
 
-            // 1. 顯示使用者訊息
             appendMessage('user', text);
-            aiInput.value = ''; // 清空輸入框
+            aiInput.value = ''; 
 
-            // 2. 準備提示詞 (Prompt)
             let finalPrompt = "";
 
             // --- 模式 A: 行程諮詢 (Consult) ---
-            // 這裡我們會使用剛植入的 systemPrompt 大腦
             if (mode === 'consult' || mode === 'auto') {
+                
+                // ★ 關鍵修改：讀取快取中的「我的位置與天氣」
+                let liveContext = "";
+                if (window.appCache && window.appCache['my_location_combined']) {
+                    const d = window.appCache['my_location_combined'].data;
+                    // 將天氣代碼轉為文字 (使用您現有的輔助函式)
+                    const weatherDesc = typeof getWeatherDescText === 'function' ? getWeatherDescText(d.code) : '';
+                    
+                    liveContext = `
+                    【使用者當下情境 (即時感知)】
+                    - 目前位置：${d.city}
+                    - 當地天氣：${weatherDesc} (氣溫 ${d.temp}°C)
+                    (若使用者詢問「這裡」、「現在」的天氣或穿著，請務必參考此資訊回答。)
+                    `;
+                }
+
                 finalPrompt = `
                     ${systemPrompt}
+                    ${liveContext}
                     
                     【使用者問題】： "${text}"
-                    (請根據上述行程記憶，提供簡潔、像導遊般的建議。若問題與行程無關，請禮貌引導回旅遊話題。)
+                    (請根據行程記憶與當下情境，提供簡潔、像導遊般的建議。)
                 `;
             } 
-            // --- 模式 B: 翻譯 (Translate) ---
-            // 不需行程記憶，專注翻譯
+            // --- 模式 B: 翻譯 ---
             else if (mode === 'translate') {
                 finalPrompt = `
                     你是一個中日雙向翻譯機。
                     【使用者輸入】： "${text}"
-                    任務：
-                    1. 若是中文 -> 翻成日文 (禮貌形)。
-                    2. 若是日文 -> 翻成繁體中文。
-                    注意：只輸出翻譯結果，不要解釋。
+                    任務：中翻日(禮貌形) 或 日翻中。只輸出翻譯結果，不要解釋。
                 `;
             }
-            // --- 模式 C: 語音 (Voice) ---
-            // 根據左下角的語言開關決定翻譯方向
+            // --- 模式 C: 語音 ---
             else if (mode === 'voice_auto') {
                  const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
                  const isInputZh = selectedLang === 'zh-TW';
-                 
                  finalPrompt = `
-                    你是一個口譯員。
-                    輸入語言：${isInputZh ? '中文' : '日文'}
-                    內容： "${text}"
-                    任務：請翻譯成${isInputZh ? '日文' : '中文'}。
-                    注意：只輸出翻譯結果。
+                    你是一個口譯員。輸入語言：${isInputZh ? '中文' : '日文'}。內容： "${text}"。
+                    任務：請翻譯成${isInputZh ? '日文' : '中文'}。只輸出結果。
                  `;
             }
 
-            // 3. 呼叫 Gemini (使用您原本就有的 getGeminiResponse 函式)
             showLoading();
             try {
-                // 這裡會自動使用您已經寫好的 AES 解密功能
                 const responseText = await getGeminiResponse(finalPrompt);
                 removeLoading();
                 
-                // 判斷是否為翻譯 (若是日文且短句，顯示朗讀按鈕)
                 const isTranslation = /[\u3040-\u309F\u30A0-\u30FF]/.test(responseText) && responseText.length < 100;
-                
-                // 將換行符號轉為 HTML 換行
                 const formattedText = responseText.replace(/\n/g, '<br>');
-                
                 appendMessage('ai', formattedText, isTranslation);
 
             } catch (e) {
