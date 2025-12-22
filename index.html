@@ -3895,6 +3895,7 @@ function getSmartAdviceText(temp, weatherCode) {
         // [修改] AI 發送邏輯：整合系統記憶與多種模式
         // [修改] AI 發送邏輯：加入「情境感知」能力
         // [修改] AI 發送邏輯：整合記憶、天氣感知、以及「羅馬拼音」翻譯
+        // [修改] AI 發送邏輯：依據翻譯方向決定是否顯示拼音
         async function sendToGemini(mode) {
             const text = aiInput.value.trim();
             if (!text) return;
@@ -3934,12 +3935,10 @@ function getSmartAdviceText(temp, weatherCode) {
                     你是一個中日雙向翻譯機。
                     【使用者輸入】： "${text}"
                     任務：
-                    1. 若是中文 -> 翻成日文 (禮貌形)。★重要：請在日文下方附上羅馬拼音 (Romaji) 以便發音。
-                    2. 若是日文 -> 翻成繁體中文。
+                    1. 若輸入是中文 -> 請翻成日文 (禮貌形)。★並且務必在下方附上羅馬拼音 (Romaji)。
+                    2. 若輸入是日文 -> 請翻成繁體中文。★不需要羅馬拼音，只給中文即可。
                     
-                    輸出格式範例：
-                    すみません、トイレはどこですか？
-                    (Sumimasen, toire wa doko desu ka?)
+                    注意：只輸出翻譯結果，不要解釋。
                 `;
             }
             // --- 模式 C: 語音 (Voice) ---
@@ -3947,13 +3946,15 @@ function getSmartAdviceText(temp, weatherCode) {
                  const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
                  const isInputZh = selectedLang === 'zh-TW';
                  
+                 // 如果輸入是中文(代表要講給日本人聽)，就要日文+拼音
+                 // 如果輸入是日文(代表對方講日文)，只要翻成中文給你看就好
                  finalPrompt = `
                     你是一個口譯員。
                     輸入語言：${isInputZh ? '中文' : '日文'}
                     內容： "${text}"
                     
                     任務：
-                    ${isInputZh ? '1. 翻譯成日文 (禮貌形)。並附上羅馬拼音 (Romaji)。' : '1. 翻譯成台灣繁體中文。'}
+                    ${isInputZh ? '1. 翻譯成日文 (禮貌形)，並附上羅馬拼音 (Romaji)。' : '1. 翻譯成台灣繁體中文 (不需要拼音)。'}
                     
                     注意：只輸出翻譯結果。
                  `;
@@ -3964,11 +3965,12 @@ function getSmartAdviceText(temp, weatherCode) {
                 const responseText = await getGeminiResponse(finalPrompt);
                 removeLoading();
                 
-                // 判斷是否為翻譯 (若是日文且短句，顯示朗讀按鈕)
-                const isTranslation = /[\u3040-\u309F\u30A0-\u30FF]/.test(responseText) && responseText.length < 200;
+                // 判斷是否為日文翻譯 (含有日文字元且長度適中)，才顯示朗讀按鈕
+                // 這樣日文翻中文時，因為是中文結果，就不會出現不需要的朗讀按鈕
+                const isJapaneseResult = /[\u3040-\u309F\u30A0-\u30FF]/.test(responseText) && responseText.length < 200;
                 
                 const formattedText = responseText.replace(/\n/g, '<br>');
-                appendMessage('ai', formattedText, isTranslation);
+                appendMessage('ai', formattedText, isJapaneseResult);
 
             } catch (e) {
                 removeLoading();
