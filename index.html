@@ -2637,7 +2637,7 @@
                         <!-- 修正 1: 我的位置圖示 (Pin) -->
                         <div class="wc-mini-title" style="display: flex; align-items: center; justify-content: center;">
                             <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            <span id="wc-loc-name">我的位置</span>
+                            我的位置 (點擊更新)
                         </div>
                         <div class="wc-mini-temp" id="wc-my-temp">--°</div>
                     </div>
@@ -2809,13 +2809,13 @@ function getDecryptedKey() {
         backup: { temp: '10°C', range: '2°C ~ 11°C', desc: '晴時多雲', advice: '氣溫適中但早晚偏涼，長袖配外套。', icon: 'cloud-sun' }
     },
     'd2': {
-        dateStr: '2025-12-22',
+        dateStr: '2026-01-26',
         loc: '阿蘇/黑川',
         lat: 33.096, lon: 131.096, // 黑川溫泉附近座標
         backup: { temp: '5°C', range: '-3°C ~ 6°C', desc: '多雲/飄雪', advice: '山區極冷，務必穿著羽絨外套保暖。', icon: 'snow' }
     },
     'd3': {
-        dateStr: '2025-12-23',
+        dateStr: '2026-01-27',
         loc: '別府/由布院',
         lat: 33.265, lon: 131.360, // 由布院座標
         backup: { temp: '7°C', range: '0°C ~ 8°C', desc: '多雲', advice: '濕度較高體感寒冷，請穿防滑鞋。', icon: 'cloud' }
@@ -2841,42 +2841,6 @@ function getDecryptedKey() {
 };
 
         // [修改 2] 讓 Widget 支援非同步讀取與 Loading 狀態
-        // [新增] 通用快取抓取函式 (10分鐘快取機制)
-// [新增] 全域快取變數 (重新整理網頁後會自動清空，符合您的需求)
-        window.appCache = {}; 
-
-        // [修改] 通用快取抓取函式 (使用記憶體變數)
-        async function fetchWithCache(url, cacheKey) {
-            const CACHE_TIME = 10 * 60 * 1000; // 10分鐘 (毫秒)
-            const now = Date.now();
-            
-            // 1. 檢查 記憶體變數 中是否有資料
-            if (window.appCache[cacheKey]) {
-                const record = window.appCache[cacheKey];
-                // 2. 檢查是否在 10 分鐘內
-                if (now - record.timestamp < CACHE_TIME) {
-                    console.log(`[省流] 使用記憶體快取: ${cacheKey}`);
-                    return record.data; // 直接回傳舊資料
-                }
-            }
-
-            // 3. 若無資料或已過期，呼叫 API
-            console.log(`[API消耗] 呼叫網路: ${url}`);
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-
-                // 4. 存入記憶體變數
-                window.appCache[cacheKey] = {
-                    timestamp: now,
-                    data: data
-                };
-                return data;
-            } catch (e) {
-                console.error("Fetch Error:", e);
-                return null;
-            }
-        }
 async function updateWeatherWidget(dayId) {
     const config = tripConfig[dayId];
     if (!config) return;
@@ -2910,36 +2874,38 @@ async function updateWeatherWidget(dayId) {
     document.getElementById('hw-icon').innerHTML = `<div class="weather-icon ${finalIcon}"></div>`;
 }
 // [修改] 智慧判斷函式：改用「真實溫度」生成動態建議
-// [修改] 智慧判斷函式：加入 10 分鐘快取機制
 async function getSmartWeatherData(config) {
+    // 1. 取得今日日期字串 (YYYY-MM-DD)
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0]; // 格式: YYYY-MM-DD
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${year}-${month}-${day}`;
     
     const tripDate = new Date(config.dateStr);
     tripDate.setHours(0, 0, 0, 0);
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
 
-    // --- 情境 A: 過去式 ---
+    // --- 情境 A: 過去式 (回憶模式) ---
     if (tripDate < todayDate) {
         console.log(`[${config.loc}] 是過去行程，使用靜態紀錄。`);
         return config.backup;
     }
 
-    // --- 情境 B & C: 今天或未來 (呼叫 API + 快取) ---
+    // --- 情境 B & C: 今天或未來 (呼叫 API) ---
     try {
+        console.log(`[${config.loc}] 呼叫 API 更新天氣...`);
+        
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${config.lat}&longitude=${config.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=Asia%2FTokyo`;
         
-        // ★ 產生唯一快取金鑰 (日期+地點)
-        const cacheKey = `trip_weather_${config.dateStr}_${config.lat}`;
-        
-        // ★ 改用快取函式抓取
-        const json = await fetchWithCache(url, cacheKey);
+        const res = await fetch(url);
+        const json = await res.json();
         
         const index = json.daily.time.indexOf(config.dateStr);
         let displayData = {};
 
-        // 資料解析邏輯 (維持原本不變)
+        // 優先判斷「是不是今天」
         if (config.dateStr === todayStr) {
             const current = json.current_weather;
             const todayMax = json.daily.temperature_2m_max[0];
@@ -2950,6 +2916,7 @@ async function getSmartWeatherData(config) {
                 range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`,
                 desc: getWeatherDescText(current.weathercode),
                 icon: getWeatherIconClass(current.weathercode),
+                // ★ 這裡會呼叫上面新增的函式
                 advice: `(即時) ${getSmartAdviceText(current.temperature, current.weathercode)}`
             };
         } 
@@ -2968,16 +2935,16 @@ async function getSmartWeatherData(config) {
             };
         } 
         else {
-            // 若超出預報範圍 (例如7天後)，顯示當下天氣作為參考
             const current = json.current_weather;
             const todayMax = json.daily.temperature_2m_max[0];
             const todayMin = json.daily.temperature_2m_min[0];
+
             displayData = {
                 temp: `${Math.round(current.temperature)}°C`,
                 range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`,
                 desc: getWeatherDescText(current.weathercode),
                 icon: getWeatherIconClass(current.weathercode),
-                advice: `(參考) ${getSmartAdviceText(current.temperature, current.weathercode)}`
+                advice: `(目前狀況) ${getSmartAdviceText(current.temperature, current.weathercode)}`
             };
         }
         
@@ -3245,158 +3212,102 @@ function getSmartAdviceText(temp, weatherCode) {
         }
 
 // [修改] 取得定位天氣 (同步更新 Header 與 分頁)
-// [修改] 取得定位天氣 (加入 10 分鐘快取)
-// [修改] 取得定位天氣 (含地名解析 + 10分鐘記憶體快取)
-       // [修改] 取得定位天氣 (強化地名解析 + 10分鐘記憶體快取)
-        // [修正] 全域快取變數 (確保變數存在，防止錯誤)
-        window.appCache = window.appCache || {}; 
+function getLocalWeather() {
+    // 1. 定義要更新的 UI 元件 (Header + Tab)
+    const els = {
+        headerLoc: document.getElementById('header-my-loc'),
+        headerTemp: document.getElementById('header-my-temp'),
+        tabTemp: document.getElementById('wc-my-temp'),
+        titleEl: document.querySelector('.wc-mini-card .wc-mini-title') 
+    };
+    
+    // 檢查瀏覽器支援
+    if (!navigator.geolocation) {
+        openModal('瀏覽器不支援定位，請手動輸入城市：');
+        return;
+    }
+    
+    // 視覺回饋 (Loading)
+    if(els.headerLoc) els.headerLoc.innerText = '...';
+    if(els.tabTemp) {
+        els.tabTemp.innerText = '定位中..';
+        els.tabTemp.style.fontSize = '1.2rem';
+        if(els.titleEl) els.titleEl.innerHTML = '讀取 GPS...'; 
+    }
 
-        // [修改] 取得定位天氣 (強化穩定版)
-        function getLocalWeather() {
-            // 定義 UI 元件 (使用剛才新增的 ID: wc-loc-name)
-            const els = {
-                headerLoc: document.getElementById('header-my-loc'),   // 左上角地名
-                headerTemp: document.getElementById('header-my-temp'), // 左上角溫度
-                tabTemp: document.getElementById('wc-my-temp'),        // 分頁大溫度
-                tabLocName: document.getElementById('wc-loc-name')     // ★ 分頁圖片旁地名 (新 ID)
-            };
+    const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
+        try {
+            // A. 取得天氣 (Open-Meteo)
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+            const weatherData = await weatherRes.json();
             
-            if (!navigator.geolocation) {
-                if(els.headerLoc) els.headerLoc.innerText = "無GPS";
-                return;
-            }
+            // 數據處理
+            currentMyTemp = weatherData.current_weather.temperature;
+            const tempStr = `${Math.round(currentMyTemp)}°C`;
             
-            // 視覺回饋
-            if(els.headerLoc) els.headerLoc.innerText = '定位中..';
-            if(els.tabLocName) els.tabLocName.innerText = '解析中..';
-
-            const cacheKey = 'my_location_combined';
-            const CACHE_TIME = 10 * 60 * 1000;
-            const now = Date.now();
-
-            // 1. 檢查快取
-            if (window.appCache[cacheKey] && (now - window.appCache[cacheKey].timestamp < CACHE_TIME)) {
-                console.log("[省流] 使用快取定位資料");
-                updateMyLocUI(window.appCache[cacheKey].data, els);
-                return; 
-            }
-
-            // 2. 執行定位與抓取
-            const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
-
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                
-                try {
-                    // A. 抓天氣
-                    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-                    const weatherRes = await fetch(weatherUrl);
-                    const weatherJson = await weatherRes.json();
-                    const temp = Math.round(weatherJson.current_weather.temperature);
-
-                    // B. 抓地名
-                    let cityName = "未知地點";
-                    try {
-                        const geoUrl = `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&count=1&language=zh&format=json`;
-                        const geoRes = await fetch(geoUrl);
-                        const geoJson = await geoRes.json();
-                        
-                        if (geoJson.results && geoJson.results.length > 0) {
-                            const res = geoJson.results[0];
-                            // 優先顯示順序
-                            cityName = res.name || res.admin2 || res.admin1 || "我的位置";
-                        }
-                    } catch (err) {
-                        console.warn("地名解析失敗", err);
-                        cityName = `${lat.toFixed(1)}, ${lon.toFixed(1)}`;
-                    }
-
-                    const finalData = { temp: temp, city: cityName };
-
-                    // 3. 寫入快取
-                    window.appCache[cacheKey] = {
-                        timestamp: now,
-                        data: finalData
-                    };
-
-                    // 更新畫面
-                    updateMyLocUI(finalData, els);
-
-                } catch (e) {
-                    console.error("API Error:", e);
-                    if(els.headerLoc) els.headerLoc.innerText = 'Err';
-                }
-            }, (err) => {
-                console.warn('定位失敗:', err);
-                if(els.headerLoc) els.headerLoc.innerText = '定位失敗';
-            }, options);
-        }
-
-        // [修改] UI 更新函式 (安全版)
-        function updateMyLocUI(data, els) {
-            const tempStr = `${data.temp}°C`;
-            
-            // 逐一檢查元素是否存在，避免報錯
-            if(els.headerLoc) els.headerLoc.innerText = data.city;
-            if(els.headerTemp) els.headerTemp.innerText = tempStr;
-            
+            // 更新 UI (Tab)
             if(els.tabTemp) {
                 els.tabTemp.innerText = tempStr;
                 els.tabTemp.style.fontSize = '1.5rem';
                 els.tabTemp.style.color = '#1F2937';
             }
-
-            // ★ 這裡使用 ID 直接更新文字，最穩定
-            if(els.tabLocName) {
-                els.tabLocName.innerText = data.city;
-            }
+            // 更新 UI (Header - 紅圈處)
+            if(els.headerTemp) els.headerTemp.innerText = tempStr;
             
             // 更新溫差比對
-            const targetEl = document.getElementById('wc-temp');
-            if (targetEl && targetEl.innerText !== '--°' && typeof updateComparison === 'function') {
-                updateComparison(parseFloat(targetEl.innerText));
-            }
-        }
-
-        // [新增] 輔助函式：更新我的位置 UI
-        // [修改] 輔助函式：確保 UI (包含左上角與圖片旁文字) 正確更新
-        function updateMyLocUI(data, els) {
-            const tempStr = `${data.temp}°C`;
-            
-            // 1. 更新左上角 (Header)
-            if(els.headerLoc) els.headerLoc.innerText = data.city;
-            if(els.headerTemp) els.headerTemp.innerText = tempStr;
-
-            // 2. 更新天氣分頁的大字溫度
-            if(els.tabTemp) {
-                els.tabTemp.innerText = tempStr;
-                els.tabTemp.style.fontSize = '1.5rem';
-                els.tabTemp.style.color = '#1F2937';
-            }
-
-            // 3. 更新圖片旁的所在地名稱 (關鍵修正)
-            if(els.titleEl) {
-                // 這裡我們直接修改 span 的文字，而不破壞 svg 結構，比較穩定
-                const span = els.titleEl.querySelector('span');
-                if (span) {
-                    span.innerText = data.city;
-                } else {
-                    // 如果結構不對，才重寫整個 HTML
-                    els.titleEl.innerHTML = `
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-                            <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            <span>${data.city}</span>
-                        </div>`;
-                }
-            }
-            
-            // 4. 更新溫差比對 (若有)
             const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
             if (targetTempStr !== '--°' && typeof updateComparison === 'function') {
                 updateComparison(parseFloat(targetTempStr));
             }
+
+            // B. 解析地名 (AI 翻譯或預設)
+            let displayZh = "我的位置";
+            
+            try {
+                if(els.titleEl) els.titleEl.innerHTML = '解析地名...';
+                
+                // 嘗試使用 AI 解析 (若有金鑰)
+                const locationPrompt = `Task: Identify city name for ${lat},${lon}. Output: "中文|English". Example: "台北|Taipei"`;
+                const locationStr = await getGeminiResponse(locationPrompt);
+
+                if (locationStr && locationStr.includes('|')) {
+                    displayZh = locationStr.split('|')[0].trim();
+                } else if (locationStr) {
+                    displayZh = locationStr.trim();
+                }
+            } catch (aiError) {
+                console.warn("AI 解析略過 (無 Key 或 失敗)，將顯示座標或預設文字");
+                displayZh = "我的位置"; // 降級顯示
+            }
+
+            // 更新 UI (Header 地名)
+            if(els.headerLoc) els.headerLoc.innerText = displayZh;
+
+            // 更新 UI (Tab 地名)
+            if(els.titleEl) {
+                els.titleEl.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                        <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>${displayZh}</span>
+                    </div>`;
+            }
+
+        } catch (e) {
+            console.error(e);
+            if(els.headerLoc) els.headerLoc.innerText = 'Err';
+            if(els.tabTemp) els.tabTemp.innerText = 'Err';
         }
+    }, (err) => {
+        console.warn('定位失敗:', err);
+        if(els.headerLoc) els.headerLoc.innerText = '定位失敗';
+        if(els.tabTemp) els.tabTemp.innerText = '無權限';
+    }, options);
+}
 
         // --- Modal Functions (取代原生 alert/prompt) ---
         function openModal(msg) {
