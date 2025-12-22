@@ -2838,13 +2838,13 @@ function getDecryptedKey() {
         backup: { temp: '10°C', range: '2°C ~ 11°C', desc: '晴時多雲', advice: '氣溫適中但早晚偏涼，長袖配外套。', icon: 'cloud-sun' }
     },
     'd2': {
-        dateStr: '2025-12-22',
+        dateStr: '2026-01-26',
         loc: '阿蘇/黑川',
         lat: 33.096, lon: 131.096, // 黑川溫泉附近座標
         backup: { temp: '5°C', range: '-3°C ~ 6°C', desc: '多雲/飄雪', advice: '山區極冷，務必穿著羽絨外套保暖。', icon: 'snow' }
     },
     'd3': {
-        dateStr: '2025-12-23',
+        dateStr: '2026-01-27',
         loc: '別府/由布院',
         lat: 33.265, lon: 131.360, // 由布院座標
         backup: { temp: '7°C', range: '0°C ~ 8°C', desc: '多雲', advice: '濕度較高體感寒冷，請穿防滑鞋。', icon: 'cloud' }
@@ -4144,82 +4144,83 @@ function getSmartAdviceText(temp, weatherCode) {
             icon.style.color = '#6B7280';
         }
     }
+    async function handleImageSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // 1. 顯示讀取中
+    showLoading();
+    
+    try {
+        // 2. 壓縮圖片
+        const base64Image = await compressImage(file, 800, 0.7);
+        
+        // 3. 在聊天室顯示圖片
+        const imgHtml = `<img src="data:image/jpeg;base64,${base64Image}" style="max-width:100%; border-radius:10px; border:1px solid #ccc; margin-top:5px;">`;
+        appendMessage('user', imgHtml);
+
+        // 4. 設定 AI 提示詞
+        const visionPrompt = `
+            ${systemPrompt}
+            
+            【使用者傳送了一張圖片】
+            任務：請擔任專業導遊與翻譯。
+            請判斷圖片內容並提供協助：
+            1. 若是菜單：翻譯菜名並推薦必吃。
+            2. 若是商品/藥妝：說明這是什麼、功效與是否值得購買。
+            3. 若是景點/路牌：告訴我這在哪裡，或上面寫什麼。
+            
+            請用簡潔、像朋友般的口吻回答。
+        `;
+
+        // 5. 發送給 Gemini
+        const responseText = await getGeminiResponse(visionPrompt, base64Image);
+        
+        removeLoading();
+        const formattedText = responseText.replace(/\n/g, '<br>');
+        appendMessage('ai', formattedText, true);
+
+    } catch (e) {
+        removeLoading();
+        appendMessage('ai', `<span style="color:red">圖片辨識失敗：${e.message}</span>`);
+    }
+    
+    // 清空 input
+    event.target.value = '';
+}
+
+// 🟢 正確位置：壓縮函式也一起移出來
+function compressImage(file, maxWidth, quality) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                let w = img.width;
+                let h = img.height;
+                if (w > maxWidth) {
+                    h = Math.round(h * (maxWidth / w));
+                    w = maxWidth;
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                const base64 = dataUrl.split(',')[1];
+                resolve(base64);
+            };
+            img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
+    });
+}
         document.addEventListener('DOMContentLoaded', () => {
         // [新增] 圖片處理與壓縮邏輯
-        async function handleImageSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // 1. 顯示讀取中
-            showLoading();
-            
-            try {
-                // 2. 壓縮圖片 (限制寬度 800px，畫質 0.7)
-                const base64Image = await compressImage(file, 800, 0.7);
-                
-                // 3. 在聊天室顯示使用者的圖片
-                const imgHtml = `<img src="data:image/jpeg;base64,${base64Image}" style="max-width:100%; border-radius:10px; border:1px solid #ccc; margin-top:5px;">`;
-                appendMessage('user', imgHtml);
-
-                // 4. 設定 AI 的任務提示詞
-                const visionPrompt = `
-                    ${systemPrompt}
-                    
-                    【使用者傳送了一張圖片】
-                    任務：請擔任專業導遊與翻譯。
-                    請判斷圖片內容並提供協助：
-                    1. 若是菜單：翻譯菜名並推薦必吃。
-                    2. 若是商品/藥妝：說明這是什麼、功效與是否值得購買。
-                    3. 若是景點/路牌：告訴我這在哪裡，或上面寫什麼。
-                    
-                    請用簡潔、像朋友般的口吻回答。
-                `;
-
-                // 5. 發送給 Gemini (帶圖片)
-                const responseText = await getGeminiResponse(visionPrompt, base64Image);
-                
-                removeLoading();
-                const formattedText = responseText.replace(/\n/g, '<br>');
-                appendMessage('ai', formattedText, true); // true 開啟朗讀功能
-
-            } catch (e) {
-                removeLoading();
-                appendMessage('ai', `<span style="color:red">圖片辨識失敗：${e.message}</span>`);
-            }
-            
-            // 清空 input，讓同一張圖可以再次選擇
-            event.target.value = '';
-        }
-
-        // [輔助] 圖片壓縮函式 (Canvas 繪製)
-        function compressImage(file, maxWidth, quality) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        let w = img.width;
-                        let h = img.height;
-                        if (w > maxWidth) {
-                            h = Math.round(h * (maxWidth / w));
-                            w = maxWidth;
-                        }
-                        const canvas = document.createElement('canvas');
-                        canvas.width = w;
-                        canvas.height = h;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, w, h);
-                        const dataUrl = canvas.toDataURL('image/jpeg', quality);
-                        const base64 = dataUrl.split(',')[1];
-                        resolve(base64);
-                    };
-                    img.onerror = (err) => reject(err);
-                };
-                reader.onerror = (err) => reject(err);
-            });
-        }    
+        
             // --- 智慧自動展開邏輯開始 ---
             
             // 1. 定義日期與行程 ID 的對應表
