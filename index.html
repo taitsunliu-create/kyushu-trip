@@ -3904,6 +3904,7 @@ function getSmartAdviceText(temp, weatherCode) {
         // [修改] AI 發送邏輯：整合記憶、天氣感知、以及「羅馬拼音」翻譯
         // [修改] AI 發送邏輯：依據翻譯方向決定是否顯示拼音
         // [修改] AI 發送邏輯：加入「連續對話記憶」功能
+        // [修改] AI 發送邏輯：修復「諮詢模式」誤判為翻譯的問題
         async function sendToGemini(mode) {
             const text = aiInput.value.trim();
             if (!text) return;
@@ -3929,8 +3930,7 @@ function getSmartAdviceText(temp, weatherCode) {
                     `;
                 }
 
-                // 2. ★ 組合歷史紀錄 (讓 AI 知道前文)
-                // 將歷史陣列轉成文字，並加上標籤
+                // 2. 組合歷史紀錄
                 const historyText = conversationHistory.length > 0 
                     ? `【之前的對話紀錄】\n${conversationHistory.join('\n')}\n`
                     : "";
@@ -3945,7 +3945,6 @@ function getSmartAdviceText(temp, weatherCode) {
                 `;
             } 
             // --- 模式 B: 翻譯 (Translate) ---
-            // 翻譯通常不需要歷史紀錄，保持單次獨立
             else if (mode === 'translate') {
                 finalPrompt = `
                     你是一個中日雙向翻譯機。
@@ -3976,18 +3975,18 @@ function getSmartAdviceText(temp, weatherCode) {
                 const responseText = await getGeminiResponse(finalPrompt);
                 removeLoading();
                 
-                // 判斷是否為日文翻譯結果
-                const isJapaneseResult = /[\u3040-\u309F\u30A0-\u30FF]/.test(responseText) && responseText.length < 200;
+                // ★ 關鍵修改：只有在「翻譯」或「語音」模式下，且含有日文時，才顯示朗讀按鈕
+                // 這樣「行程諮詢」就算回傳了日文單字，也不會被誤判為可朗讀的翻譯
+                const isTranslation = (mode === 'translate' || mode === 'voice_auto') && 
+                                      /[\u3040-\u309F\u30A0-\u30FF]/.test(responseText);
                 
                 const formattedText = responseText.replace(/\n/g, '<br>');
-                appendMessage('ai', formattedText, isJapaneseResult);
+                appendMessage('ai', formattedText, isTranslation);
 
-                // 3. ★ 寫入歷史紀錄 (只針對諮詢模式)
+                // 3. 寫入歷史紀錄 (只針對諮詢模式)
                 if (mode === 'consult' || mode === 'auto') {
                     conversationHistory.push(`User: ${text}`);
                     conversationHistory.push(`Guide: ${responseText}`);
-
-                    // 限制記憶長度 (只保留最後 10 句，避免太長)
                     if (conversationHistory.length > 20) {
                         conversationHistory = conversationHistory.slice(conversationHistory.length - 20);
                     }
