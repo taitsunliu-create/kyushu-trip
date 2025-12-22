@@ -3762,14 +3762,23 @@ function getSmartAdviceText(temp, weatherCode) {
             }
         }
 
+        // [修改] 文字轉語音函式 (過濾羅馬拼音，只唸日文)
         function speakText(text) {
-             speechSynthesis.cancel();
-             const utterance = new SpeechSynthesisUtterance(text);
-             utterance.lang = 'ja-JP'; 
-             utterance.rate = 0.9;
+             speechSynthesis.cancel(); // 停止上一句
+
+             // ★ 關鍵修改：使用正規表達式移除括號內的羅馬拼音 (例如: "(Konnichiwa)")
+             // 邏輯：找到 "(" 開頭，中間包含英文字母/標點，並以 ")" 結尾的字串，將其刪除
+             const cleanText = text.replace(/\([a-zA-Z\s,.?!'-]+\)/g, '').trim();
+
+             const utterance = new SpeechSynthesisUtterance(cleanText);
+             utterance.lang = 'ja-JP'; // 設定語言為日文
+             utterance.rate = 0.9;     // 語速稍慢，方便聆聽
+             
+             // 嘗試取得較自然的日文語音包 (若裝置支援)
              const voices = speechSynthesis.getVoices();
              const jaVoice = voices.find(v => v.lang.includes('ja'));
              if (jaVoice) utterance.voice = jaVoice;
+
              speechSynthesis.speak(utterance);
         }
 
