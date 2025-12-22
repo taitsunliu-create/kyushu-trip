@@ -2841,6 +2841,39 @@ function getDecryptedKey() {
 };
 
         // [修改 2] 讓 Widget 支援非同步讀取與 Loading 狀態
+        // [新增] 通用快取抓取函式 (10分鐘快取機制)
+async function fetchWithCache(url, cacheKey) {
+    const CACHE_TIME = 10 * 60 * 1000; // 10分鐘 (毫秒)
+    const now = Date.now();
+    
+    // 1. 檢查是否有舊資料
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+        try {
+            const record = JSON.parse(cached);
+            // 2. 檢查是否在 10 分鐘內
+            if (now - record.timestamp < CACHE_TIME) {
+                console.log(`[省流模式] 使用快取: ${cacheKey}`);
+                return record.data; // ★ 直接回傳舊資料，不呼叫 API
+            }
+        } catch (e) {
+            console.warn("快取解析失敗，將重新抓取");
+        }
+    }
+
+    // 3. 若無快取或已過期，才真的去呼叫 API
+    console.log(`[API消耗] 呼叫網路: ${url}`);
+    const res = await fetch(url);
+    const data = await res.json();
+
+    // 4. 存入新資料與時間戳記
+    localStorage.setItem(cacheKey, JSON.stringify({
+        timestamp: now,
+        data: data
+    }));
+
+    return data;
+}
 async function updateWeatherWidget(dayId) {
     const config = tripConfig[dayId];
     if (!config) return;
@@ -2874,38 +2907,36 @@ async function updateWeatherWidget(dayId) {
     document.getElementById('hw-icon').innerHTML = `<div class="weather-icon ${finalIcon}"></div>`;
 }
 // [修改] 智慧判斷函式：改用「真實溫度」生成動態建議
+// [修改] 智慧判斷函式：加入 10 分鐘快取機制
 async function getSmartWeatherData(config) {
-    // 1. 取得今日日期字串 (YYYY-MM-DD)
     const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const todayStr = `${year}-${month}-${day}`;
+    const todayStr = now.toISOString().split('T')[0]; // 格式: YYYY-MM-DD
     
     const tripDate = new Date(config.dateStr);
     tripDate.setHours(0, 0, 0, 0);
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
 
-    // --- 情境 A: 過去式 (回憶模式) ---
+    // --- 情境 A: 過去式 ---
     if (tripDate < todayDate) {
         console.log(`[${config.loc}] 是過去行程，使用靜態紀錄。`);
         return config.backup;
     }
 
-    // --- 情境 B & C: 今天或未來 (呼叫 API) ---
+    // --- 情境 B & C: 今天或未來 (呼叫 API + 快取) ---
     try {
-        console.log(`[${config.loc}] 呼叫 API 更新天氣...`);
-        
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${config.lat}&longitude=${config.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=Asia%2FTokyo`;
         
-        const res = await fetch(url);
-        const json = await res.json();
+        // ★ 產生唯一快取金鑰 (日期+地點)
+        const cacheKey = `trip_weather_${config.dateStr}_${config.lat}`;
+        
+        // ★ 改用快取函式抓取
+        const json = await fetchWithCache(url, cacheKey);
         
         const index = json.daily.time.indexOf(config.dateStr);
         let displayData = {};
 
-        // 優先判斷「是不是今天」
+        // 資料解析邏輯 (維持原本不變)
         if (config.dateStr === todayStr) {
             const current = json.current_weather;
             const todayMax = json.daily.temperature_2m_max[0];
@@ -2916,7 +2947,6 @@ async function getSmartWeatherData(config) {
                 range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`,
                 desc: getWeatherDescText(current.weathercode),
                 icon: getWeatherIconClass(current.weathercode),
-                // ★ 這裡會呼叫上面新增的函式
                 advice: `(即時) ${getSmartAdviceText(current.temperature, current.weathercode)}`
             };
         } 
@@ -2935,16 +2965,16 @@ async function getSmartWeatherData(config) {
             };
         } 
         else {
+            // 若超出預報範圍 (例如7天後)，顯示當下天氣作為參考
             const current = json.current_weather;
             const todayMax = json.daily.temperature_2m_max[0];
             const todayMin = json.daily.temperature_2m_min[0];
-
             displayData = {
                 temp: `${Math.round(current.temperature)}°C`,
                 range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`,
                 desc: getWeatherDescText(current.weathercode),
                 icon: getWeatherIconClass(current.weathercode),
-                advice: `(目前狀況) ${getSmartAdviceText(current.temperature, current.weathercode)}`
+                advice: `(參考) ${getSmartAdviceText(current.temperature, current.weathercode)}`
             };
         }
         
