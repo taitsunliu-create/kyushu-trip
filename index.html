@@ -3702,6 +3702,7 @@ function getSmartAdviceText(temp, weatherCode) {
         }
         
         // Append Message Bubble
+        // [修改] 訊息顯示函式：移除自動朗讀，改為全手動播放
         function appendMessage(sender, htmlContent, isAudio = false) {
             const row = document.createElement('div');
             row.className = `chat-row ${sender}`;
@@ -3710,28 +3711,32 @@ function getSmartAdviceText(temp, weatherCode) {
             bubble.className = `chat-bubble ${sender}`;
             bubble.innerHTML = htmlContent;
             
-            // If it's an AI message with Japanese, add inline audio button
+            // 若為 AI 回覆且標記為可朗讀 (isAudio=true)，加入喇叭按鈕
             if (sender === 'ai' && isAudio) {
                 const btn = document.createElement('button');
                 btn.className = 'btn-audio-inline';
+                // 喇叭圖示
                 btn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
-                // Extract plain text for speaking (remove HTML tags)
+                
+                // 取得純文字 (移除 HTML 標籤與圖示文字) 以供朗讀
                 const textToSpeak = bubble.innerText.replace('🔊', '').trim();
                 
+                // 綁定點擊事件 (只有點擊時才發聲)
                 btn.onclick = () => speakText(textToSpeak);
+                
                 bubble.appendChild(btn);
                 
-                // Also auto-play once
-                setTimeout(() => speakText(textToSpeak), 200);
+                // ★ 已移除：setTimeout(() => speakText(textToSpeak), 200); 
+                // 現在不會自動播放了！
             }
 
             row.appendChild(bubble);
             chatHistory.appendChild(row);
             
-            // Scroll to bottom
+            // 自動捲動到底部
             chatHistory.scrollTop = chatHistory.scrollHeight;
             
-            return bubble; // Return in case we need to update it (loading state)
+            return bubble; 
         }
         
         function showLoading() {
