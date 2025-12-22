@@ -2842,38 +2842,41 @@ function getDecryptedKey() {
 
         // [修改 2] 讓 Widget 支援非同步讀取與 Loading 狀態
         // [新增] 通用快取抓取函式 (10分鐘快取機制)
-async function fetchWithCache(url, cacheKey) {
-    const CACHE_TIME = 10 * 60 * 1000; // 10分鐘 (毫秒)
-    const now = Date.now();
-    
-    // 1. 檢查是否有舊資料
-    const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-        try {
-            const record = JSON.parse(cached);
-            // 2. 檢查是否在 10 分鐘內
-            if (now - record.timestamp < CACHE_TIME) {
-                console.log(`[省流模式] 使用快取: ${cacheKey}`);
-                return record.data; // ★ 直接回傳舊資料，不呼叫 API
+// [新增] 全域快取變數 (重新整理網頁後會自動清空，符合您的需求)
+        window.appCache = {}; 
+
+        // [修改] 通用快取抓取函式 (使用記憶體變數)
+        async function fetchWithCache(url, cacheKey) {
+            const CACHE_TIME = 10 * 60 * 1000; // 10分鐘 (毫秒)
+            const now = Date.now();
+            
+            // 1. 檢查 記憶體變數 中是否有資料
+            if (window.appCache[cacheKey]) {
+                const record = window.appCache[cacheKey];
+                // 2. 檢查是否在 10 分鐘內
+                if (now - record.timestamp < CACHE_TIME) {
+                    console.log(`[省流] 使用記憶體快取: ${cacheKey}`);
+                    return record.data; // 直接回傳舊資料
+                }
             }
-        } catch (e) {
-            console.warn("快取解析失敗，將重新抓取");
+
+            // 3. 若無資料或已過期，呼叫 API
+            console.log(`[API消耗] 呼叫網路: ${url}`);
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+
+                // 4. 存入記憶體變數
+                window.appCache[cacheKey] = {
+                    timestamp: now,
+                    data: data
+                };
+                return data;
+            } catch (e) {
+                console.error("Fetch Error:", e);
+                return null;
+            }
         }
-    }
-
-    // 3. 若無快取或已過期，才真的去呼叫 API
-    console.log(`[API消耗] 呼叫網路: ${url}`);
-    const res = await fetch(url);
-    const data = await res.json();
-
-    // 4. 存入新資料與時間戳記
-    localStorage.setItem(cacheKey, JSON.stringify({
-        timestamp: now,
-        data: data
-    }));
-
-    return data;
-}
 async function updateWeatherWidget(dayId) {
     const config = tripConfig[dayId];
     if (!config) return;
