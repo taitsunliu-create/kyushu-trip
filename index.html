@@ -2635,10 +2635,10 @@
                 <div class="weather-compare-row">
                     <div class="wc-mini-card" onclick="getLocalWeather()" style="cursor:pointer; background:#F9FAFB;">
                         <!-- 修正 1: 我的位置圖示 (Pin) -->
-                        <div class="wc-mini-title" style="display: flex; align-items: center; justify-content: center;">
-                            <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            我的位置 (點擊更新)
-                        </div>
+                        <div id="wc-loc-box" class="wc-mini-title" style="display: flex; align-items: center; justify-content: center;">
+    <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+    <span>我的位置 (點擊更新)</span>
+</div>
                         <div class="wc-mini-temp" id="wc-my-temp">--°</div>
                     </div>
                     <div class="wc-mini-card">
@@ -3264,33 +3264,32 @@ function getSmartAdviceText(temp, weatherCode) {
 
 // [修改] 取得定位天氣 (同步更新 Header 與 分頁)
 // [修改] 取得定位天氣 (儲存天氣代碼供 AI 讀取)
+        // [修改] 取得定位天氣 (防卡死穩定版)
         function getLocalWeather() {
+            // 定義 UI 元件
             const els = {
                 headerLoc: document.getElementById('header-my-loc'),
                 headerTemp: document.getElementById('header-my-temp'),
                 tabTemp: document.getElementById('wc-my-temp'),
-                titleEl: document.querySelector('.wc-mini-card .wc-mini-title') 
+                // ★ 改用剛剛新增的 ID，確保一定抓得到
+                titleBox: document.getElementById('wc-loc-box') 
             };
             
+            // 1. 檢查權限與支援度
             if (!navigator.geolocation) {
-                openModal('瀏覽器不支援定位，請手動輸入城市：');
+                alert('您的瀏覽器不支援定位功能');
                 return;
             }
             
-            if(els.headerLoc) els.headerLoc.innerText = '...';
-            if(els.tabTemp) els.tabTemp.innerText = '定位中..';
+            // 2. 顯示讀取中狀態
+            if(els.headerLoc) els.headerLoc.innerText = '定位中..';
+            if(els.tabTemp) els.tabTemp.innerText = '...';
+            if(els.titleBox) els.titleBox.innerHTML = `
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span class="loading-dots">定位中</span>
+                </div>`;
 
-            const cacheKey = 'my_location_combined';
-            const CACHE_TIME = 10 * 60 * 1000;
-            const now = Date.now();
-
-            // 1. 檢查快取
-            if (window.appCache && window.appCache[cacheKey] && (now - window.appCache[cacheKey].timestamp < CACHE_TIME)) {
-                console.log("[省流] 使用快取定位資料");
-                updateMyLocUI(window.appCache[cacheKey].data, els);
-                return; 
-            }
-
+            // 設定 10 秒超時，避免無限空轉
             const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
 
             navigator.geolocation.getCurrentPosition(async (position) => {
@@ -3298,43 +3297,73 @@ function getSmartAdviceText(temp, weatherCode) {
                 const lon = position.coords.longitude;
                 
                 try {
-                    // A. 抓天氣 (Open-Meteo)
+                    // A. 抓天氣
                     const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
                     const weatherData = await weatherRes.json();
                     
-                    const temp = Math.round(weatherData.current_weather.temperature);
-                    const code = weatherData.current_weather.weathercode; // ★ 新增：取得天氣代碼 (如 0=晴, 61=雨)
+                    currentMyTemp = weatherData.current_weather.temperature;
+                    const tempStr = `${Math.round(currentMyTemp)}°C`;
+                    const code = weatherData.current_weather.weathercode; // 記住天氣代碼
                     
-                    // B. 解析地名
-                    let cityName = "我的位置";
+                    // B. 解析地名 (嘗試 AI，失敗則回退)
+                    let displayZh = "我的位置";
                     try {
+                        // 這裡若沒輸入密碼或 AI 失敗，會自動跳到 catch，不會卡住
                         const locationPrompt = `Task: Identify city name for ${lat},${lon}. Output: "中文". Example: "台北"`;
-                        const aiCity = await getGeminiResponse(locationPrompt);
-                        if (aiCity) cityName = aiCity.trim();
+                        // 設定一個 3秒 的競賽，如果 AI 太慢就直接放棄，避免卡住
+                        const aiPromise = getGeminiResponse(locationPrompt);
+                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000));
+                        
+                        const aiCity = await Promise.race([aiPromise, timeoutPromise]);
+                        if (aiCity) displayZh = aiCity.trim();
                     } catch (e) {
-                        console.warn("AI 地名解析失敗");
+                        console.warn("AI 地名解析略過:", e);
                     }
 
-                    // ★ 新增：將 code 一併存入資料結構
-                    const finalData = { temp: temp, city: cityName, code: code };
-
-                    // 存入快取
+                    // --- 更新存檔 (供 AI 情境感知使用) ---
                     window.appCache = window.appCache || {};
-                    window.appCache[cacheKey] = {
-                        timestamp: now,
-                        data: finalData
+                    window.appCache['my_location_combined'] = {
+                        timestamp: Date.now(),
+                        data: { temp: currentMyTemp, city: displayZh, code: code }
                     };
 
-                    // 更新 UI
-                    updateMyLocUI(finalData, els);
+                    // --- 更新 UI ---
+                    // 1. Header 左上角
+                    if(els.headerLoc) els.headerLoc.innerText = displayZh;
+                    if(els.headerTemp) els.headerTemp.innerText = tempStr;
+                    
+                    // 2. Tab 分頁大溫度
+                    if(els.tabTemp) {
+                        els.tabTemp.innerText = tempStr;
+                        els.tabTemp.style.fontSize = '1.5rem';
+                        els.tabTemp.style.color = '#1F2937';
+                    }
+
+                    // 3. Tab 圖片旁地名 (使用 ID 更新)
+                    if(els.titleBox) {
+                        els.titleBox.innerHTML = `
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <span>${displayZh}</span>
+                            </div>`;
+                    }
+                    
+                    // 4. 觸發溫差比對
+                    const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
+                    if (targetTempStr !== '--°') updateComparison(parseFloat(targetTempStr));
 
                 } catch (e) {
-                    console.error(e);
-                    if(els.headerLoc) els.headerLoc.innerText = 'Err';
+                    console.error("天氣抓取錯誤", e);
+                    if(els.headerLoc) els.headerLoc.innerText = '連線失敗';
+                    if(els.titleBox) els.titleBox.innerText = '無法取得資料';
                 }
             }, (err) => {
+                // 定位失敗的處理 (例如使用者拒絕權限)
                 console.warn('定位失敗:', err);
-                if(els.headerLoc) els.headerLoc.innerText = '定位失敗';
+                if(els.headerLoc) els.headerLoc.innerText = '定位未開';
+                if(els.titleBox) els.titleBox.innerText = '請開啟 GPS';
+                if(els.tabTemp) els.tabTemp.innerText = '--';
+                alert("無法取得您的位置，請確認瀏覽器是否有開啟 GPS 權限。");
             }, options);
         }
 
