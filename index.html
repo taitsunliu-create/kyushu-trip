@@ -2763,7 +2763,25 @@ const encryptedApiKey = "U2FsdGVkX1/64ozwLOVc7Q7oTx058ndDWtXLLJ6Ri7cafbqjyyabFrs
 
 // 2. 用來暫存解密後的 Key
 let apiKey = ""; 
+// [新增] AI 導遊的系統提示詞 (這裡定義了它的記憶與人設)
+    const systemPrompt = `
+    你是一位專業的九州旅遊導遊，負責帶領「親子自由行」團隊。
+    目前的日期是 2026年1月 (請根據使用者提問判斷相對日期)。
+    
+    【行程總覽】
+    Day 1 (1/25 日): 抵達福岡機場(12:00) -> 租車(Toyota) -> 熊本城/櫻之馬場 -> 晚餐:勝烈亭豬排 -> 住: The Blossom Kumamoto。
+    Day 2 (1/26 一): 熊本站搭 Aso Boy! (09:00) -> 阿蘇站/草千里/火山博物館 -> 開車往黑川溫泉 -> 住: 黑川溫泉 (入湯手形)。
+    Day 3 (1/27 二): 九州自然野生動物園 (叢林巴士) -> 別府地獄巡禮 (海地獄/灶地獄) -> 住: 由布院 (金鱗湖旁)。
+    Day 4 (1/28 三): 由布院散策 (湯之坪/Snoopy茶屋) -> 太宰府天滿宮 -> TeamLab Forest 福岡 -> 住: 福岡市區。
+    Day 5 (1/29 四): 大濠公園/美術館 -> 天神地下街/PARCO (午餐:極味屋) -> 博多運河城 -> 中洲屋台 -> 住: 福岡市區。
+    Day 6 (1/30 五): 整理行李 -> 福岡機場還車 (10:30) -> 搭機返台 (JX847 19:10)。
 
+    【回答原則】
+    1. 簡潔：你是在手機上被閱讀，回答請精簡，不要長篇大論。
+    2. 親切：語氣要像朋友一樣熱心。
+    3. 準確：只能根據上述行程回答，不要編造不在行程內的景點。
+    4. 語言：請使用繁體中文 (台灣)。
+    `;
 // 3. 解密函式 (會在需要 API 時自動呼叫)
 function getDecryptedKey() {
     if (apiKey) return apiKey; // 如果已經解密過，直接回傳
@@ -3856,67 +3874,74 @@ function getLocalWeather() {
             if (e.key === 'Enter') sendToGemini('auto');
         }
 
-        function sendToGemini(mode) {
+        // [修改] AI 發送邏輯：整合系統記憶與多種模式
+        async function sendToGemini(mode) {
             const text = aiInput.value.trim();
             if (!text) return;
 
-            // Display User Message
+            // 1. 顯示使用者訊息
             appendMessage('user', text);
-            aiInput.value = ''; // Clear input
+            aiInput.value = ''; // 清空輸入框
 
-            // 1. Grab Schedule Context
-            const scheduleContext = document.getElementById('view-schedule').innerText;
-            
-            let prompt = "";
+            // 2. 準備提示詞 (Prompt)
+            let finalPrompt = "";
 
-            if (mode === 'consult') {
-                prompt = `
-                    你是一位專業的九州親子旅遊顧問。
-                    【行程表資訊】：${scheduleContext.substring(0, 8000)}
+            // --- 模式 A: 行程諮詢 (Consult) ---
+            // 這裡我們會使用剛植入的 systemPrompt 大腦
+            if (mode === 'consult' || mode === 'auto') {
+                finalPrompt = `
+                    ${systemPrompt}
+                    
                     【使用者問題】： "${text}"
-                    任務：請根據行程表，針對使用者的問題提供具體、實用的建議。
-                    注意：考慮到是親子旅遊，請注意體力分配與兒童需求。
-                    請用台灣繁體中文回答。
+                    (請根據上述行程記憶，提供簡潔、像導遊般的建議。若問題與行程無關，請禮貌引導回旅遊話題。)
                 `;
-            } else if (mode === 'translate') {
-                prompt = `
-                    你是一個專業的中日翻譯機。
+            } 
+            // --- 模式 B: 翻譯 (Translate) ---
+            // 不需行程記憶，專注翻譯
+            else if (mode === 'translate') {
+                finalPrompt = `
+                    你是一個中日雙向翻譯機。
                     【使用者輸入】： "${text}"
                     任務：
-                    1. 若輸入中文：請翻譯成自然的日文 (禮貌形)。只輸出翻譯後的日文。
-                    2. 若輸入日文：請翻譯成繁體中文。
-                    注意：不要任何解釋，只給我翻譯結果。不要羅馬拼音。
-                `;
-            } else if (mode === 'voice_auto') {
-                // 根據使用者選擇的語言，給 AI 更精準的指令
-                const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
-                const isInputZh = selectedLang === 'zh-TW';
-                
-                prompt = `
-                    你是一個中日雙向口譯員。
-                    【輸入語言】：${isInputZh ? '中文 (台灣)' : '日文'}
-                    【輸入內容】： "${text}"
-                    
-                    任務：
-                    ${isInputZh ? '1. 使用者說中文，請翻譯成日文 (禮貌形)。' : '1. 使用者說日文，請翻譯成台灣繁體中文。'}
-                    
-                    注意：
-                    - 只輸出翻譯結果，不要解釋。
-                    - 若語意不清，請根據旅遊情境推測最可能的句子。
-                `;
-            } else {
-                prompt = `
-                    你是一位專業的九州親子旅遊顧問與隨身翻譯。
-                    【行程表資訊】：${scheduleContext.substring(0, 5000)}
-                    【使用者輸入】： "${text}"
-                    請自動判斷：
-                    1. 若是問問題/尋求建議 -> 執行行程諮詢模式。
-                    2. 若是短句/單詞 -> 執行翻譯模式 (中翻日或日翻中)。
-                    請直接給出結果，不要解釋你的判斷邏輯。
+                    1. 若是中文 -> 翻成日文 (禮貌形)。
+                    2. 若是日文 -> 翻成繁體中文。
+                    注意：只輸出翻譯結果，不要解釋。
                 `;
             }
+            // --- 模式 C: 語音 (Voice) ---
+            // 根據左下角的語言開關決定翻譯方向
+            else if (mode === 'voice_auto') {
+                 const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
+                 const isInputZh = selectedLang === 'zh-TW';
+                 
+                 finalPrompt = `
+                    你是一個口譯員。
+                    輸入語言：${isInputZh ? '中文' : '日文'}
+                    內容： "${text}"
+                    任務：請翻譯成${isInputZh ? '日文' : '中文'}。
+                    注意：只輸出翻譯結果。
+                 `;
+            }
 
-            callGemini(prompt);
+            // 3. 呼叫 Gemini (使用您原本就有的 getGeminiResponse 函式)
+            showLoading();
+            try {
+                // 這裡會自動使用您已經寫好的 AES 解密功能
+                const responseText = await getGeminiResponse(finalPrompt);
+                removeLoading();
+                
+                // 判斷是否為翻譯 (若是日文且短句，顯示朗讀按鈕)
+                const isTranslation = /[\u3040-\u309F\u30A0-\u30FF]/.test(responseText) && responseText.length < 100;
+                
+                // 將換行符號轉為 HTML 換行
+                const formattedText = responseText.replace(/\n/g, '<br>');
+                
+                appendMessage('ai', formattedText, isTranslation);
+
+            } catch (e) {
+                removeLoading();
+                appendMessage('ai', `<span style="color:red">連線錯誤: ${e.message}</span>`);
+            }
         }
 
         async function callGemini(promptText) {
