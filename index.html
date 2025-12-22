@@ -3218,6 +3218,7 @@ function getSmartAdviceText(temp, weatherCode) {
 // [新增] 獲取 GPS 並透過 LINE/簡訊 分享 Google Maps 連結
 // [新增] 智慧天氣快取函式 (10分鐘內不重複耗用API)
         async function fetchWeatherWithCache(url, cacheKey) {
+            if (!apiKey) return null;
             const CACHE_DURATION = 10 * 60 * 1000; // 設定 10 分鐘
             const now = Date.now();
             
