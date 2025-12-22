@@ -3006,7 +3006,7 @@ async function getSmartWeatherData(config) {
                 range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`,
                 desc: getWeatherDescText(current.weathercode),
                 icon: getWeatherIconClass(current.weathercode),
-                advice: `(當下參考) ${getSmartAdviceText(current.temperature, current.weathercode)}`
+                advice: `(行前參考) ${getSmartAdviceText(current.temperature, current.weathercode)}`
             };
         }
         
@@ -4186,7 +4186,7 @@ function getSmartAdviceText(temp, weatherCode) {
         
         removeLoading();
         const formattedText = responseText.replace(/\n/g, '<br>');
-        appendMessage('ai', formattedText, true);
+        appendMessage('ai', formattedText, false);
 
     } catch (e) {
         removeLoading();
