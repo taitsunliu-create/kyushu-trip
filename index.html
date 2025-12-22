@@ -3247,6 +3247,7 @@ function getSmartAdviceText(temp, weatherCode) {
 // [修改] 取得定位天氣 (同步更新 Header 與 分頁)
 // [修改] 取得定位天氣 (加入 10 分鐘快取)
 // [修改] 取得定位天氣 (含地名解析 + 10分鐘記憶體快取)
+       // [修改] 取得定位天氣 (強化地名解析 + 10分鐘記憶體快取)
         function getLocalWeather() {
             // 定義 UI 元件
             const els = {
@@ -3261,24 +3262,23 @@ function getSmartAdviceText(temp, weatherCode) {
                 return;
             }
             
-            // 視覺回饋
+            // 視覺回饋：讓使用者知道正在運作
             if(els.headerLoc) els.headerLoc.innerText = '定位中..';
             if(els.tabTemp) els.tabTemp.innerText = '...';
 
-            // 設定快取 Key (綁定 'my_location_data')
+            // 設定快取 Key
             const cacheKey = 'my_location_combined';
             const CACHE_TIME = 10 * 60 * 1000;
             const now = Date.now();
 
-            // ★ 1. 先檢查有沒有「我的位置」的快取
+            // 1. 檢查快取
             if (window.appCache[cacheKey] && (now - window.appCache[cacheKey].timestamp < CACHE_TIME)) {
                 console.log("[省流] 使用快取的定位天氣資料");
-                const cachedData = window.appCache[cacheKey].data;
-                updateMyLocUI(cachedData, els); // 直接更新畫面
+                updateMyLocUI(window.appCache[cacheKey].data, els);
                 return; 
             }
 
-            // ★ 2. 沒有快取，才開始定位並抓取
+            // 2. 開始定位
             const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
 
             navigator.geolocation.getCurrentPosition(async (position) => {
@@ -3286,31 +3286,38 @@ function getSmartAdviceText(temp, weatherCode) {
                 const lon = position.coords.longitude;
                 
                 try {
-                    console.log("[API消耗] 正在抓取 GPS 天氣與地名...");
-
                     // A. 抓天氣
                     const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
                     const weatherRes = await fetch(weatherUrl);
                     const weatherJson = await weatherRes.json();
                     const temp = Math.round(weatherJson.current_weather.temperature);
 
-                    // B. 抓地名 (使用 Open-Meteo 免費逆向地理編碼)
-                    let cityName = "我的位置";
+                    // B. 抓地名 (強化版)
+                    // 先顯示解析中，讓您知道程式有在跑
+                    if(els.titleEl) els.titleEl.querySelector('span').innerText = "解析地名..";
+                    
+                    let cityName = "未知地點";
                     try {
                         const geoUrl = `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&count=1&language=zh&format=json`;
                         const geoRes = await fetch(geoUrl);
                         const geoJson = await geoRes.json();
+                        
                         if (geoJson.results && geoJson.results.length > 0) {
-                            cityName = geoJson.results[0].name; // 取得城市名稱 (如: 熊本市)
+                            const res = geoJson.results[0];
+                            // 優先順序：城市名稱 -> 區域(區/鎮) -> 行政區(縣/市) -> 英文名稱
+                            cityName = res.name || res.admin2 || res.admin1 || "我的位置";
+                            
+                            // 針對 Open-Meteo 有時回傳英文做簡單處理 (非必要，但體驗較好)
+                            // 如果是 Japan，可以加上 (JP) 或不做處理
                         }
                     } catch (err) {
-                        console.warn("地名解析失敗", err);
+                        console.warn("地名解析失敗，使用座標代替", err);
+                        cityName = `${lat.toFixed(1)}, ${lon.toFixed(1)}`;
                     }
 
-                    // 組合資料
                     const finalData = { temp: temp, city: cityName };
 
-                    // ★ 3. 存入快取 (10分鐘內重整前有效)
+                    // 3. 存入快取
                     window.appCache[cacheKey] = {
                         timestamp: now,
                         data: finalData
@@ -3320,7 +3327,7 @@ function getSmartAdviceText(temp, weatherCode) {
                     updateMyLocUI(finalData, els);
 
                 } catch (e) {
-                    console.error(e);
+                    console.error("Fetch Error:", e);
                     if(els.headerLoc) els.headerLoc.innerText = 'Err';
                 }
             }, (err) => {
@@ -3330,28 +3337,38 @@ function getSmartAdviceText(temp, weatherCode) {
         }
 
         // [新增] 輔助函式：更新我的位置 UI
+        // [修改] 輔助函式：確保 UI (包含左上角與圖片旁文字) 正確更新
         function updateMyLocUI(data, els) {
             const tempStr = `${data.temp}°C`;
             
-            // Header
-            if(els.headerLoc) els.headerLoc.innerText = data.city; // 顯示地名 (如: 熊本市)
+            // 1. 更新左上角 (Header)
+            if(els.headerLoc) els.headerLoc.innerText = data.city;
             if(els.headerTemp) els.headerTemp.innerText = tempStr;
 
-            // Tab
+            // 2. 更新天氣分頁的大字溫度
             if(els.tabTemp) {
                 els.tabTemp.innerText = tempStr;
                 els.tabTemp.style.fontSize = '1.5rem';
                 els.tabTemp.style.color = '#1F2937';
             }
+
+            // 3. 更新圖片旁的所在地名稱 (關鍵修正)
             if(els.titleEl) {
-                els.titleEl.innerHTML = `
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-                        <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                        <span>${data.city}</span>
-                    </div>`;
+                // 這裡我們直接修改 span 的文字，而不破壞 svg 結構，比較穩定
+                const span = els.titleEl.querySelector('span');
+                if (span) {
+                    span.innerText = data.city;
+                } else {
+                    // 如果結構不對，才重寫整個 HTML
+                    els.titleEl.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                            <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>${data.city}</span>
+                        </div>`;
+                }
             }
             
-            // 更新溫差 (若有)
+            // 4. 更新溫差比對 (若有)
             const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
             if (targetTempStr !== '--°' && typeof updateComparison === 'function') {
                 updateComparison(parseFloat(targetTempStr));
