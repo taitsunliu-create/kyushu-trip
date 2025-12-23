@@ -948,7 +948,16 @@
             60% { content: ' ...'; }
             80%, 100% { content: ' ....'; }
         }
-
+/* [新增] SVG Sprite 通用樣式 */
+        .icon-sprite {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
         /* Mobile Optimization */
         @media (max-width: 600px) {
             .container { padding: 15px 12px; } /* Adjust padding */
@@ -1011,7 +1020,40 @@
     </style>
 </head>
 <body>
-
+<svg style="display: none;">
+        <defs>
+            <symbol id="icon-schedule" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </symbol>
+            
+            <symbol id="icon-stay" viewBox="0 0 24 24">
+                <path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"></path>
+            </symbol>
+            
+            <symbol id="icon-car" viewBox="0 0 24 24">
+                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+                <circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>
+                <path d="M5 17h2"/><path d="M15 17h2"/>
+            </symbol>
+            
+            <symbol id="icon-info" viewBox="0 0 24 24">
+                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+                <path d="M9 18h6"/><path d="M10 22h4"/>
+            </symbol>
+            
+            <symbol id="icon-weather" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="5"></circle>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+            </symbol>
+            
+            <symbol id="icon-ai" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+            </symbol>
+        </defs>
+    </svg>
     <header>
         <div class="header-content">
             <div class="header-title-area">
@@ -2721,41 +2763,39 @@
     <nav class="nav-bar">
         <div class="nav-item active" data-target="view-schedule" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <svg class="icon-sprite"><use href="#icon-schedule"></use></svg>
             </span>
             行程表
         </div>
         <div class="nav-item" data-target="view-stay" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"></path></svg>
+                <svg class="icon-sprite"><use href="#icon-stay"></use></svg>
             </span>
             住宿資訊
         </div>
         <div class="nav-item" data-target="view-car" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17h2"/><path d="M15 17h2"/></svg>
+                <svg class="icon-sprite"><use href="#icon-car"></use></svg>
             </span>
             交通資訊
         </div>
         <div class="nav-item" data-target="view-info" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                <svg class="icon-sprite"><use href="#icon-info"></use></svg>
             </span>
             旅遊資訊
         </div>
         
-        <!-- 調整順序: 先放天氣 -->
         <div class="nav-item" data-target="view-weather" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+                <svg class="icon-sprite"><use href="#icon-weather"></use></svg>
             </span>
             即時天氣
         </div>
 
-        <!-- 調整順序: AI 助手放到最後 -->
         <div class="nav-item" data-target="view-ai" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                <svg class="icon-sprite"><use href="#icon-ai"></use></svg>
             </span>
             AI 助手
         </div>
