@@ -3471,7 +3471,8 @@ function getSmartAdviceText(temp, weatherCode) {
             if (event.target == lModal) lModal.style.display = "none";
         }
 // [新增] 獲取 GPS 並透過 LINE/簡訊 分享 Google Maps 連結
-        function shareCurrentLocation() {
+       // [修改] 獲取 GPS 並透過 OSM (Nominatim) 解析地標與門牌分享
+        async function shareCurrentLocation() {
             // 1. 檢查支援度
             if (!navigator.geolocation) {
                 alert("您的裝置不支援定位功能。");
@@ -3481,50 +3482,108 @@ function getSmartAdviceText(temp, weatherCode) {
             const btn = document.getElementById('btn-share-loc');
             const originalContent = btn.innerHTML;
             
-            // 2. 顯示讀取中狀態
-            // 2. 顯示讀取中狀態 (只留 loading 圖示)
-            btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:rotate 1s linear infinite;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" fill="none" stroke="currentColor" stroke-width="2"></path></svg>`;
+            // 2. 顯示讀取中狀態 (綠色雷達波，表示正在搜尋地標)
+            btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:rotate 1s linear infinite; color:#10B981;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" fill="none" stroke="currentColor" stroke-width="2"></path></svg>`;
             btn.style.opacity = "0.8";
 
-            // 3. 獲取高精確度位置
-            navigator.geolocation.getCurrentPosition(position => {
+            // 3. 獲取位置
+            navigator.geolocation.getCurrentPosition(async position => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 
-                // 產生 Google Maps 連結
-                const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
-                const shareText = `【緊急/報平安】我目前的位置在這裡，請點擊連結查看：`;
+                // Google Maps 連結 (給導航用)
+                const mapUrl = `https://www.google.com/maps?q=$${lat},${lon}`;
+                
+                let locationName = "";
+                let subDetail = ""; // 用來補充路名 (例如：7-11 [中山路])
 
-                // 4. 呼叫原生分享選單 (Web Share API)
-                if (navigator.share) {
-                    navigator.share({
-                        title: '我的即時位置',
-                        text: shareText,
-                        url: mapUrl
-                    }).then(() => {
-                        console.log('分享成功');
-                    }).catch((error) => {
-                        console.log('分享取消', error);
-                    });
-                } else {
-                    // 電腦版或不支援分享的瀏覽器 -> 改為複製連結
-                    prompt("請複製以下連結發送給朋友：", mapUrl);
+                // [OSM Nominatim 解析邏輯]
+                try {
+                    // 設定 5秒 timeout 防止 OSM API 沒反應
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                    // 請求詳細地址資訊 (addressdetails=1) 並指定中文 (accept-language=zh-TW)
+                    const osmUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`;
+                    
+                    const res = await fetch(osmUrl, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    
+                    if (res.ok) {
+                        const data = await res.json();
+                        const addr = data.address || {};
+                        
+                        // --- 邏輯 A: 搜尋具體地標 (擴大範圍) ---
+                        // 我們定義一組「有意義的點位」標籤，優先級由高到低
+                        // 包含您要求的 office, industrial, craft
+                        const targetKeys = [
+                            'tourism', 'amenity', 'shop', 'leisure', 'historic', 
+                            'office', 'industrial', 'craft', 'building', 'emergency'
+                        ];
+
+                        for (const key of targetKeys) {
+                            if (addr[key]) {
+                                locationName = addr[key]; // 抓到了！例如：台積電F12, 某某工坊, 7-Eleven
+                                break;
+                            }
+                        }
+
+                        // --- 邏輯 B: 處理路名與門牌 ---
+                        // 找出路名 (OSM 有時會用 road, street, neighborhood 等不同欄位)
+                        const roadName = addr.road || addr.street || addr.neighbourhood || addr.suburb || "";
+                        const houseNum = addr.house_number || "";
+
+                        // --- 邏輯 C: 組合最終名稱 ---
+                        if (locationName) {
+                            // 情境 1: 有找到地標 (例如：全家便利商店)
+                            // 補充路名在後面方便確認，例如：全家便利商店 (中正路)
+                            if (roadName) subDetail = ` (${roadName})`;
+                        } else {
+                            // 情境 2: 沒地標，退回「門牌機制」
+                            if (roadName && houseNum) {
+                                locationName = `${roadName}${houseNum}號`; // 例如：中山路156號
+                            } else if (roadName) {
+                                locationName = `${roadName} 周邊`; // 例如：中山路 周邊
+                            } else {
+                                // 真的什麼都抓不到，用大區域 (區/鎮)
+                                locationName = addr.district || addr.city || addr.town || "未知名稱";
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn("OSM 解析失敗或超時", e);
+                    // 失敗時保持空白，後續會自動填補 "我在這裡"
                 }
 
-                // 復原按鈕
+                // 4. 組合文案
+                const timeStr = new Date().toLocaleTimeString('zh-TW', {hour: '2-digit', minute:'2-digit'});
+                
+                // 最終顯示名稱： "地標名稱" + " (路名)"
+                const finalLocName = locationName ? `${locationName}${subDetail}` : `📍 座標位置`;
+                
+                const shareTitle = '我的即時位置';
+                // 文案強調「看得見的地標」
+                const shareText = `【報平安 ${timeStr}】\n我在：${finalLocName}\n請點擊連結導航：\n`;
+
+                // 5. 呼叫分享
+                if (navigator.share) {
+                    navigator.share({
+                        title: shareTitle,
+                        text: shareText,
+                        url: mapUrl
+                    }).catch(console.error);
+                } else {
+                    prompt("請複製位置資訊：", `${shareText} ${mapUrl}`);
+                }
+
                 btn.innerHTML = originalContent;
                 btn.style.opacity = "1";
 
             }, error => {
-                console.error(error);
-                alert("無法取得位置，請確認 GPS 已開啟，並允許網頁存取位置。");
+                alert("無法取得位置，請確認 GPS 已開啟。");
                 btn.innerHTML = originalContent;
                 btn.style.opacity = "1";
-            }, { 
-                enableHighAccuracy: true, // 要求高精確度 (重要!)
-                timeout: 10000, 
-                maximumAge: 0 
-            });
+            }, { enableHighAccuracy: true, timeout: 10000 });
         }
         async function submitManualLocation() {
             const manualCity = document.getElementById('modal-city-input').value.trim();
