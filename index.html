@@ -1052,22 +1052,41 @@
         }
     /* [新增] 分頁滑動切換特效 */
         /* 定義從右邊滑入 (前往下一個分頁) */
-        @keyframes slideInRight {
-            from { transform: translateX(30%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        /* [修改] 分頁 3D 旋轉門特效 (Revolving Door Effect) */
+        
+        /* 定義從右邊旋轉進來 (前往下一個分頁) */
+        @keyframes rotateInRight {
+            0% { 
+                transform: perspective(1000px) rotateY(60deg); 
+                opacity: 0; 
+            }
+            100% { 
+                transform: perspective(1000px) rotateY(0); 
+                opacity: 1; 
+            }
         }
-        /* 定義從左邊滑入 (返回上一個分頁) */
-        @keyframes slideInLeft {
-            from { transform: translateX(-30%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        
+        /* 定義從左邊旋轉進來 (返回上一個分頁) */
+        @keyframes rotateInLeft {
+            0% { 
+                transform: perspective(1000px) rotateY(-60deg); 
+                opacity: 0; 
+            }
+            100% { 
+                transform: perspective(1000px) rotateY(0); 
+                opacity: 1; 
+            }
         }
 
-        /* 套用動畫的類別 - 使用 cubic-bezier 讓動態更自然 */
+        /* 套用動畫的類別 */
+        /* 使用 ease-out 讓旋轉停止時有緩衝感 */
         .container.active.slide-next {
-            animation: slideInRight 0.3s cubic-bezier(0.2, 0.0, 0.2, 1) forwards;
+            animation: rotateInRight 0.5s ease-out forwards;
+            transform-origin: center left; /* 設定旋轉軸心在左側，像推門一樣 */
         }
         .container.active.slide-prev {
-            animation: slideInLeft 0.3s cubic-bezier(0.2, 0.0, 0.2, 1) forwards;
+            animation: rotateInLeft 0.5s ease-out forwards;
+            transform-origin: center right; /* 設定旋轉軸心在右側 */
         }
     </style>
 </head>
