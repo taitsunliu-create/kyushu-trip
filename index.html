@@ -2964,34 +2964,59 @@ function getDecryptedKey() {
         // [修改 2] 讓 Widget 支援非同步讀取與 Loading 狀態
         // [新增] 通用快取抓取函式 (10分鐘快取機制)
 // [新增] 全域快取變數 (重新整理網頁後會自動清空，符合您的需求)
-        window.appCache = {}; 
-
-        // [修改] 通用快取抓取函式 (使用記憶體變數)
-        async function fetchWithCache(url, cacheKey) {
-            const CACHE_TIME = 10 * 60 * 1000; // 10分鐘 (毫秒)
-            const now = Date.now();
-            
-            // 1. 檢查 記憶體變數 中是否有資料
-            if (window.appCache[cacheKey]) {
-                const record = window.appCache[cacheKey];
-                // 2. 檢查是否在 10 分鐘內
-                if (now - record.timestamp < CACHE_TIME) {
-                    console.log(`[省流] 使用記憶體快取: ${cacheKey}`);
-                    return record.data; // 直接回傳舊資料
+        // [API 省流優化] 統一快取管理系統 (LocalStorage 版)
+        const CACHE_SYSTEM = {
+            // 存入資料 (預設 TTL 為 30 分鐘)
+            save: (key, data, ttlMinutes = 30) => { 
+                try {
+                    const record = {
+                        timestamp: Date.now(),
+                        expiry: ttlMinutes * 60 * 1000,
+                        data: data
+                    };
+                    localStorage.setItem(key, JSON.stringify(record));
+                } catch (e) {
+                    console.warn("LocalStorage 儲存失敗 (可能是容量已滿)", e);
+                }
+            },
+            // 讀取資料
+            get: (key) => {
+                const json = localStorage.getItem(key);
+                if (!json) return null;
+                
+                try {
+                    const record = JSON.parse(json);
+                    const now = Date.now();
+                    
+                    // 檢查是否過期
+                    if (now - record.timestamp > record.expiry) {
+                        console.log(`[快取過期] ${key} 已清除`);
+                        localStorage.removeItem(key);
+                        return null;
+                    }
+                    
+                    console.log(`[省流模式] 讀取 LocalStorage: ${key}`);
+                    return record.data;
+                } catch (e) {
+                    return null;
                 }
             }
+        };
 
-            // 3. 若無資料或已過期，呼叫 API
+        // [修改] 支援 LocalStorage 的 Fetch 函式
+        async function fetchWithCache(url, cacheKey) {
+            // 1. 先查快取
+            const cachedData = CACHE_SYSTEM.get(cacheKey);
+            if (cachedData) return cachedData;
+
+            // 2. 無快取則呼叫 API
             console.log(`[API消耗] 呼叫網路: ${url}`);
             try {
                 const res = await fetch(url);
                 const data = await res.json();
-
-                // 4. 存入記憶體變數
-                window.appCache[cacheKey] = {
-                    timestamp: now,
-                    data: data
-                };
+                
+                // 3. 存入快取 (天氣資料存 20 分鐘)
+                CACHE_SYSTEM.save(cacheKey, data, 20); 
                 return data;
             } catch (e) {
                 console.error("Fetch Error:", e);
