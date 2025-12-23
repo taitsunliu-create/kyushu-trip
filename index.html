@@ -4569,6 +4569,52 @@ function compressImage(file, maxWidth, quality) {
             setupVoiceButton(); // Init voice listener
             getLocalWeather(); // Fetch local weather on load
             initChecklist(); // Init checklist
+            // [新增] 手機版左右滑動切換分頁功能 (Gestures)
+            let touchStartX = 0;
+            let touchStartY = 0;
+
+            // 1. 手指接觸螢幕，記錄起點
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, {passive: true});
+
+            // 2. 手指離開螢幕，計算滑動方向
+            document.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].screenX;
+                const touchEndY = e.changedTouches[0].screenY;
+                handleSwipeGesture(touchStartX, touchStartY, touchEndX, touchEndY);
+            }, {passive: true});
+
+            // 3. 滑動判斷邏輯
+            function handleSwipeGesture(startX, startY, endX, endY) {
+                const diffX = endX - startX;
+                const diffY = endY - startY;
+
+                // 靈敏度設定：水平滑動超過 60px 且 水平距離 > 垂直距離的 2 倍 (防止滑動網頁時誤觸)
+                if (Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY) * 2) { 
+                    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+                    const activeItem = document.querySelector('.nav-item.active');
+                    const currentIndex = navItems.indexOf(activeItem);
+                    
+                    if (currentIndex === -1) return;
+
+                    let nextIndex = currentIndex;
+
+                    if (diffX > 0) {
+                        // 向右滑 -> 顯示左邊的分頁 (上一頁)
+                        nextIndex = currentIndex - 1;
+                    } else {
+                        // 向左滑 -> 顯示右邊的分頁 (下一頁)
+                        nextIndex = currentIndex + 1;
+                    }
+
+                    // 確保沒有超出分頁範圍，然後執行切換
+                    if (nextIndex >= 0 && nextIndex < navItems.length) {
+                        switchTab(navItems[nextIndex]);
+                    }
+                }
+            }      
         });
     </script>
 </body>
