@@ -3329,7 +3329,7 @@ function getSmartAdviceText(temp, weatherCode) {
                 </div>`;
 
             // 設定 10 秒超時，避免無限空轉
-            const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
+            const options = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
 
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const lat = position.coords.latitude;
@@ -3348,7 +3348,7 @@ function getSmartAdviceText(temp, weatherCode) {
                     let displayZh = "我的位置";
                     try {
                         // 這裡若沒輸入密碼或 AI 失敗，會自動跳到 catch，不會卡住
-                        const locationPrompt = `Task: Identify city name for ${lat},${lon}. Output: "中文". Example: "台北"`;
+                        const locationPrompt = `Task: Identify the specific district/township name for ${lat},${lon} (e.g., 竹北市, 新竹市東區, 博多區). Output ONLY the Traditional Chinese name.`;
                         // 設定一個 3秒 的競賽，如果 AI 太慢就直接放棄，避免卡住
                         const aiPromise = getGeminiResponse(locationPrompt);
                         /* 修改前 (舊的) */
