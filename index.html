@@ -1053,29 +1053,30 @@
         /* [修改] 分頁純水平翻轉特效 (Horizontal Flip / Flip Clock Style) */
         
         /* 定義從右側翻轉進入 (前往下一頁) */
-        /* [修改] 3D 光影懸浮翻轉 (Deep 3D Flip with Lighting) */
+        /* [修正] 3D 光影懸浮翻轉 - 強制中心軸 (Centered Axis 3D Flip) */
         
-        /* 從右側翻入 (前往下一頁) */
-        @keyframes deepFlipInRight {
+        /* 從右側翻轉進入 (前往下一頁) */
+        @keyframes deepCenterFlipInRight {
             0% { 
-                /* 初始狀態：旋轉90度 + 稍微縮小(景深) + 變暗(陰影) */
+                /* 初始：旋轉90度(側面) + 縮小(景深) + 變暗(陰影) */
                 transform: perspective(1500px) rotateY(90deg) scale(0.8); 
                 opacity: 0;
-                filter: brightness(0.4); /* 模擬陰影，讓 3D 感更重 */
+                filter: brightness(0.5); /* 亮度變暗，模擬背光 */
             }
             100% { 
+                /* 結束：轉正(0度) + 恢復大小 + 恢復亮度 */
                 transform: perspective(1500px) rotateY(0) scale(1); 
                 opacity: 1;
-                filter: brightness(1); /* 回復明亮 */
+                filter: brightness(1);
             }
         }
         
-        /* 從左側翻入 (返回上一頁) */
-        @keyframes deepFlipInLeft {
+        /* 從左側翻轉進入 (返回上一頁) */
+        @keyframes deepCenterFlipInLeft {
             0% { 
                 transform: perspective(1500px) rotateY(-90deg) scale(0.8); 
                 opacity: 0;
-                filter: brightness(0.4);
+                filter: brightness(0.5);
             }
             100% { 
                 transform: perspective(1500px) rotateY(0) scale(1); 
@@ -1084,17 +1085,17 @@
             }
         }
 
-        /* 套用動畫 - 維持中心軸旋轉，確保視覺舒適 */
+        /* 套用動畫 - 關鍵修正：transform-origin 設為 center center */
         .container.active.slide-next {
-            transform-origin: center; 
-            animation: deepFlipInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-            backface-visibility: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3); /* [選用] 加入浮動陰影，增加層次 */
+            transform-origin: center center; /* [關鍵] 鎖定在正中心旋轉，不偏移 */
+            animation: deepCenterFlipInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            backface-visibility: hidden; /* 隱藏背面，避免閃爍 */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3); /* 懸浮陰影 */
         }
 
         .container.active.slide-prev {
-            transform-origin: center;
-            animation: deepFlipInLeft 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            transform-origin: center center; /* [關鍵] 鎖定在正中心旋轉 */
+            animation: deepCenterFlipInLeft 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
             backface-visibility: hidden;
             box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
