@@ -2806,21 +2806,6 @@
             </div>
         </div>
     </div>
-    <div id="img-preview-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-title">確認圖片</div>
-            <div style="background:#F3F4F6; padding:10px; border-radius:8px; margin-bottom:15px; display:flex; justify-content:center;">
-                <img id="img-preview-content" style="max-width:100%; max-height:300px; border-radius:4px; object-fit:contain;">
-            </div>
-            <div class="modal-desc" style="font-size:0.85rem; color:#666; margin-bottom:15px;">
-                確認要傳送這張圖片給 AI 進行分析嗎？
-            </div>
-            <div class="modal-btns">
-                <button class="modal-btn btn-cancel" onclick="cancelImagePreview()">取消</button>
-                <button class="modal-btn btn-confirm" onclick="confirmImageAnalysis()">開始辨識</button>
-            </div>
-        </div>
-    </div>
     <!-- Bottom Navigation Bar (6 items now) -->
     
     <nav class="nav-bar">
@@ -2979,59 +2964,34 @@ function getDecryptedKey() {
         // [修改 2] 讓 Widget 支援非同步讀取與 Loading 狀態
         // [新增] 通用快取抓取函式 (10分鐘快取機制)
 // [新增] 全域快取變數 (重新整理網頁後會自動清空，符合您的需求)
-        // [API 省流優化] 統一快取管理系統 (LocalStorage 版)
-        const CACHE_SYSTEM = {
-            // 存入資料 (預設 TTL 為 30 分鐘)
-            save: (key, data, ttlMinutes = 30) => { 
-                try {
-                    const record = {
-                        timestamp: Date.now(),
-                        expiry: ttlMinutes * 60 * 1000,
-                        data: data
-                    };
-                    localStorage.setItem(key, JSON.stringify(record));
-                } catch (e) {
-                    console.warn("LocalStorage 儲存失敗 (可能是容量已滿)", e);
-                }
-            },
-            // 讀取資料
-            get: (key) => {
-                const json = localStorage.getItem(key);
-                if (!json) return null;
-                
-                try {
-                    const record = JSON.parse(json);
-                    const now = Date.now();
-                    
-                    // 檢查是否過期
-                    if (now - record.timestamp > record.expiry) {
-                        console.log(`[快取過期] ${key} 已清除`);
-                        localStorage.removeItem(key);
-                        return null;
-                    }
-                    
-                    console.log(`[省流模式] 讀取 LocalStorage: ${key}`);
-                    return record.data;
-                } catch (e) {
-                    return null;
+        window.appCache = {}; 
+
+        // [修改] 通用快取抓取函式 (使用記憶體變數)
+        async function fetchWithCache(url, cacheKey) {
+            const CACHE_TIME = 10 * 60 * 1000; // 10分鐘 (毫秒)
+            const now = Date.now();
+            
+            // 1. 檢查 記憶體變數 中是否有資料
+            if (window.appCache[cacheKey]) {
+                const record = window.appCache[cacheKey];
+                // 2. 檢查是否在 10 分鐘內
+                if (now - record.timestamp < CACHE_TIME) {
+                    console.log(`[省流] 使用記憶體快取: ${cacheKey}`);
+                    return record.data; // 直接回傳舊資料
                 }
             }
-        };
 
-        // [修改] 支援 LocalStorage 的 Fetch 函式
-        async function fetchWithCache(url, cacheKey) {
-            // 1. 先查快取
-            const cachedData = CACHE_SYSTEM.get(cacheKey);
-            if (cachedData) return cachedData;
-
-            // 2. 無快取則呼叫 API
+            // 3. 若無資料或已過期，呼叫 API
             console.log(`[API消耗] 呼叫網路: ${url}`);
             try {
                 const res = await fetch(url);
                 const data = await res.json();
-                
-                // 3. 存入快取 (天氣資料存 20 分鐘)
-                CACHE_SYSTEM.save(cacheKey, data, 20); 
+
+                // 4. 存入記憶體變數
+                window.appCache[cacheKey] = {
+                    timestamp: now,
+                    data: data
+                };
                 return data;
             } catch (e) {
                 console.error("Fetch Error:", e);
@@ -3309,42 +3269,27 @@ function getSmartAdviceText(temp, weatherCode) {
                 }
 
                 // 步驟 2: 如果對照表沒有，請求 AI 在背景翻譯 (您的新想法!)
-                // 步驟 2: AI 背景翻譯 (已加入永久快取)
                 if (!isTranslated) {
-                    // [新增] 先查快取 (金鑰: city_trans_中文名)
-                    const cacheKey = `city_trans_${rawInput}`;
-                    const cachedName = CACHE_SYSTEM.get(cacheKey);
-
-                    if (cachedName) {
-                        searchTerm = cachedName;
-                        isTranslated = true;
-                        console.log("使用快取地名:", searchTerm);
-                        document.getElementById('wc-desc').innerText = `搜尋: ${searchTerm} (快取)`;
-                    } else {
-                        // 無快取，才呼叫 AI
-                        document.getElementById('wc-desc').innerText = '🔍 AI 正在翻譯地名...';
-                        
-                        const translatePrompt = `
-                            Task: Translate the place name "${rawInput}" into its official English Romanization name for using in a Weather API.
-                            Target: Global locations (Focus on Taiwan/Japan).
-                            Rule: Output ONLY the English name. No explanations.
-                            Example: "台北" -> "Taipei", "由布院" -> "Yufuin", "新竹" -> "Hsinchu".
-                        `;
-                        
-                        try {
-                            const aiTranslation = await getGeminiResponse(translatePrompt);
-                            if (/^[a-zA-Z\s\-,]+$/.test(aiTranslation)) {
-                                searchTerm = aiTranslation;
-                                isTranslated = true;
-                                console.log("AI 翻譯結果:", searchTerm);
-                                document.getElementById('wc-desc').innerText = `搜尋: ${searchTerm}...`;
-                                
-                                // [新增] 翻譯成功後，存入快取 (保存 24 小時 = 1440 分鐘)
-                                CACHE_SYSTEM.save(cacheKey, searchTerm, 1440);
-                            }
-                        } catch (e) {
-                            console.warn("AI 翻譯失敗，嘗試使用原始中文搜尋");
+                    document.getElementById('wc-desc').innerText = '🔍 AI 正在翻譯地名...';
+                    
+                    const translatePrompt = `
+                        Task: Translate the place name "${rawInput}" into its official English Romanization name for using in a Weather API.
+                        Target: Japan locations.
+                        Rule: Output ONLY the English name. No explanations.
+                        Example: "黑川溫泉" -> "Minamioguni" (or Kurokawa Onsen), "由布院" -> "Yufuin".
+                    `;
+                    
+                    try {
+                        const aiTranslation = await getGeminiResponse(translatePrompt);
+                        // 簡單驗證回傳是否為英文
+                        if (/^[a-zA-Z\s\-,]+$/.test(aiTranslation)) {
+                            searchTerm = aiTranslation;
+                            isTranslated = true;
+                            console.log("AI 翻譯結果:", searchTerm);
+                            document.getElementById('wc-desc').innerText = `搜尋: ${searchTerm}...`;
                         }
+                    } catch (e) {
+                        console.warn("AI 翻譯失敗，嘗試使用原始中文搜尋");
                     }
                 }
 
@@ -3820,19 +3765,6 @@ function getSmartAdviceText(temp, weatherCode) {
         }
 
         async function askAiWeatherAdvice(city, temp, condition) {
-            // [新增] 1. 產生快取金鑰 (地點 + 氣溫整數 + 天氣狀況)
-            // 這樣如果溫度只差 0.1 度，或是天氣一樣，就不用重新問 AI
-            const cacheKey = `ai_advice_${city}_${Math.round(temp)}_${condition}`;
-            
-            // [新增] 2. 先查快取
-            const cachedAdvice = CACHE_SYSTEM.get(cacheKey);
-            if (cachedAdvice) {
-                console.log("使用快取穿衣建議");
-                document.getElementById('wc-advice').innerText = cachedAdvice;
-                return;
-            }
-
-            // 無快取，才執行 AI 請求
             const prompt = `
                 現在${city}的即時氣溫是 ${temp}度，天氣狀況為${condition}。
                 請以「旅遊小秘書」的口吻，給予台灣旅客簡短的穿衣建議（約50字）。
@@ -3840,12 +3772,9 @@ function getSmartAdviceText(temp, weatherCode) {
             `;
             
             try {
+                // 改用新的共用函數
                 const text = await getGeminiResponse(prompt);
                 document.getElementById('wc-advice').innerText = text;
-                
-                // [新增] 3. 存入快取 (保存 60 分鐘)
-                CACHE_SYSTEM.save(cacheKey, text, 30);
-                
             } catch (e) {
                 document.getElementById('wc-advice').innerText = 'AI 連線逾時，建議洋蔥式穿搭。';
             }
@@ -4337,87 +4266,59 @@ function getSmartAdviceText(temp, weatherCode) {
             icon.style.color = '#6B7280';
         }
     }
-    // [新增] 圖片預覽全域變數
-    let pendingImageBase64 = null;
-
-    // [新增] 關閉圖片預覽
-    function cancelImagePreview() {
-        document.getElementById('img-preview-modal').style.display = 'none';
-        pendingImageBase64 = null;
-    }
-
-    // [新增] 確認發送圖片 (原本的邏輯移到這裡)
-    async function confirmImageAnalysis() {
-        if (!pendingImageBase64) return;
-        
-        // 1. 關閉視窗
-        cancelImagePreview();
-        
-        // 2. 顯示讀取中
-        showLoading();
-
-        try {
-            // 3. 在聊天室顯示圖片 (使用者確認後才顯示)
-            const imgHtml = `<img src="data:image/jpeg;base64,${pendingImageBase64}" style="max-width:100%; border-radius:10px; border:1px solid #ccc; margin-top:5px;">`;
-            appendMessage('user', imgHtml);
-
-            // [新增] 讀取目前位置 (從天氣模組獲取)
-            let curLoc = ""; 
-            if (window.appCache && window.appCache['my_location_combined']) {
-                curLoc = window.appCache['my_location_combined'].data.city;
-            }
-
-            // 4. 設定 AI 提示詞
-            const visionPrompt = `
-                ${systemPrompt}
-                
-                【使用者傳送了一張圖片】
-                【使用者目前位置】：${curLoc}
-                
-                任務：請擔任專業導遊與購物助手。
-                請判斷圖片內容並提供協助：
-                1. 若是商品/藥妝/零食：說明這是什麼 (名稱與功效)，並推薦在「${curLoc}」哪裡買得到。
-                2. 若是菜單：翻譯菜名並推薦必吃。
-                3. 若是景點/路牌：告訴我這在哪裡。
-                
-                請用簡潔、像朋友般的口吻回答。
-            `;
-            
-            // 5. 發送給 Gemini
-            const responseText = await getGeminiResponse(visionPrompt, pendingImageBase64);
-            
-            removeLoading();
-            const formattedText = responseText.replace(/\n/g, '<br>');
-            appendMessage('ai', formattedText, false);
-
-        } catch (e) {
-            removeLoading();
-            appendMessage('ai', `<span style="color:red">圖片辨識失敗：${e.message}</span>`);
-        }
-    }
     async function handleImageSelect(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    const file = event.target.files[0];
+    if (!file) return;
 
-        // 1. 壓縮圖片 (但先不發送)
-        // 為了預覽流暢，這裡先做壓縮，如果檔案太大會在這裡處理掉
-        try {
-            pendingImageBase64 = await compressImage(file, 800, 0.7);
-            
-            // 2. 顯示預覽彈窗
-            const previewImg = document.getElementById('img-preview-content');
-            previewImg.src = `data:image/jpeg;base64,${pendingImageBase64}`;
-            
-            document.getElementById('img-preview-modal').style.display = 'flex';
-            
-        } catch (e) {
-            alert("圖片處理失敗，請重試");
-            console.error(e);
-        }
+    // 1. 顯示讀取中
+    showLoading();
+    
+    try {
+        // 2. 壓縮圖片
+        const base64Image = await compressImage(file, 800, 0.7);
         
-        // 3. 清空 input，確保下次選同一張圖也能觸發 change 事件
-        event.target.value = '';
+        // 3. 在聊天室顯示圖片
+        const imgHtml = `<img src="data:image/jpeg;base64,${base64Image}" style="max-width:100%; border-radius:10px; border:1px solid #ccc; margin-top:5px;">`;
+        appendMessage('user', imgHtml);
+
+        // [新增] 讀取目前位置 (從天氣模組獲取)
+        let curLoc = ""; 
+        if (window.appCache && window.appCache['my_location_combined']) {
+            curLoc = window.appCache['my_location_combined'].data.city;
+        }
+
+        // 4. 設定 AI 提示詞 (加入位置資訊)
+        const visionPrompt = `
+            ${systemPrompt}
+            
+            【使用者傳送了一張圖片】
+            【使用者目前位置】：${curLoc}
+            
+            任務：請擔任專業導遊與購物助手。
+            請判斷圖片內容並提供協助：
+            1. 若是商品/藥妝/零食：
+               - 說明這是什麼 (名稱與功效)。
+               - 針對「${curLoc}」這個地點，推薦我去哪裡買 (例如：${curLoc}的車站、藥妝店或超市)。
+            2. 若是菜單：翻譯菜名並推薦必吃。
+            3. 若是景點/路牌：告訴我這在哪裡。
+            
+            請用簡潔、像朋友般的口吻回答。
+        `;
+        // 5. 發送給 Gemini
+        const responseText = await getGeminiResponse(visionPrompt, base64Image);
+        
+        removeLoading();
+        const formattedText = responseText.replace(/\n/g, '<br>');
+        appendMessage('ai', formattedText, false);
+
+    } catch (e) {
+        removeLoading();
+        appendMessage('ai', `<span style="color:red">圖片辨識失敗：${e.message}</span>`);
     }
+    
+    // 清空 input
+    event.target.value = '';
+}
 
 // 🟢 正確位置：壓縮函式也一起移出來
 function compressImage(file, maxWidth, quality) {
