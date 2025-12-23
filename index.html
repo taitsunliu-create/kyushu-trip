@@ -2806,21 +2806,6 @@
             </div>
         </div>
     </div>
-    <div id="img-preview-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-title">確認圖片</div>
-            <div style="background:#F3F4F6; padding:10px; border-radius:8px; margin-bottom:15px; display:flex; justify-content:center;">
-                <img id="img-preview-content" style="max-width:100%; max-height:300px; border-radius:4px; object-fit:contain;">
-            </div>
-            <div class="modal-desc" style="font-size:0.85rem; color:#666; margin-bottom:15px;">
-                確認要傳送這張圖片給 AI 進行分析嗎？
-            </div>
-            <div class="modal-btns">
-                <button class="modal-btn btn-cancel" onclick="cancelImagePreview()">取消</button>
-                <button class="modal-btn btn-confirm" onclick="confirmImageAnalysis()">開始辨識</button>
-            </div>
-        </div>
-    </div>
     <!-- Bottom Navigation Bar (6 items now) -->
     
     <nav class="nav-bar">
@@ -3233,27 +3218,22 @@ function getSmartAdviceText(temp, weatherCode) {
             }
 
             try {
-                // 1. 建立基本的 parts 陣列，先放入文字
-                let parts = [
-                    { text: promptText }
-                ];
+                const requestBody = {
+                    contents: [{
+                        parts: [
+                            { text: promptText }
+                        ]
+                    }]
+                };
 
-                // 2. 如果有圖片，使用 unshift 將圖片「插隊」到最前面
                 if (imageBase64) {
-                    parts.unshift({
+                    requestBody.contents[0].parts.push({
                         inline_data: {
                             mime_type: "image/jpeg",
                             data: imageBase64
                         }
                     });
                 }
-
-                // 3. 組合請求內容
-                const requestBody = {
-                    contents: [{
-                        parts: parts
-                    }]
-                };
 
                 // ★ 關鍵修改：使用正確的 Gemini 3 Flash Preview 模型名稱
                 // Release Date: 2025-12-17
@@ -4342,87 +4322,59 @@ function getSmartAdviceText(temp, weatherCode) {
             icon.style.color = '#6B7280';
         }
     }
-    // [新增] 圖片預覽全域變數
-    let pendingImageBase64 = null;
-
-    // [新增] 關閉圖片預覽
-    function cancelImagePreview() {
-        document.getElementById('img-preview-modal').style.display = 'none';
-        pendingImageBase64 = null;
-    }
-
-    // [新增] 確認發送圖片 (原本的邏輯移到這裡)
-    async function confirmImageAnalysis() {
-        if (!pendingImageBase64) return;
-        
-        // 1. 關閉視窗
-        cancelImagePreview();
-        
-        // 2. 顯示讀取中
-        showLoading();
-
-        try {
-            // 3. 在聊天室顯示圖片 (使用者確認後才顯示)
-            const imgHtml = `<img src="data:image/jpeg;base64,${pendingImageBase64}" style="max-width:100%; border-radius:10px; border:1px solid #ccc; margin-top:5px;">`;
-            appendMessage('user', imgHtml);
-
-            // [新增] 讀取目前位置 (從天氣模組獲取)
-            let curLoc = ""; 
-            if (window.appCache && window.appCache['my_location_combined']) {
-                curLoc = window.appCache['my_location_combined'].data.city;
-            }
-
-            // 4. 設定 AI 提示詞
-            const visionPrompt = `
-                ${systemPrompt}
-                
-                【使用者傳送了一張圖片】
-                【使用者目前位置】：${curLoc}
-                
-                任務：請擔任專業導遊與購物助手。
-                請判斷圖片內容並提供協助：
-                1. 若是商品/藥妝/零食：說明這是什麼 (名稱與功效)，並推薦在「${curLoc}」哪裡買得到。
-                2. 若是菜單：翻譯菜名並推薦必吃。
-                3. 若是景點/路牌：告訴我這在哪裡。
-                
-                請用簡潔、像朋友般的口吻回答。
-            `;
-            
-            // 5. 發送給 Gemini
-            const responseText = await getGeminiResponse(visionPrompt, pendingImageBase64);
-            
-            removeLoading();
-            const formattedText = responseText.replace(/\n/g, '<br>');
-            appendMessage('ai', formattedText, false);
-
-        } catch (e) {
-            removeLoading();
-            appendMessage('ai', `<span style="color:red">圖片辨識失敗：${e.message}</span>`);
-        }
-    }
     async function handleImageSelect(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    const file = event.target.files[0];
+    if (!file) return;
 
-        // 1. 壓縮圖片 (但先不發送)
-        // 為了預覽流暢，這裡先做壓縮，如果檔案太大會在這裡處理掉
-        try {
-            pendingImageBase64 = await compressImage(file, 800, 0.7);
-            
-            // 2. 顯示預覽彈窗
-            const previewImg = document.getElementById('img-preview-content');
-            previewImg.src = `data:image/jpeg;base64,${pendingImageBase64}`;
-            
-            document.getElementById('img-preview-modal').style.display = 'flex';
-            
-        } catch (e) {
-            alert("圖片處理失敗，請重試");
-            console.error(e);
-        }
+    // 1. 顯示讀取中
+    showLoading();
+    
+    try {
+        // 2. 壓縮圖片
+        const base64Image = await compressImage(file, 800, 0.7);
         
-        // 3. 清空 input，確保下次選同一張圖也能觸發 change 事件
-        event.target.value = '';
+        // 3. 在聊天室顯示圖片
+        const imgHtml = `<img src="data:image/jpeg;base64,${base64Image}" style="max-width:100%; border-radius:10px; border:1px solid #ccc; margin-top:5px;">`;
+        appendMessage('user', imgHtml);
+
+        // [新增] 讀取目前位置 (從天氣模組獲取)
+        let curLoc = ""; 
+        if (window.appCache && window.appCache['my_location_combined']) {
+            curLoc = window.appCache['my_location_combined'].data.city;
+        }
+
+        // 4. 設定 AI 提示詞 (加入位置資訊)
+        const visionPrompt = `
+            ${systemPrompt}
+            
+            【使用者傳送了一張圖片】
+            【使用者目前位置】：${curLoc}
+            
+            任務：請擔任專業導遊與購物助手。
+            請判斷圖片內容並提供協助：
+            1. 若是商品/藥妝/零食：
+               - 說明這是什麼 (名稱與功效)。
+               - 針對「${curLoc}」這個地點，推薦我去哪裡買 (例如：${curLoc}的車站、藥妝店或超市)。
+            2. 若是菜單：翻譯菜名並推薦必吃。
+            3. 若是景點/路牌：告訴我這在哪裡。
+            
+            請用簡潔、像朋友般的口吻回答。
+        `;
+        // 5. 發送給 Gemini
+        const responseText = await getGeminiResponse(visionPrompt, base64Image);
+        
+        removeLoading();
+        const formattedText = responseText.replace(/\n/g, '<br>');
+        appendMessage('ai', formattedText, false);
+
+    } catch (e) {
+        removeLoading();
+        appendMessage('ai', `<span style="color:red">圖片辨識失敗：${e.message}</span>`);
     }
+    
+    // 清空 input
+    event.target.value = '';
+}
 
 // 🟢 正確位置：壓縮函式也一起移出來
 function compressImage(file, maxWidth, quality) {
