@@ -3304,41 +3304,34 @@ function getSmartAdviceText(temp, weatherCode) {
 // [修改] 取得定位天氣 (同步更新 Header 與 分頁)
 // [修改] 取得定位天氣 (儲存天氣代碼供 AI 讀取)
         // [修改] 取得定位天氣 (防卡死穩定版)
-        // [修改] 智慧定位函式：手機用高精確度，電腦自動降級為一般模式
-        // [修改] 終極定位函式：支援 GPS (手機)、Wi-Fi (筆電) 與 有線網路 (桌機)
-        // [修正版] 混合雙軌定位：手機抓精確、電腦抓 IP，確保 100% 成功率
-        // [智慧定位函式] 完美解決方案：手機優先抓 GPS，電腦自動退回抓 IP
-        // [最終版] 裝置分流定位：電腦模擬舊版行為(IP)，手機啟用高精度(GPS)
         function getLocalWeather() {
-            // 定義 UI 
+            // 定義 UI 元件
             const els = {
                 headerLoc: document.getElementById('header-my-loc'),
                 headerTemp: document.getElementById('header-my-temp'),
                 tabTemp: document.getElementById('wc-my-temp'),
+                // ★ 改用剛剛新增的 ID，確保一定抓得到
                 titleBox: document.getElementById('wc-loc-box') 
             };
-
-            // 1. 檢查瀏覽器支援
+            
+            // 1. 檢查權限與支援度
             if (!navigator.geolocation) {
-                alert('您的瀏覽器不支援定位');
+                alert('您的瀏覽器不支援定位功能');
                 return;
             }
-
-            // UI 顯示
-            if(els.headerLoc) els.headerLoc.innerText = '定位中...';
-            if(els.titleBox) els.titleBox.innerHTML = '<span class="loading-dots">定位中</span>';
-
-            // 2. 判斷裝置類型：是手機嗎？
-            // 如果是 iPhone, Android 等行動裝置，isMobile 會是 true
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            // 策略：手機用 true (高精度)，電腦強制用 false (低精度，像 index_ai 一樣)
-            const useHighAccuracy = isMobile; 
-            
-            console.log(`裝置偵測: ${isMobile ? "手機 (啟用 GPS)" : "電腦 (使用 IP 定位)"}`);
+            // 2. 顯示讀取中狀態
+            if(els.headerLoc) els.headerLoc.innerText = '定位中..';
+            if(els.tabTemp) els.tabTemp.innerText = '...';
+            if(els.titleBox) els.titleBox.innerHTML = `
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span class="loading-dots">定位中</span>
+                </div>`;
 
-            // === 成功邏輯 ===
-            const handleSuccess = async (position) => {
+            // 設定 10 秒超時，避免無限空轉
+            const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
+
+            navigator.geolocation.getCurrentPosition(async (position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 
@@ -3346,32 +3339,51 @@ function getSmartAdviceText(temp, weatherCode) {
                     // A. 抓天氣
                     const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
                     const weatherData = await weatherRes.json();
+                    
                     currentMyTemp = weatherData.current_weather.temperature;
                     const tempStr = `${Math.round(currentMyTemp)}°C`;
-                    const code = weatherData.current_weather.weathercode;
+                    const code = weatherData.current_weather.weathercode; // 記住天氣代碼
                     
-                    // B. AI 解析地名
+                    // B. 解析地名 (嘗試 AI，失敗則回退)
                     let displayZh = "我的位置";
                     try {
-                        // 提示詞
-                        const locationPrompt = `Task: Identify the specific district/township name for ${lat},${lon} (e.g., 竹北市, 新竹市東區, 博多區). Output ONLY the Traditional Chinese name.`;
-                        // 呼叫 AI (設定 10秒 超時)
+                        // 這裡若沒輸入密碼或 AI 失敗，會自動跳到 catch，不會卡住
+                        const locationPrompt = `Task: Identify city name for ${lat},${lon}. Output: "中文". Example: "台北"`;
+                        // 設定一個 3秒 的競賽，如果 AI 太慢就直接放棄，避免卡住
                         const aiPromise = getGeminiResponse(locationPrompt);
-                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000));
+                        /* 修改前 (舊的) */
+//const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000));
+
+/* 修改後 (請複製貼上覆蓋此行) - 延長到 10 秒 */
+const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000));
+
+
                         const aiCity = await Promise.race([aiPromise, timeoutPromise]);
                         if (aiCity) displayZh = aiCity.trim();
                     } catch (e) {
-                        console.warn("AI 解析略過");
+                        console.warn("AI 地名解析略過:", e);
                     }
 
-                    // C. 更新 UI
+                    // --- 更新存檔 (供 AI 情境感知使用) ---
+                    window.appCache = window.appCache || {};
+                    window.appCache['my_location_combined'] = {
+                        timestamp: Date.now(),
+                        data: { temp: currentMyTemp, city: displayZh, code: code }
+                    };
+
+                    // --- 更新 UI ---
+                    // 1. Header 左上角
                     if(els.headerLoc) els.headerLoc.innerText = displayZh;
                     if(els.headerTemp) els.headerTemp.innerText = tempStr;
+                    
+                    // 2. Tab 分頁大溫度
                     if(els.tabTemp) {
                         els.tabTemp.innerText = tempStr;
                         els.tabTemp.style.fontSize = '1.5rem';
                         els.tabTemp.style.color = '#1F2937';
                     }
+
+                    // 3. Tab 圖片旁地名 (使用 ID 更新)
                     if(els.titleBox) {
                         els.titleBox.innerHTML = `
                             <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
@@ -3380,52 +3392,23 @@ function getSmartAdviceText(temp, weatherCode) {
                             </div>`;
                     }
                     
-                    // 存檔與比對
-                    window.appCache = window.appCache || {};
-                    window.appCache['my_location_combined'] = {
-                        timestamp: Date.now(),
-                        data: { temp: currentMyTemp, city: displayZh, code: code }
-                    };
+                    // 4. 觸發溫差比對
                     const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
                     if (targetTempStr !== '--°') updateComparison(parseFloat(targetTempStr));
 
                 } catch (e) {
-                    console.error("處理失敗", e);
+                    console.error("天氣抓取錯誤", e);
                     if(els.headerLoc) els.headerLoc.innerText = '連線失敗';
+                    if(els.titleBox) els.titleBox.innerText = '無法取得資料';
                 }
-            };
-
-            // === 失敗處理 (只針對手機的高精度失敗進行降級) ===
-            const handleError = (err) => {
-                console.warn("定位失敗:", err.code, err.message);
-                
-                // 如果是手機嘗試高精度失敗了，再給它一次機會用低精度
-                if (useHighAccuracy) {
-                    console.log("手機 GPS 失敗，嘗試切換 IP 定位...");
-                    navigator.geolocation.getCurrentPosition(
-                        handleSuccess,
-                        (err2) => {
-                             alert("定位失敗，請確認手機定位服務已開啟。");
-                             if(els.headerLoc) els.headerLoc.innerText = '定位未開';
-                        },
-                        { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 }
-                    );
-                } else {
-                    // 電腦低精度如果也失敗，那就是真的被封鎖或沒網路了
-                    if(els.headerLoc) els.headerLoc.innerText = '無法定位';
-                    alert("電腦無法取得位置，請確認瀏覽器權限。");
-                }
-            };
-
-            // === 3. 開始執行 ===
-            // 這裡使用了變數 useHighAccuracy
-            // 電腦版：useHighAccuracy 為 false -> 行為等同 index_ai (不會報錯)
-            // 手機版：useHighAccuracy 為 true -> 行為等同 index (抓竹北)
-            navigator.geolocation.getCurrentPosition(
-                handleSuccess, 
-                handleError, 
-                { enableHighAccuracy: useHighAccuracy, timeout: 5000, maximumAge: 0 }
-            );
+            }, (err) => {
+                // 定位失敗的處理 (例如使用者拒絕權限)
+                console.warn('定位失敗:', err);
+                if(els.headerLoc) els.headerLoc.innerText = '定位未開';
+                if(els.titleBox) els.titleBox.innerText = '請開啟 GPS';
+                if(els.tabTemp) els.tabTemp.innerText = '--';
+                alert("無法取得您的位置，請確認瀏覽器是否有開啟 GPS 權限。");
+            }, options);
         }
 
         // --- Modal Functions (取代原生 alert/prompt) ---
