@@ -1024,13 +1024,6 @@
             margin-bottom: 5px;
             flex-shrink: 0;
         }
-    /* [最終修正] 強制鎖定 AI 按鈕內的圖示大小 */
-        .btn-mode .icon-sprite {
-            width: 24px !important;
-            height: 24px !important;
-            margin-bottom: 5px;
-            flex-shrink: 0;
-        }
     </style>
 </head>
 <body>
@@ -2694,7 +2687,6 @@
                         </label>
                     </div>
 
-                    <div class="ai-actions-row">
                         <div class="ai-actions-row">
                         <button class="btn-mode consult" onclick="sendToGemini('consult')">
                             <svg class="icon-sprite"><use href="#icon-consult"></use></svg>
@@ -2713,7 +2705,7 @@
                             拍照辨識
                         </button>
                         <input type="file" id="img-upload-input" accept="image/*" onchange="handleImageSelect(event)" style="display: none;">
-                    </div>
+                    
                     </div>
                 </div>
             </div>
