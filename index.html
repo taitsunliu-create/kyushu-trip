@@ -3308,56 +3308,63 @@ function getSmartAdviceText(temp, weatherCode) {
         // [修改] 終極定位函式：支援 GPS (手機)、Wi-Fi (筆電) 與 有線網路 (桌機)
         // [修正版] 混合雙軌定位：手機抓精確、電腦抓 IP，確保 100% 成功率
         // [智慧定位函式] 完美解決方案：手機優先抓 GPS，電腦自動退回抓 IP
+        // [最終版] 裝置分流定位：電腦模擬舊版行為(IP)，手機啟用高精度(GPS)
         function getLocalWeather() {
-            // UI 綁定
+            // 定義 UI 
             const els = {
                 headerLoc: document.getElementById('header-my-loc'),
                 headerTemp: document.getElementById('header-my-temp'),
                 tabTemp: document.getElementById('wc-my-temp'),
                 titleBox: document.getElementById('wc-loc-box') 
             };
-            
-            // 檢查基本支援
+
+            // 1. 檢查瀏覽器支援
             if (!navigator.geolocation) {
-                alert('您的瀏覽器不支援定位功能');
+                alert('您的瀏覽器不支援定位');
                 return;
             }
-            
-            // 顯示讀取狀態
-            if(els.headerLoc) els.headerLoc.innerText = '定位中..';
+
+            // UI 顯示
+            if(els.headerLoc) els.headerLoc.innerText = '定位中...';
             if(els.titleBox) els.titleBox.innerHTML = '<span class="loading-dots">定位中</span>';
 
-            // === 成功後的處理邏輯 (共用) ===
+            // 2. 判斷裝置類型：是手機嗎？
+            // 如果是 iPhone, Android 等行動裝置，isMobile 會是 true
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            // 策略：手機用 true (高精度)，電腦強制用 false (低精度，像 index_ai 一樣)
+            const useHighAccuracy = isMobile; 
+            
+            console.log(`裝置偵測: ${isMobile ? "手機 (啟用 GPS)" : "電腦 (使用 IP 定位)"}`);
+
+            // === 成功邏輯 ===
             const handleSuccess = async (position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                // 用 console 讓您知道現在是用哪種模式成功的
-                console.log(`定位成功 (精度:${position.coords.accuracy}m)`);
                 
                 try {
                     // A. 抓天氣
                     const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
                     const weatherData = await weatherRes.json();
-                    
                     currentMyTemp = weatherData.current_weather.temperature;
                     const tempStr = `${Math.round(currentMyTemp)}°C`;
                     const code = weatherData.current_weather.weathercode;
                     
-                    // B. AI 解析地名 (根據經緯度)
+                    // B. AI 解析地名
                     let displayZh = "我的位置";
                     try {
-                        // 嘗試抓取行政區 (竹北市)
+                        // 提示詞
                         const locationPrompt = `Task: Identify the specific district/township name for ${lat},${lon} (e.g., 竹北市, 新竹市東區, 博多區). Output ONLY the Traditional Chinese name.`;
+                        // 呼叫 AI (設定 10秒 超時)
                         const aiPromise = getGeminiResponse(locationPrompt);
-                        // 10秒 AI 超時設定
                         const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000));
                         const aiCity = await Promise.race([aiPromise, timeoutPromise]);
                         if (aiCity) displayZh = aiCity.trim();
                     } catch (e) {
-                        console.warn("AI 地名解析失敗，使用預設值");
+                        console.warn("AI 解析略過");
                     }
 
-                    // 更新畫面
+                    // C. 更新 UI
                     if(els.headerLoc) els.headerLoc.innerText = displayZh;
                     if(els.headerTemp) els.headerTemp.innerText = tempStr;
                     if(els.tabTemp) {
@@ -3373,52 +3380,51 @@ function getSmartAdviceText(temp, weatherCode) {
                             </div>`;
                     }
                     
-                    // 儲存資料
+                    // 存檔與比對
                     window.appCache = window.appCache || {};
                     window.appCache['my_location_combined'] = {
                         timestamp: Date.now(),
                         data: { temp: currentMyTemp, city: displayZh, code: code }
                     };
-                    
                     const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
                     if (targetTempStr !== '--°') updateComparison(parseFloat(targetTempStr));
 
                 } catch (e) {
-                    console.error("抓取失敗", e);
-                    if(els.headerLoc) els.headerLoc.innerText = '連線錯誤';
+                    console.error("處理失敗", e);
+                    if(els.headerLoc) els.headerLoc.innerText = '連線失敗';
                 }
             };
 
-            // === B 計畫：低精確度模式 (電腦用) ===
-            const useLowAccuracyMode = () => {
-                console.log('切換至一般定位模式 (模擬 index_ai 的行為)...');
-                navigator.geolocation.getCurrentPosition(
-                    handleSuccess, // 成功也是跑一樣的流程
-                    (err) => {
-                        console.error('一般模式也失敗:', err);
-                        alert("無法取得位置。請確認您的瀏覽器是否有開啟定位權限。");
-                        if(els.headerLoc) els.headerLoc.innerText = '定位未開';
-                    },
-                    { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 } // 這裡就是 index_ai 的設定
-                );
+            // === 失敗處理 (只針對手機的高精度失敗進行降級) ===
+            const handleError = (err) => {
+                console.warn("定位失敗:", err.code, err.message);
+                
+                // 如果是手機嘗試高精度失敗了，再給它一次機會用低精度
+                if (useHighAccuracy) {
+                    console.log("手機 GPS 失敗，嘗試切換 IP 定位...");
+                    navigator.geolocation.getCurrentPosition(
+                        handleSuccess,
+                        (err2) => {
+                             alert("定位失敗，請確認手機定位服務已開啟。");
+                             if(els.headerLoc) els.headerLoc.innerText = '定位未開';
+                        },
+                        { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 }
+                    );
+                } else {
+                    // 電腦低精度如果也失敗，那就是真的被封鎖或沒網路了
+                    if(els.headerLoc) els.headerLoc.innerText = '無法定位';
+                    alert("電腦無法取得位置，請確認瀏覽器權限。");
+                }
             };
 
-            // === 執行入口 ===
-            // 1. 先嘗試高精確度 (給手機用)
-            // 設定 3秒 超時，如果電腦 3秒 抓不到 GPS，就會報錯並自動跳去 useLowAccuracyMode
+            // === 3. 開始執行 ===
+            // 這裡使用了變數 useHighAccuracy
+            // 電腦版：useHighAccuracy 為 false -> 行為等同 index_ai (不會報錯)
+            // 手機版：useHighAccuracy 為 true -> 行為等同 index (抓竹北)
             navigator.geolocation.getCurrentPosition(
                 handleSuccess, 
-                (err) => {
-                    console.warn("高精確度失敗 (可能是電腦)，切換 B 計畫...");
-                    // 只要不是「使用者拒絕 (code 1)」，就自動嘗試 B 計畫
-                    if (err.code !== 1) {
-                        useLowAccuracyMode();
-                    } else {
-                        alert("您封鎖了位置權限，請手動開啟。");
-                        if(els.headerLoc) els.headerLoc.innerText = '權限不足';
-                    }
-                }, 
-                { enableHighAccuracy: true, timeout: 3000, maximumAge: 0 }
+                handleError, 
+                { enableHighAccuracy: useHighAccuracy, timeout: 5000, maximumAge: 0 }
             );
         }
 
