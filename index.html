@@ -248,14 +248,15 @@
         /* 手機版微調 */
         @media (max-width: 600px) {
             .hw-col-my-loc {
-        padding-right: 8px;
-        margin-right: 0;
-        border-right: 1px solid rgba(255,255,255,0.2); /* 手機版保留分隔線 */
-        
-        /* [新增] 下面這兩行是解決擠壓的關鍵 */
-        min-width: 90px;  /* 強制給予足夠寬度，避免文字折行 */
-        white-space: nowrap; /* 禁止文字換行 */
-    }
+                padding-right: 8px;
+                margin-right: 0;
+                border-right: 1px solid rgba(255,255,255,0.2); 
+                
+                /* [新增] 下面這兩行是解決擠壓的關鍵 */
+                min-width: auto;  /* [修正] 改為 auto，讓寬度隨內容調整 */
+                flex-shrink: 0;   /* [新增] 防止內容被擠扁 */
+                white-space: nowrap; /* 禁止文字換行 */
+            }
         }
         .hw-col-loc {
             padding-right: 15px;
@@ -948,7 +949,16 @@
             60% { content: ' ...'; }
             80%, 100% { content: ' ....'; }
         }
-
+/* [新增] SVG Sprite 通用樣式 */
+        .icon-sprite {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
         /* Mobile Optimization */
         @media (max-width: 600px) {
             .container { padding: 15px 12px; } /* Adjust padding */
@@ -1008,10 +1018,100 @@
             /* Price Table scrollable if needed */
             .price-table { font-size: 0.85rem; }
         }
+        /* [最終修正] 強制限制 AI 按鈕圖示大小 */
+        .btn-mode .icon-sprite {
+            width: 24px !important;
+            height: 24px !important;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
+<svg style="display: none;">
+        <defs>
+            <symbol id="icon-schedule" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </symbol>
+            
+            <symbol id="icon-stay" viewBox="0 0 24 24">
+                <path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"></path>
+            </symbol>
+            
+            <symbol id="icon-car" viewBox="0 0 24 24">
+                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+                <circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>
+                <path d="M5 17h2"/><path d="M15 17h2"/>
+            </symbol>
+            
+            <symbol id="icon-info" viewBox="0 0 24 24">
+                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+                <path d="M9 18h6"/><path d="M10 22h4"/>
+            </symbol>
+            
+            <symbol id="icon-weather" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="5"></circle>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+            </symbol>
+            
+            <symbol id="icon-ai" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+            </symbol>
+            <symbol id="icon-consult" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </symbol>
 
+            <symbol id="icon-trans" viewBox="0 0 24 24">
+                <path d="M7 10h14"></path>
+                <path d="M17 6l4 4-4 4"></path>
+                <path d="M17 14H3"></path>
+                <path d="M7 18l-4-4 4-4"></path>
+            </symbol>
+
+            <symbol id="icon-voice" viewBox="0 0 24 24">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+            </symbol>
+
+            <symbol id="icon-camera" viewBox="0 0 24 24">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+            </symbol>
+
+            <symbol id="icon-loc" viewBox="0 0 24 24">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+            </symbol>
+            <symbol id="icon-earth" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </symbol>
+
+            <symbol id="icon-temp" viewBox="0 0 24 24">
+                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+            </symbol>
+
+            <symbol id="icon-shirt" viewBox="0 0 24 24">
+                <path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path>
+            </symbol>
+
+            <symbol id="icon-reset" viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </symbol>
+
+            <symbol id="icon-nav-arrow" viewBox="0 0 24 24">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </symbol>
+        </defs>
+    </svg>
     <header>
         <div class="header-content">
             <div class="header-title-area">
@@ -1025,7 +1125,7 @@
                 
                 <div class="hw-col-my-loc" id="hw-my-loc-box" onclick="getLocalWeather()">
                     <div class="hw-sub-label">
-                        <svg class="icon-mini" style="width:12px;height:12px;vertical-align:text-top;" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                        <svg class="icon-mini" style="width:12px;height:12px;vertical-align:text-top;"><use href="#icon-nav-arrow"></use></svg>
                         我的位置
                     </div>
                     <div class="hw-my-data">
@@ -2541,10 +2641,7 @@
             </div>
           <div style="text-align: right; margin-bottom: 5px; padding-right: 5px;">
     <button onclick="resetAppPassword()" style="border: none; background: none; color: #EF4444; font-size: 0.85rem; cursor: pointer; text-decoration: underline; display: inline-flex; align-items: center;">
-        <svg style="width: 14px; height: 14px; margin-right: 4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-        </svg>
+        <svg style="width: 14px; height: 14px; margin-right: 4px; fill:none; stroke:currentColor; stroke-width:2;"><use href="#icon-reset"></use></svg>
         重設金鑰密碼
             </button>
         </div>
@@ -2591,25 +2688,25 @@
                         </label>
                     </div>
 
-                    <div class="ai-actions-row">
+                        <div class="ai-actions-row">
                         <button class="btn-mode consult" onclick="sendToGemini('consult')">
-                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                            <svg class="icon-sprite"><use href="#icon-consult"></use></svg>
                             行程諮詢
                         </button>
                         <button class="btn-mode trans" onclick="sendToGemini('translate')">
-                            <svg viewBox="0 0 24 24"><path d="M7 10h14"></path><path d="M17 6l4 4-4 4"></path><path d="M17 14H3"></path><path d="M7 18l-4-4 4-4"></path></svg>
+                            <svg class="icon-sprite"><use href="#icon-trans"></use></svg>
                             中/日翻譯
                         </button>
-                        <!-- Voice Button -->
                         <button class="btn-mode voice" id="btn-voice-ja">
-                            <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                            <svg class="icon-sprite"><use href="#icon-voice"></use></svg>
                             語音輸入
                         </button>
                         <button class="btn-mode camera" onclick="document.getElementById('img-upload-input').click()">
-                            <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            <svg class="icon-sprite"><use href="#icon-camera"></use></svg>
                             拍照辨識
                         </button>
-                        <input type="file" id="img-upload-input" accept="image/*" onchange="handleImageSelect(event)">
+                        <input type="file" id="img-upload-input" accept="image/*" onchange="handleImageSelect(event)" style="display: none;">
+                    
                     </div>
                 </div>
             </div>
@@ -2626,7 +2723,7 @@
             <div class="card-header">
                 <!-- 修正 1: 將 Emoji 🌍 換成簡約 SVG 地球圖示 -->
                 <div class="card-title" style="display: flex; align-items: center; gap: 6px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    <svg class="icon-mini" style="color: var(--primary);"><use href="#icon-earth"></use></svg>
                     即時天氣查詢 & 穿衣建議
                 </div>
             </div>
@@ -2649,7 +2746,7 @@
                     <div class="wc-mini-card" onclick="getLocalWeather()" style="cursor:pointer; background:#F9FAFB;">
                         <!-- 修正 1: 我的位置圖示 (Pin) -->
                         <div id="wc-loc-box" class="wc-mini-title" style="display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="getLocalWeather()">
-    <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+    <svg class="icon-mini" style="color: #EF4444;"><use href="#icon-loc"></use></svg>
     <span>我的位置 (點擊更新)</span>
 </div>
                         <div class="wc-mini-temp" id="wc-my-temp">--°</div>
@@ -2657,7 +2754,7 @@
                     <div class="wc-mini-card">
                         <!-- 修正 2: 溫差對比圖示 (Thermometer) -->
                         <div class="wc-mini-title" style="display: flex; align-items: center; justify-content: center;">
-                            <svg class="icon-mini" style="color: #3B82F6;" viewBox="0 0 24 24"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg>
+                            <svg class="icon-mini" style="color: #3B82F6;"><use href="#icon-temp"></use></svg>
                             溫差對比
                         </div>
                         <div id="wc-diff-tag" class="wc-diff-tag" style="display:none;">--</div>
@@ -2669,7 +2766,7 @@
                 <div class="advice-box">
                     <!-- 修正 3: 穿衣建議圖示 (Shirt) -->
                     <strong style="display: flex; align-items: center; gap: 4px;">
-                        <svg class="icon-mini" style="color: #059669;" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>
+                        <svg class="icon-mini" style="color: #059669;"><use href="#icon-shirt"></use></svg>
                         AI 穿衣建議：
                     </strong>
                     <div style="margin-top: 5px;" id="wc-advice">分析氣候數據中...</div>
@@ -2716,46 +2813,59 @@
             </div>
         </div>
     </div>
+    <div id="img-preview-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title">確認圖片</div>
+            <div style="background:#F3F4F6; padding:10px; border-radius:8px; margin-bottom:15px; display:flex; justify-content:center;">
+                <img id="img-preview-content" style="max-width:100%; max-height:300px; border-radius:4px; object-fit:contain;">
+            </div>
+            <div class="modal-desc" style="font-size:0.85rem; color:#666; margin-bottom:15px;">
+                確認要傳送這張圖片給 AI 進行分析嗎？
+            </div>
+            <div class="modal-btns">
+                <button class="modal-btn btn-cancel" onclick="cancelImagePreview()">取消</button>
+                <button class="modal-btn btn-confirm" onclick="confirmImageAnalysis()">開始辨識</button>
+            </div>
+        </div>
+    </div>
     <!-- Bottom Navigation Bar (6 items now) -->
     
     <nav class="nav-bar">
         <div class="nav-item active" data-target="view-schedule" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <svg class="icon-sprite"><use href="#icon-schedule"></use></svg>
             </span>
             行程表
         </div>
         <div class="nav-item" data-target="view-stay" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"></path></svg>
+                <svg class="icon-sprite"><use href="#icon-stay"></use></svg>
             </span>
             住宿資訊
         </div>
         <div class="nav-item" data-target="view-car" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17h2"/><path d="M15 17h2"/></svg>
+                <svg class="icon-sprite"><use href="#icon-car"></use></svg>
             </span>
             交通資訊
         </div>
         <div class="nav-item" data-target="view-info" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                <svg class="icon-sprite"><use href="#icon-info"></use></svg>
             </span>
             旅遊資訊
         </div>
         
-        <!-- 調整順序: 先放天氣 -->
         <div class="nav-item" data-target="view-weather" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+                <svg class="icon-sprite"><use href="#icon-weather"></use></svg>
             </span>
             即時天氣
         </div>
 
-        <!-- 調整順序: AI 助手放到最後 -->
         <div class="nav-item" data-target="view-ai" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                <svg class="icon-sprite"><use href="#icon-ai"></use></svg>
             </span>
             AI 助手
         </div>
@@ -2876,34 +2986,59 @@ function getDecryptedKey() {
         // [修改 2] 讓 Widget 支援非同步讀取與 Loading 狀態
         // [新增] 通用快取抓取函式 (10分鐘快取機制)
 // [新增] 全域快取變數 (重新整理網頁後會自動清空，符合您的需求)
-        window.appCache = {}; 
-
-        // [修改] 通用快取抓取函式 (使用記憶體變數)
-        async function fetchWithCache(url, cacheKey) {
-            const CACHE_TIME = 10 * 60 * 1000; // 10分鐘 (毫秒)
-            const now = Date.now();
-            
-            // 1. 檢查 記憶體變數 中是否有資料
-            if (window.appCache[cacheKey]) {
-                const record = window.appCache[cacheKey];
-                // 2. 檢查是否在 10 分鐘內
-                if (now - record.timestamp < CACHE_TIME) {
-                    console.log(`[省流] 使用記憶體快取: ${cacheKey}`);
-                    return record.data; // 直接回傳舊資料
+        // [API 省流優化] 統一快取管理系統 (LocalStorage 版)
+        const CACHE_SYSTEM = {
+            // 存入資料 (預設 TTL 為 30 分鐘)
+            save: (key, data, ttlMinutes = 30) => { 
+                try {
+                    const record = {
+                        timestamp: Date.now(),
+                        expiry: ttlMinutes * 60 * 1000,
+                        data: data
+                    };
+                    localStorage.setItem(key, JSON.stringify(record));
+                } catch (e) {
+                    console.warn("LocalStorage 儲存失敗 (可能是容量已滿)", e);
+                }
+            },
+            // 讀取資料
+            get: (key) => {
+                const json = localStorage.getItem(key);
+                if (!json) return null;
+                
+                try {
+                    const record = JSON.parse(json);
+                    const now = Date.now();
+                    
+                    // 檢查是否過期
+                    if (now - record.timestamp > record.expiry) {
+                        console.log(`[快取過期] ${key} 已清除`);
+                        localStorage.removeItem(key);
+                        return null;
+                    }
+                    
+                    console.log(`[省流模式] 讀取 LocalStorage: ${key}`);
+                    return record.data;
+                } catch (e) {
+                    return null;
                 }
             }
+        };
 
-            // 3. 若無資料或已過期，呼叫 API
+        // [修改] 支援 LocalStorage 的 Fetch 函式
+        async function fetchWithCache(url, cacheKey) {
+            // 1. 先查快取
+            const cachedData = CACHE_SYSTEM.get(cacheKey);
+            if (cachedData) return cachedData;
+
+            // 2. 無快取則呼叫 API
             console.log(`[API消耗] 呼叫網路: ${url}`);
             try {
                 const res = await fetch(url);
                 const data = await res.json();
-
-                // 4. 存入記憶體變數
-                window.appCache[cacheKey] = {
-                    timestamp: now,
-                    data: data
-                };
+                
+                // 3. 存入快取 (天氣資料存 20 分鐘)
+                CACHE_SYSTEM.save(cacheKey, data, 20); 
                 return data;
             } catch (e) {
                 console.error("Fetch Error:", e);
@@ -3105,22 +3240,27 @@ function getSmartAdviceText(temp, weatherCode) {
             }
 
             try {
-                const requestBody = {
-                    contents: [{
-                        parts: [
-                            { text: promptText }
-                        ]
-                    }]
-                };
+                // 1. 建立基本的 parts 陣列，先放入文字
+                let parts = [
+                    { text: promptText }
+                ];
 
+                // 2. 如果有圖片，使用 unshift 將圖片「插隊」到最前面
                 if (imageBase64) {
-                    requestBody.contents[0].parts.push({
+                    parts.unshift({
                         inline_data: {
                             mime_type: "image/jpeg",
                             data: imageBase64
                         }
                     });
                 }
+
+                // 3. 組合請求內容
+                const requestBody = {
+                    contents: [{
+                        parts: parts
+                    }]
+                };
 
                 // ★ 關鍵修改：使用正確的 Gemini 3 Flash Preview 模型名稱
                 // Release Date: 2025-12-17
@@ -3181,27 +3321,42 @@ function getSmartAdviceText(temp, weatherCode) {
                 }
 
                 // 步驟 2: 如果對照表沒有，請求 AI 在背景翻譯 (您的新想法!)
+                // 步驟 2: AI 背景翻譯 (已加入永久快取)
                 if (!isTranslated) {
-                    document.getElementById('wc-desc').innerText = '🔍 AI 正在翻譯地名...';
-                    
-                    const translatePrompt = `
-                        Task: Translate the place name "${rawInput}" into its official English Romanization name for using in a Weather API.
-                        Target: Japan locations.
-                        Rule: Output ONLY the English name. No explanations.
-                        Example: "黑川溫泉" -> "Minamioguni" (or Kurokawa Onsen), "由布院" -> "Yufuin".
-                    `;
-                    
-                    try {
-                        const aiTranslation = await getGeminiResponse(translatePrompt);
-                        // 簡單驗證回傳是否為英文
-                        if (/^[a-zA-Z\s\-,]+$/.test(aiTranslation)) {
-                            searchTerm = aiTranslation;
-                            isTranslated = true;
-                            console.log("AI 翻譯結果:", searchTerm);
-                            document.getElementById('wc-desc').innerText = `搜尋: ${searchTerm}...`;
+                    // [新增] 先查快取 (金鑰: city_trans_中文名)
+                    const cacheKey = `city_trans_${rawInput}`;
+                    const cachedName = CACHE_SYSTEM.get(cacheKey);
+
+                    if (cachedName) {
+                        searchTerm = cachedName;
+                        isTranslated = true;
+                        console.log("使用快取地名:", searchTerm);
+                        document.getElementById('wc-desc').innerText = `搜尋: ${searchTerm} (快取)`;
+                    } else {
+                        // 無快取，才呼叫 AI
+                        document.getElementById('wc-desc').innerText = '🔍 AI 正在翻譯地名...';
+                        
+                        const translatePrompt = `
+                            Task: Translate the place name "${rawInput}" into its official English Romanization name for using in a Weather API.
+                            Target: Global locations (Focus on Taiwan/Japan).
+                            Rule: Output ONLY the English name. No explanations.
+                            Example: "台北" -> "Taipei", "由布院" -> "Yufuin", "新竹" -> "Hsinchu".
+                        `;
+                        
+                        try {
+                            const aiTranslation = await getGeminiResponse(translatePrompt);
+                            if (/^[a-zA-Z\s\-,]+$/.test(aiTranslation)) {
+                                searchTerm = aiTranslation;
+                                isTranslated = true;
+                                console.log("AI 翻譯結果:", searchTerm);
+                                document.getElementById('wc-desc').innerText = `搜尋: ${searchTerm}...`;
+                                
+                                // [新增] 翻譯成功後，存入快取 (保存 24 小時 = 1440 分鐘)
+                                CACHE_SYSTEM.save(cacheKey, searchTerm, 1440);
+                            }
+                        } catch (e) {
+                            console.warn("AI 翻譯失敗，嘗試使用原始中文搜尋");
                         }
-                    } catch (e) {
-                        console.warn("AI 翻譯失敗，嘗試使用原始中文搜尋");
                     }
                 }
 
@@ -3304,34 +3459,41 @@ function getSmartAdviceText(temp, weatherCode) {
 // [修改] 取得定位天氣 (同步更新 Header 與 分頁)
 // [修改] 取得定位天氣 (儲存天氣代碼供 AI 讀取)
         // [修改] 取得定位天氣 (防卡死穩定版)
+        // [修改] 智慧定位函式：手機用高精確度，電腦自動降級為一般模式
+        // [修改] 終極定位函式：支援 GPS (手機)、Wi-Fi (筆電) 與 有線網路 (桌機)
+        // [修正版] 混合雙軌定位：手機抓精確、電腦抓 IP，確保 100% 成功率
+        // [智慧定位函式] 完美解決方案：手機優先抓 GPS，電腦自動退回抓 IP
+        // [最終版] 裝置分流定位：電腦模擬舊版行為(IP)，手機啟用高精度(GPS)
         function getLocalWeather() {
-            // 定義 UI 元件
+            // 定義 UI 
             const els = {
                 headerLoc: document.getElementById('header-my-loc'),
                 headerTemp: document.getElementById('header-my-temp'),
                 tabTemp: document.getElementById('wc-my-temp'),
-                // ★ 改用剛剛新增的 ID，確保一定抓得到
                 titleBox: document.getElementById('wc-loc-box') 
             };
-            
-            // 1. 檢查權限與支援度
+
+            // 1. 檢查瀏覽器支援
             if (!navigator.geolocation) {
-                alert('您的瀏覽器不支援定位功能');
+                alert('您的瀏覽器不支援定位');
                 return;
             }
+
+            // UI 顯示
+            if(els.headerLoc) els.headerLoc.innerText = '定位中...';
+            if(els.titleBox) els.titleBox.innerHTML = '<span class="loading-dots">定位中</span>';
+
+            // 2. 判斷裝置類型：是手機嗎？
+            // 如果是 iPhone, Android 等行動裝置，isMobile 會是 true
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            // 2. 顯示讀取中狀態
-            if(els.headerLoc) els.headerLoc.innerText = '定位中..';
-            if(els.tabTemp) els.tabTemp.innerText = '...';
-            if(els.titleBox) els.titleBox.innerHTML = `
-                <div style="display:flex; align-items:center; gap:4px;">
-                    <span class="loading-dots">定位中</span>
-                </div>`;
+            // 策略：手機用 true (高精度)，電腦強制用 false (低精度，像 index_ai 一樣)
+            const useHighAccuracy = isMobile; 
+            
+            console.log(`裝置偵測: ${isMobile ? "手機 (啟用 GPS)" : "電腦 (使用 IP 定位)"}`);
 
-            // 設定 10 秒超時，避免無限空轉
-            const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
-
-            navigator.geolocation.getCurrentPosition(async (position) => {
+            // === 成功邏輯 ===
+            const handleSuccess = async (position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 
@@ -3339,51 +3501,32 @@ function getSmartAdviceText(temp, weatherCode) {
                     // A. 抓天氣
                     const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
                     const weatherData = await weatherRes.json();
-                    
                     currentMyTemp = weatherData.current_weather.temperature;
                     const tempStr = `${Math.round(currentMyTemp)}°C`;
-                    const code = weatherData.current_weather.weathercode; // 記住天氣代碼
+                    const code = weatherData.current_weather.weathercode;
                     
-                    // B. 解析地名 (嘗試 AI，失敗則回退)
+                    // B. AI 解析地名
                     let displayZh = "我的位置";
                     try {
-                        // 這裡若沒輸入密碼或 AI 失敗，會自動跳到 catch，不會卡住
-                        const locationPrompt = `Task: Identify city name for ${lat},${lon}. Output: "中文". Example: "台北"`;
-                        // 設定一個 3秒 的競賽，如果 AI 太慢就直接放棄，避免卡住
+                        // 提示詞
+                        const locationPrompt = `Task: Identify the specific district/township name for ${lat},${lon} (e.g., 竹北市, 新竹市東區, 博多區). Output ONLY the Traditional Chinese name.`;
+                        // 呼叫 AI (設定 10秒 超時)
                         const aiPromise = getGeminiResponse(locationPrompt);
-                        /* 修改前 (舊的) */
-//const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000));
-
-/* 修改後 (請複製貼上覆蓋此行) - 延長到 10 秒 */
-const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000));
-
-
+                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000));
                         const aiCity = await Promise.race([aiPromise, timeoutPromise]);
                         if (aiCity) displayZh = aiCity.trim();
                     } catch (e) {
-                        console.warn("AI 地名解析略過:", e);
+                        console.warn("AI 解析略過");
                     }
 
-                    // --- 更新存檔 (供 AI 情境感知使用) ---
-                    window.appCache = window.appCache || {};
-                    window.appCache['my_location_combined'] = {
-                        timestamp: Date.now(),
-                        data: { temp: currentMyTemp, city: displayZh, code: code }
-                    };
-
-                    // --- 更新 UI ---
-                    // 1. Header 左上角
+                    // C. 更新 UI
                     if(els.headerLoc) els.headerLoc.innerText = displayZh;
                     if(els.headerTemp) els.headerTemp.innerText = tempStr;
-                    
-                    // 2. Tab 分頁大溫度
                     if(els.tabTemp) {
                         els.tabTemp.innerText = tempStr;
                         els.tabTemp.style.fontSize = '1.5rem';
                         els.tabTemp.style.color = '#1F2937';
                     }
-
-                    // 3. Tab 圖片旁地名 (使用 ID 更新)
                     if(els.titleBox) {
                         els.titleBox.innerHTML = `
                             <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
@@ -3392,23 +3535,52 @@ const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Er
                             </div>`;
                     }
                     
-                    // 4. 觸發溫差比對
+                    // 存檔與比對
+                    window.appCache = window.appCache || {};
+                    window.appCache['my_location_combined'] = {
+                        timestamp: Date.now(),
+                        data: { temp: currentMyTemp, city: displayZh, code: code }
+                    };
                     const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
                     if (targetTempStr !== '--°') updateComparison(parseFloat(targetTempStr));
 
                 } catch (e) {
-                    console.error("天氣抓取錯誤", e);
+                    console.error("處理失敗", e);
                     if(els.headerLoc) els.headerLoc.innerText = '連線失敗';
-                    if(els.titleBox) els.titleBox.innerText = '無法取得資料';
                 }
-            }, (err) => {
-                // 定位失敗的處理 (例如使用者拒絕權限)
-                console.warn('定位失敗:', err);
-                if(els.headerLoc) els.headerLoc.innerText = '定位未開';
-                if(els.titleBox) els.titleBox.innerText = '請開啟 GPS';
-                if(els.tabTemp) els.tabTemp.innerText = '--';
-                alert("無法取得您的位置，請確認瀏覽器是否有開啟 GPS 權限。");
-            }, options);
+            };
+
+            // === 失敗處理 (只針對手機的高精度失敗進行降級) ===
+            const handleError = (err) => {
+                console.warn("定位失敗:", err.code, err.message);
+                
+                // 如果是手機嘗試高精度失敗了，再給它一次機會用低精度
+                if (useHighAccuracy) {
+                    console.log("手機 GPS 失敗，嘗試切換 IP 定位...");
+                    navigator.geolocation.getCurrentPosition(
+                        handleSuccess,
+                        (err2) => {
+                             alert("定位失敗，請確認手機定位服務已開啟。");
+                             if(els.headerLoc) els.headerLoc.innerText = '定位未開';
+                        },
+                        { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 }
+                    );
+                } else {
+                    // 電腦低精度如果也失敗，那就是真的被封鎖或沒網路了
+                    if(els.headerLoc) els.headerLoc.innerText = '無法定位';
+                    alert("電腦無法取得位置，請確認瀏覽器權限。");
+                }
+            };
+
+            // === 3. 開始執行 ===
+            // 這裡使用了變數 useHighAccuracy
+            // 電腦版：useHighAccuracy 為 false -> 行為等同 index_ai (不會報錯)
+            // 手機版：useHighAccuracy 為 true -> 行為等同 index (抓竹北)
+            navigator.geolocation.getCurrentPosition(
+                handleSuccess, 
+                handleError, 
+                { enableHighAccuracy: useHighAccuracy, timeout: 5000, maximumAge: 0 }
+            );
         }
 
         // --- Modal Functions (取代原生 alert/prompt) ---
@@ -3660,6 +3832,19 @@ const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Er
         }
 
         async function askAiWeatherAdvice(city, temp, condition) {
+            // [新增] 1. 產生快取金鑰 (地點 + 氣溫整數 + 天氣狀況)
+            // 這樣如果溫度只差 0.1 度，或是天氣一樣，就不用重新問 AI
+            const cacheKey = `ai_advice_${city}_${Math.round(temp)}_${condition}`;
+            
+            // [新增] 2. 先查快取
+            const cachedAdvice = CACHE_SYSTEM.get(cacheKey);
+            if (cachedAdvice) {
+                console.log("使用快取穿衣建議");
+                document.getElementById('wc-advice').innerText = cachedAdvice;
+                return;
+            }
+
+            // 無快取，才執行 AI 請求
             const prompt = `
                 現在${city}的即時氣溫是 ${temp}度，天氣狀況為${condition}。
                 請以「旅遊小秘書」的口吻，給予台灣旅客簡短的穿衣建議（約50字）。
@@ -3667,9 +3852,12 @@ const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Er
             `;
             
             try {
-                // 改用新的共用函數
                 const text = await getGeminiResponse(prompt);
                 document.getElementById('wc-advice').innerText = text;
+                
+                // [新增] 3. 存入快取 (保存 60 分鐘)
+                CACHE_SYSTEM.save(cacheKey, text, 30);
+                
             } catch (e) {
                 document.getElementById('wc-advice').innerText = 'AI 連線逾時，建議洋蔥式穿搭。';
             }
@@ -4161,59 +4349,89 @@ const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Er
             icon.style.color = '#6B7280';
         }
     }
-    async function handleImageSelect(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+    // [新增] 圖片預覽全域變數
+    let pendingImageBase64 = null;
 
-    // 1. 顯示讀取中
-    showLoading();
-    
-    try {
-        // 2. 壓縮圖片
-        const base64Image = await compressImage(file, 800, 0.7);
-        
-        // 3. 在聊天室顯示圖片
-        const imgHtml = `<img src="data:image/jpeg;base64,${base64Image}" style="max-width:100%; border-radius:10px; border:1px solid #ccc; margin-top:5px;">`;
-        appendMessage('user', imgHtml);
-
-        // [新增] 讀取目前位置 (從天氣模組獲取)
-        let curLoc = ""; 
-        if (window.appCache && window.appCache['my_location_combined']) {
-            curLoc = window.appCache['my_location_combined'].data.city;
-        }
-
-        // 4. 設定 AI 提示詞 (加入位置資訊)
-        const visionPrompt = `
-            ${systemPrompt}
-            
-            【使用者傳送了一張圖片】
-            【使用者目前位置】：${curLoc}
-            
-            任務：請擔任專業導遊與購物助手。
-            請判斷圖片內容並提供協助：
-            1. 若是商品/藥妝/零食：
-               - 說明這是什麼 (名稱與功效)。
-               - 針對「${curLoc}」這個地點，推薦我去哪裡買 (例如：${curLoc}的車站、藥妝店或超市)。
-            2. 若是菜單：翻譯菜名並推薦必吃。
-            3. 若是景點/路牌：告訴我這在哪裡。
-            
-            請用簡潔、像朋友般的口吻回答。
-        `;
-        // 5. 發送給 Gemini
-        const responseText = await getGeminiResponse(visionPrompt, base64Image);
-        
-        removeLoading();
-        const formattedText = responseText.replace(/\n/g, '<br>');
-        appendMessage('ai', formattedText, false);
-
-    } catch (e) {
-        removeLoading();
-        appendMessage('ai', `<span style="color:red">圖片辨識失敗：${e.message}</span>`);
+    // [新增] 關閉圖片預覽
+    function cancelImagePreview() {
+        document.getElementById('img-preview-modal').style.display = 'none';
+        pendingImageBase64 = null;
     }
-    
-    // 清空 input
-    event.target.value = '';
-}
+
+    // [新增] 確認發送圖片 (原本的邏輯移到這裡)
+    async function confirmImageAnalysis() {
+        if (!pendingImageBase64) return;
+        
+        // [修正] 1. 移除這裡的 cancelImagePreview();
+        // 不要在一開始就清除資料！
+        
+        // 2. 先把視窗隱藏起來就好 (視覺上關閉，但不要清空變數)
+        document.getElementById('img-preview-modal').style.display = 'none';
+
+        showLoading();
+
+        try {
+            // 3. 在聊天室顯示圖片
+            const imgHtml = `<img src="data:image/jpeg;base64,${pendingImageBase64}" style="max-width:100%; border-radius:10px; border:1px solid #ccc; margin-top:5px;">`;
+            appendMessage('user', imgHtml);
+
+            // 讀取位置
+            let curLoc = ""; 
+            if (window.appCache && window.appCache['my_location_combined']) {
+                curLoc = window.appCache['my_location_combined'].data.city;
+            }
+
+            // 設定 Prompt
+            const visionPrompt = `
+                ${systemPrompt}
+                【使用者傳送了一張圖片】
+                【使用者目前位置】：${curLoc}
+                任務：請擔任專業導遊與購物助手。
+                請判斷圖片內容並提供協助：
+                1. 若是商品/藥妝/零食：說明這是什麼 (名稱與功效)，並推薦在「${curLoc}」哪裡買得到。
+                2. 若是菜單：翻譯菜名並推薦必吃。
+                3. 若是景點/路牌：告訴我這在哪裡。
+                請用簡潔、像朋友般的口吻回答。
+            `;
+            
+            // 4. 發送 API (這時候 pendingImageBase64 還有值，所以會成功)
+            const responseText = await getGeminiResponse(visionPrompt, pendingImageBase64);
+            
+            removeLoading();
+            const formattedText = responseText.replace(/\n/g, '<br>');
+            appendMessage('ai', formattedText, false);
+
+        } catch (e) {
+            removeLoading();
+            appendMessage('ai', `<span style="color:red">圖片辨識失敗：${e.message}</span>`);
+        } finally {
+            // [修正] 5. 無論成功或失敗，最後才真正清空變數
+            pendingImageBase64 = null;
+        }
+    }
+    async function handleImageSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // 1. 壓縮圖片 (但先不發送)
+        // 為了預覽流暢，這裡先做壓縮，如果檔案太大會在這裡處理掉
+        try {
+            pendingImageBase64 = await compressImage(file, 800, 0.7);
+            
+            // 2. 顯示預覽彈窗
+            const previewImg = document.getElementById('img-preview-content');
+            previewImg.src = `data:image/jpeg;base64,${pendingImageBase64}`;
+            
+            document.getElementById('img-preview-modal').style.display = 'flex';
+            
+        } catch (e) {
+            alert("圖片處理失敗，請重試");
+            console.error(e);
+        }
+        
+        // 3. 清空 input，確保下次選同一張圖也能觸發 change 事件
+        event.target.value = '';
+    }
 
 // 🟢 正確位置：壓縮函式也一起移出來
 function compressImage(file, maxWidth, quality) {
