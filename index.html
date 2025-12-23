@@ -3307,33 +3307,33 @@ function getSmartAdviceText(temp, weatherCode) {
         // [修改] 智慧定位函式：手機用高精確度，電腦自動降級為一般模式
         // [修改] 終極定位函式：支援 GPS (手機)、Wi-Fi (筆電) 與 有線網路 (桌機)
         // [修正版] 混合雙軌定位：手機抓精確、電腦抓 IP，確保 100% 成功率
+        // [智慧定位函式] 完美解決方案：手機優先抓 GPS，電腦自動退回抓 IP
         function getLocalWeather() {
-            // 定義 UI 
+            // UI 綁定
             const els = {
                 headerLoc: document.getElementById('header-my-loc'),
                 headerTemp: document.getElementById('header-my-temp'),
                 tabTemp: document.getElementById('wc-my-temp'),
                 titleBox: document.getElementById('wc-loc-box') 
             };
-
-            // 1. 檢查瀏覽器支援
+            
+            // 檢查基本支援
             if (!navigator.geolocation) {
-                alert('您的瀏覽器不支援定位');
+                alert('您的瀏覽器不支援定位功能');
                 return;
             }
-
-            // UI 顯示定位中
-            if(els.headerLoc) els.headerLoc.innerText = '定位中...';
+            
+            // 顯示讀取狀態
+            if(els.headerLoc) els.headerLoc.innerText = '定位中..';
             if(els.titleBox) els.titleBox.innerHTML = '<span class="loading-dots">定位中</span>';
 
-            // === 核心邏輯：成功時的處理 (手機電腦共用) ===
-            const onPositionSuccess = async (position) => {
+            // === 成功後的處理邏輯 (共用) ===
+            const handleSuccess = async (position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
+                // 用 console 讓您知道現在是用哪種模式成功的
+                console.log(`定位成功 (精度:${position.coords.accuracy}m)`);
                 
-                // 這裡加入 console log 方便除錯，確認是哪種模式成功的
-                console.log(`定位成功！經度:${lon}, 緯度:${lat}, 精度:${position.coords.accuracy}米`);
-
                 try {
                     // A. 抓天氣
                     const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
@@ -3343,23 +3343,21 @@ function getSmartAdviceText(temp, weatherCode) {
                     const tempStr = `${Math.round(currentMyTemp)}°C`;
                     const code = weatherData.current_weather.weathercode;
                     
-                    // B. 解析地名 (AI)
+                    // B. AI 解析地名 (根據經緯度)
                     let displayZh = "我的位置";
                     try {
-                        // 針對電腦版，若精確度低(IP定位)，AI可能只能解析到市。若手機則可解析到區。
+                        // 嘗試抓取行政區 (竹北市)
                         const locationPrompt = `Task: Identify the specific district/township name for ${lat},${lon} (e.g., 竹北市, 新竹市東區, 博多區). Output ONLY the Traditional Chinese name.`;
-                        
-                        // 呼叫 AI (設定 10秒 超時)
                         const aiPromise = getGeminiResponse(locationPrompt);
+                        // 10秒 AI 超時設定
                         const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000));
                         const aiCity = await Promise.race([aiPromise, timeoutPromise]);
-                        
                         if (aiCity) displayZh = aiCity.trim();
                     } catch (e) {
-                        console.warn("AI 地名解析跳過:", e);
+                        console.warn("AI 地名解析失敗，使用預設值");
                     }
 
-                    // C. 更新畫面
+                    // 更新畫面
                     if(els.headerLoc) els.headerLoc.innerText = displayZh;
                     if(els.headerTemp) els.headerTemp.innerText = tempStr;
                     if(els.tabTemp) {
@@ -3374,49 +3372,52 @@ function getSmartAdviceText(temp, weatherCode) {
                                 <span>${displayZh}</span>
                             </div>`;
                     }
-
-                    // 存檔
+                    
+                    // 儲存資料
                     window.appCache = window.appCache || {};
                     window.appCache['my_location_combined'] = {
                         timestamp: Date.now(),
                         data: { temp: currentMyTemp, city: displayZh, code: code }
                     };
                     
-                    // 觸發比對
                     const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
                     if (targetTempStr !== '--°') updateComparison(parseFloat(targetTempStr));
 
                 } catch (e) {
-                    console.error("資料獲取失敗", e);
-                    if(els.headerLoc) els.headerLoc.innerText = '連線失敗';
+                    console.error("抓取失敗", e);
+                    if(els.headerLoc) els.headerLoc.innerText = '連線錯誤';
                 }
             };
 
-            // === 核心邏輯：電腦版備案 (Low Accuracy) ===
-            const fallbackToLowAccuracy = () => {
-                console.log("切換至一般定位模式 (IP/WiFi)...");
+            // === B 計畫：低精確度模式 (電腦用) ===
+            const useLowAccuracyMode = () => {
+                console.log('切換至一般定位模式 (模擬 index_ai 的行為)...');
                 navigator.geolocation.getCurrentPosition(
-                    onPositionSuccess,
+                    handleSuccess, // 成功也是跑一樣的流程
                     (err) => {
-                        console.error("一般定位也失敗:", err);
-                        alert("無法取得位置，請確認瀏覽器位置權限已開啟。\n(如果是電腦，請檢查 Windows 設定 > 隱私權 > 位置 是否開啟)");
+                        console.error('一般模式也失敗:', err);
+                        alert("無法取得位置。請確認您的瀏覽器是否有開啟定位權限。");
                         if(els.headerLoc) els.headerLoc.innerText = '定位未開';
-                        if(els.titleBox) els.titleBox.innerText = '無權限';
                     },
-                    { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 } // 這裡關鍵：設為 false 就能像 index_ai 一樣運作
+                    { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 } // 這裡就是 index_ai 的設定
                 );
             };
 
             // === 執行入口 ===
             // 1. 先嘗試高精確度 (給手機用)
-            // 設定 timeout 為 3000ms (3秒)。如果電腦 3秒 沒反應，就會報錯進 error callback
+            // 設定 3秒 超時，如果電腦 3秒 抓不到 GPS，就會報錯並自動跳去 useLowAccuracyMode
             navigator.geolocation.getCurrentPosition(
-                onPositionSuccess,
+                handleSuccess, 
                 (err) => {
-                    console.warn("高精確度定位失敗/超時，嘗試降級...", err.code);
-                    // 2. 失敗了 (可能是電腦)，立刻執行備案
-                    fallbackToLowAccuracy();
-                },
+                    console.warn("高精確度失敗 (可能是電腦)，切換 B 計畫...");
+                    // 只要不是「使用者拒絕 (code 1)」，就自動嘗試 B 計畫
+                    if (err.code !== 1) {
+                        useLowAccuracyMode();
+                    } else {
+                        alert("您封鎖了位置權限，請手動開啟。");
+                        if(els.headerLoc) els.headerLoc.innerText = '權限不足';
+                    }
+                }, 
                 { enableHighAccuracy: true, timeout: 3000, maximumAge: 0 }
             );
         }
