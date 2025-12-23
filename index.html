@@ -3471,158 +3471,61 @@ function getSmartAdviceText(temp, weatherCode) {
             if (event.target == lModal) lModal.style.display = "none";
         }
 // [新增] 獲取 GPS 並透過 LINE/簡訊 分享 Google Maps 連結
-       // [修改] 獲取 GPS 並透過 OSM (Nominatim) 解析地標與門牌分享
-        // [修改] 獲取 GPS 並透過 OSM + AI 混合解析 (針對科學園區/工業區優化)
-async function shareCurrentLocation() {
-    // 1. 檢查支援度
-    if (!navigator.geolocation) {
-        alert("您的裝置不支援定位功能。");
-        return;
-    }
+        function shareCurrentLocation() {
+            // 1. 檢查支援度
+            if (!navigator.geolocation) {
+                alert("您的裝置不支援定位功能。");
+                return;
+            }
 
-    const btn = document.getElementById('btn-share-loc');
-    const originalContent = btn.innerHTML;
-    
-    // 顯示讀取中狀態 (綠色雷達波)
-    btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:rotate 1s linear infinite; color:#10B981;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" fill="none" stroke="currentColor" stroke-width="2"></path></svg>`;
-    btn.style.opacity = "0.8";
-
-    // 3. 獲取位置
-    navigator.geolocation.getCurrentPosition(async position => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        
-        // Google Maps 連結 (給導航用)
-        const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
-        
-        let locationName = "";
-        let addressDetail = ""; 
-
-        try {
-            // --- 階段一：OSM 查詢 (優先使用) ---
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超時
-
-            // 參數優化：
-            // zoom=18: 街道等級精度
-            // addressdetails=1: 詳細地址
-            // extratags=1: 強制抓取額外標籤 (這裡常藏有公司名)
-            // namedetails=1: 抓取多語言名稱
-            const osmUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&extratags=1&namedetails=1&accept-language=zh-TW`;
+            const btn = document.getElementById('btn-share-loc');
+            const originalContent = btn.innerHTML;
             
-            const res = await fetch(osmUrl, { signal: controller.signal });
-            clearTimeout(timeoutId);
-            
-            if (res.ok) {
-                const data = await res.json();
-                const addr = data.address || {};
-                const extras = data.extratags || {};
+            // 2. 顯示讀取中狀態
+            // 2. 顯示讀取中狀態 (只留 loading 圖示)
+            btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:rotate 1s linear infinite;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" fill="none" stroke="currentColor" stroke-width="2"></path></svg>`;
+            btn.style.opacity = "0.8";
 
-                // [優化邏輯 1] 優先抓取最精確的「場所名稱」 (data.name)
-                // 這是解決「盛群半導體」這類公司名沒出現的關鍵
-                locationName = data.name || extras.office || extras.brand || "";
-
-                // 如果最外層沒名字，才去 address 找地標類別
-                if (!locationName) {
-                    const targetKeys = [
-                        'amenity', 'shop', 'tourism', 'historic', 
-                        'office', 'industrial', 'craft', 'building', 'emergency'
-                    ];
-                    for (const key of targetKeys) {
-                        if (addr[key]) {
-                            locationName = addr[key];
-                            break;
-                        }
-                    }
-                }
-
-                // [優化邏輯 2] 抓取路名與門牌
-                const road = addr.road || addr.street || addr.neighbourhood || "";
-                const houseNum = addr.house_number || ""; // OSM 的門牌欄位
+            // 3. 獲取高精確度位置
+            navigator.geolocation.getCurrentPosition(position => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
                 
-                if (road) {
-                    addressDetail = road;
-                    if (houseNum) addressDetail += `${houseNum}`; // 只有在有門牌時才加
-                } else if (addr.suburb || addr.district) {
-                    addressDetail = addr.suburb || addr.district; // 沒路名就顯示區名
+                // 產生 Google Maps 連結
+                const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+                const shareText = `【緊急/報平安】我目前的位置在這裡，請點擊連結查看：`;
+
+                // 4. 呼叫原生分享選單 (Web Share API)
+                if (navigator.share) {
+                    navigator.share({
+                        title: '我的即時位置',
+                        text: shareText,
+                        url: mapUrl
+                    }).then(() => {
+                        console.log('分享成功');
+                    }).catch((error) => {
+                        console.log('分享取消', error);
+                    });
+                } else {
+                    // 電腦版或不支援分享的瀏覽器 -> 改為複製連結
+                    prompt("請複製以下連結發送給朋友：", mapUrl);
                 }
-            }
 
-        } catch (e) {
-            console.warn("OSM 解析失敗", e);
+                // 復原按鈕
+                btn.innerHTML = originalContent;
+                btn.style.opacity = "1";
+
+            }, error => {
+                console.error(error);
+                alert("無法取得位置，請確認 GPS 已開啟，並允許網頁存取位置。");
+                btn.innerHTML = originalContent;
+                btn.style.opacity = "1";
+            }, { 
+                enableHighAccuracy: true, // 要求高精確度 (重要!)
+                timeout: 10000, 
+                maximumAge: 0 
+            });
         }
-
-        // --- 階段二：AI 救援機制 (如果 OSM 資料太少) ---
-        // 判斷條件：如果「沒抓到地標名」或者「沒抓到門牌」，就請 AI 幫忙看座標
-        // 這是解決科學園區/工業區 OSM 資料空白的殺手鐧
-        if (!locationName || locationName.includes("園區") || locationName.includes("工業區")) {
-             try {
-                if (typeof getGeminiResponse === 'function') {
-                    // 讓按鈕顯示 AI 思考中顏色 (紫色)
-                    btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:pulse 1s infinite; color:#8B5CF6;"><circle cx="12" cy="12" r="10"></circle></svg>`;
-                    
-                    const prompt = `
-                    (Quick lookup) Coordinates: ${lat},${lon} (Taiwan).
-                    Identify the specific building name (Company/Store) and estimate the address/door number.
-                    Output format: "Name|Address" (Traditional Chinese).
-                    Example: "盛群半導體|研新二路3號".
-                    If unsure, just guess the nearest landmark. Keep it super short.
-                    `;
-                    
-                    // 設定 AI 超時 (避免卡太久)
-                    const aiPromise = getGeminiResponse(prompt);
-                    const aiTimeout = new Promise((_, r) => setTimeout(() => r(new Error("AI Timeout")), 4000));
-                    
-                    let aiResult = await Promise.race([aiPromise, aiTimeout]);
-                    aiResult = aiResult.replace(/\n/g, '').trim();
-                    
-                    if (aiResult && aiResult.includes("|")) {
-                        const [aiName, aiAddr] = aiResult.split("|");
-                        // 策略：如果 OSM 沒給出具體公司名，就用 AI 的
-                        if (!locationName || locationName.length > 8) locationName = aiName; // 如果 OSM 給的是長串"xx科學園區"，改用 AI 的公司名
-                        if (!addressDetail || addressDetail.length < 3) addressDetail = aiAddr; // 補強地址
-                    }
-                }
-            } catch (e) {
-                console.log("AI 救援略過");
-            }
-        }
-
-        // 4. 組合最終文案
-        const timeStr = new Date().toLocaleTimeString('zh-TW', {hour: '2-digit', minute:'2-digit'});
-        
-        // 格式組合： "地標名稱 (路名+門牌)"
-        let finalDisplay = locationName || "📍 座標位置";
-        if (addressDetail) {
-            // 避免重複顯示 (例如地標名已經包含路名)
-            if (!finalDisplay.includes(addressDetail)) {
-                finalDisplay += ` (${addressDetail})`;
-            }
-        }
-        
-        const shareTitle = '我的即時位置';
-        const shareText = `【報平安 ${timeStr}】\n我在：${finalDisplay}\n請點擊連結導航：\n`;
-
-        // 5. 呼叫分享
-        if (navigator.share) {
-            navigator.share({
-                title: shareTitle,
-                text: shareText,
-                url: mapUrl
-            }).catch(console.error);
-        } else {
-            prompt("請複製位置資訊：", `${shareText} ${mapUrl}`);
-        }
-
-        btn.innerHTML = originalContent;
-        btn.style.opacity = "1";
-
-    }, error => {
-        alert("無法取得位置，請確認 GPS 已開啟。");
-        btn.innerHTML = originalContent;
-        btn.style.opacity = "1";
-    }, { enableHighAccuracy: true, timeout: 10000 });
-}
         async function submitManualLocation() {
             const manualCity = document.getElementById('modal-city-input').value.trim();
             if (!manualCity) return;
