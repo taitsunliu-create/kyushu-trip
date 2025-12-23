@@ -966,7 +966,7 @@
             .header-weather-box { 
                 width: 100%; 
                 justify-content: space-between; 
-                padding: 10px 15px;
+                padding: 10px 8px ; /*15px*/
                 border-radius: 12px;
                 background: rgba(255, 255, 255, 0.15);
                 min-height: auto;
@@ -999,6 +999,7 @@
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis; /* 文字太長變 ... */
+                font-size: 1rem; /* [新增] 手機版字體縮小一點 (原本是 1.1rem)，避免長地名擠壓 */
             }
             
             /* 3. 右側：天氣 (關鍵修正：不准搶空間) */
