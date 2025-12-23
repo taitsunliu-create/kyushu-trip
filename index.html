@@ -258,12 +258,31 @@
                 white-space: nowrap; /* 禁止文字換行 */
             }
         }
-        .hw-col-loc {
-            padding-right: 15px;
-            border-right: 1px solid rgba(255,255,255,0.3);
-            text-align: center;
-            min-width: 80px;
-        }
+        /* [修正] 中間地名：給予最大權限佔據空間，並允許縮小 */
+            .hw-col-loc {
+                flex: 1;           /* 關鍵：自動填滿中間剩餘所有空間 */
+                min-width: 0;      /* 關鍵：允許內容在空間不足時被壓縮，而不是撐破版面 */
+                padding: 0 4px;    /* 縮小左右間距 */
+                border: none;      /* 手機版移除分隔線，節省 1px 空間 */
+                text-align: left;  /* 改為靠左，視覺比較整齊 */
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            /* [修正] 讓中間的地名如果太長，自動變成 ... 而不是換行撐高 */
+            .hw-col-loc .hw-loc {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* [修正] 右邊天氣：強制瘦身，移除原本的大內距 */
+            .hw-col-main {
+                flex: 0 0 auto;    /* 關鍵：只佔用內容剛好的寬度，不准變寬 */
+                padding: 0;        /* 移除原本的 15px 內距，這非常重要 */
+                gap: 5px;          /* 拉近圖示與溫度的距離 */
+            }
         .hw-loc { font-size: 1.1rem; font-weight: 700; display: block; line-height: 1.2; }
         .hw-date { font-size: 0.75rem; opacity: 0.9; display: block; margin-top: 4px; }
 
