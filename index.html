@@ -1050,6 +1050,25 @@
             margin-bottom: 5px;
             flex-shrink: 0;
         }
+    /* [新增] 分頁滑動切換特效 */
+        /* 定義從右邊滑入 (前往下一個分頁) */
+        @keyframes slideInRight {
+            from { transform: translateX(30%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        /* 定義從左邊滑入 (返回上一個分頁) */
+        @keyframes slideInLeft {
+            from { transform: translateX(-30%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* 套用動畫的類別 - 使用 cubic-bezier 讓動態更自然 */
+        .container.active.slide-next {
+            animation: slideInRight 0.3s cubic-bezier(0.2, 0.0, 0.2, 1) forwards;
+        }
+        .container.active.slide-prev {
+            animation: slideInLeft 0.3s cubic-bezier(0.2, 0.0, 0.2, 1) forwards;
+        }
     </style>
 </head>
 <body>
@@ -3890,12 +3909,42 @@ function getSmartAdviceText(temp, weatherCode) {
         
         // --- END REAL-TIME WEATHER ---
 
+        // [修改] 切換分頁函式 - 加入左右滑動動畫判斷
         function switchTab(element) {
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            document.querySelectorAll('.container').forEach(container => container.classList.remove('active'));
+            // 1. 找出目前的分頁索引 (Old Index)
+            const navItems = Array.from(document.querySelectorAll('.nav-item'));
+            const oldIndex = navItems.findIndex(item => item.classList.contains('active'));
+            const newIndex = navItems.indexOf(element);
+
+            // 2. 移除所有 active 狀態與舊動畫
+            navItems.forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.container').forEach(container => {
+                container.classList.remove('active');
+                // 重要：清除舊的動畫 class，以免下次切換時殘留
+                container.classList.remove('slide-next', 'slide-prev');
+            });
+
+            // 3. 設定按鈕為啟用狀態
             element.classList.add('active');
+
+            // 4. 處理內容顯示與動畫方向
             const targetId = element.getAttribute('data-target');
-            document.getElementById(targetId).classList.add('active');
+            const targetContainer = document.getElementById(targetId);
+            
+            // 只有當確實有切換，且不是第一次載入時，才播放動畫
+            if (oldIndex !== -1 && oldIndex !== newIndex) {
+                if (newIndex > oldIndex) {
+                    // 往右邊的分頁前進 (例如：行程表 -> 住宿資訊) -> 內容從右邊滑入
+                    targetContainer.classList.add('slide-next');
+                } else {
+                    // 往左邊的分頁回去 (例如：住宿資訊 -> 行程表) -> 內容從左邊滑入
+                    targetContainer.classList.add('slide-prev');
+                }
+            }
+
+            targetContainer.classList.add('active');
+            
+            // 5. 切換後自動滾回頂部，體驗較佳
             window.scrollTo(0, 0);
         }
 
