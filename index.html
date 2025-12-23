@@ -3542,7 +3542,7 @@ async function shareCurrentLocation() {
                 
                 if (road) {
                     addressDetail = road;
-                    if (houseNum) addressDetail += `${houseNum}號`; // 只有在有門牌時才加
+                    if (houseNum) addressDetail += `${houseNum}`; // 只有在有門牌時才加
                 } else if (addr.suburb || addr.district) {
                     addressDetail = addr.suburb || addr.district; // 沒路名就顯示區名
                 }
