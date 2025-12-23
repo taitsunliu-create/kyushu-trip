@@ -3294,27 +3294,42 @@ function getSmartAdviceText(temp, weatherCode) {
                 }
 
                 // 步驟 2: 如果對照表沒有，請求 AI 在背景翻譯 (您的新想法!)
+                // 步驟 2: AI 背景翻譯 (已加入永久快取)
                 if (!isTranslated) {
-                    document.getElementById('wc-desc').innerText = '🔍 AI 正在翻譯地名...';
-                    
-                    const translatePrompt = `
-                        Task: Translate the place name "${rawInput}" into its official English Romanization name for using in a Weather API.
-                        Target: Japan locations.
-                        Rule: Output ONLY the English name. No explanations.
-                        Example: "黑川溫泉" -> "Minamioguni" (or Kurokawa Onsen), "由布院" -> "Yufuin".
-                    `;
-                    
-                    try {
-                        const aiTranslation = await getGeminiResponse(translatePrompt);
-                        // 簡單驗證回傳是否為英文
-                        if (/^[a-zA-Z\s\-,]+$/.test(aiTranslation)) {
-                            searchTerm = aiTranslation;
-                            isTranslated = true;
-                            console.log("AI 翻譯結果:", searchTerm);
-                            document.getElementById('wc-desc').innerText = `搜尋: ${searchTerm}...`;
+                    // [新增] 先查快取 (金鑰: city_trans_中文名)
+                    const cacheKey = `city_trans_${rawInput}`;
+                    const cachedName = CACHE_SYSTEM.get(cacheKey);
+
+                    if (cachedName) {
+                        searchTerm = cachedName;
+                        isTranslated = true;
+                        console.log("使用快取地名:", searchTerm);
+                        document.getElementById('wc-desc').innerText = `搜尋: ${searchTerm} (快取)`;
+                    } else {
+                        // 無快取，才呼叫 AI
+                        document.getElementById('wc-desc').innerText = '🔍 AI 正在翻譯地名...';
+                        
+                        const translatePrompt = `
+                            Task: Translate the place name "${rawInput}" into its official English Romanization name for using in a Weather API.
+                            Target: Global locations (Focus on Taiwan/Japan).
+                            Rule: Output ONLY the English name. No explanations.
+                            Example: "台北" -> "Taipei", "由布院" -> "Yufuin", "新竹" -> "Hsinchu".
+                        `;
+                        
+                        try {
+                            const aiTranslation = await getGeminiResponse(translatePrompt);
+                            if (/^[a-zA-Z\s\-,]+$/.test(aiTranslation)) {
+                                searchTerm = aiTranslation;
+                                isTranslated = true;
+                                console.log("AI 翻譯結果:", searchTerm);
+                                document.getElementById('wc-desc').innerText = `搜尋: ${searchTerm}...`;
+                                
+                                // [新增] 翻譯成功後，存入快取 (保存 24 小時 = 1440 分鐘)
+                                CACHE_SYSTEM.save(cacheKey, searchTerm, 1440);
+                            }
+                        } catch (e) {
+                            console.warn("AI 翻譯失敗，嘗試使用原始中文搜尋");
                         }
-                    } catch (e) {
-                        console.warn("AI 翻譯失敗，嘗試使用原始中文搜尋");
                     }
                 }
 
@@ -3790,6 +3805,19 @@ function getSmartAdviceText(temp, weatherCode) {
         }
 
         async function askAiWeatherAdvice(city, temp, condition) {
+            // [新增] 1. 產生快取金鑰 (地點 + 氣溫整數 + 天氣狀況)
+            // 這樣如果溫度只差 0.1 度，或是天氣一樣，就不用重新問 AI
+            const cacheKey = `ai_advice_${city}_${Math.round(temp)}_${condition}`;
+            
+            // [新增] 2. 先查快取
+            const cachedAdvice = CACHE_SYSTEM.get(cacheKey);
+            if (cachedAdvice) {
+                console.log("使用快取穿衣建議");
+                document.getElementById('wc-advice').innerText = cachedAdvice;
+                return;
+            }
+
+            // 無快取，才執行 AI 請求
             const prompt = `
                 現在${city}的即時氣溫是 ${temp}度，天氣狀況為${condition}。
                 請以「旅遊小秘書」的口吻，給予台灣旅客簡短的穿衣建議（約50字）。
@@ -3797,9 +3825,12 @@ function getSmartAdviceText(temp, weatherCode) {
             `;
             
             try {
-                // 改用新的共用函數
                 const text = await getGeminiResponse(prompt);
                 document.getElementById('wc-advice').innerText = text;
+                
+                // [新增] 3. 存入快取 (保存 60 分鐘)
+                CACHE_SYSTEM.save(cacheKey, text, 30);
+                
             } catch (e) {
                 document.getElementById('wc-advice').innerText = 'AI 連線逾時，建議洋蔥式穿搭。';
             }
