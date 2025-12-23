@@ -3492,7 +3492,7 @@ function getSmartAdviceText(temp, weatherCode) {
                 const lon = position.coords.longitude;
                 
                 // Google Maps 連結 (給導航用)
-                const mapUrl = `https://www.google.com/maps?q=$${lat},${lon}`;
+                const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
                 
                 let locationName = "";
                 let subDetail = ""; // 用來補充路名 (例如：7-11 [中山路])
