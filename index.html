@@ -1050,33 +1050,33 @@
             margin-bottom: 5px;
             flex-shrink: 0;
         }
-        /* [新增] 物理翻頁引擎核心樣式 */
+        /* [修改] 2D 高效能滑動引擎樣式 (High Performance Slide) */
         
-        /* 1. 設定 3D 舞台 */
         body {
-        /* perspective: 1200px;  <-- 已移除，解決導航欄與浮動按鈕定位問題 */
-            overflow-x: hidden;  /* 防止拖曳時出現橫向捲軸 */
+            overflow-x: hidden;
+            /* 移除 perspective，改為平面滑動 */
         }
 
         .container {
-            /* 預設中心軸旋轉，確保翻頁不暈眩 */
-            transform-origin: center center;
-            transform-style: preserve-3d;
-            backface-visibility: hidden; /* 背面隱藏 */
-            will-change: transform, opacity, filter; /* 效能優化 */
+            /* 💡 [優化] 強制開啟 GPU 硬體加速，減少閃爍 */
+            transform: translate3d(0, 0, 0); 
+            will-change: transform, opacity; 
+            
+            /* 保持隱藏背面的設定，雖然是 2D 但可以防止渲染錯誤 */
+            backface-visibility: hidden; 
         }
 
-        /* 2. 手指拖曳中 (無動畫延遲，絕對跟隨) */
+        /* 2. 手指拖曳中 (絕對跟隨，無延遲) */
         .container.is-dragging {
             transition: none !important;
             cursor: grabbing;
         }
 
-        /* 3. 放手後的慣性動畫 (平滑彈回或翻過去) */
+        /* 3. 放手後的慣性動畫 (使用您指定的 Bezier 曲線) */
         .container.is-animating {
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), 
-                        opacity 0.4s linear, 
-                        filter 0.4s linear !important;
+            /* 💡 [優化] 使用 cubic-bezier(0.23, 1, 0.32, 1) 讓回彈更自然 */
+            transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), 
+                        opacity 0.25s ease !important;
         }
 
         /* 輔助：當頁面被隱藏時的狀態 */
@@ -4643,39 +4643,30 @@ function compressImage(file, maxWidth, quality) {
                 if (!isDragging || !activeContainer) return;
 
                 const currentX = e.touches[0].clientX;
-                const currentY = e.touches[0].clientY; // [新增]
+                const currentY = e.touches[0].clientY;
                 const diffX = currentX - startX;
-                const diffY = currentY - startY;       // [新增]
+                const diffY = currentY - startY;
 
-                // [關鍵修正] 優先判斷捲動：如果垂直移動 > 水平移動，視為捲動網頁
+                // 優先判斷捲動：如果垂直移動 > 水平移動，視為捲動網頁
                 if (Math.abs(diffY) > Math.abs(diffX)) {
-                    isDragging = false; // 放棄翻頁權限
+                    isDragging = false;
                     activeContainer.classList.remove('is-dragging'); 
-                    return; // 讓瀏覽器執行預設的上下捲動
+                    return; 
                 }
 
-                // 確定是水平滑動後，才攔截事件並加上樣式
+                // 確定是水平滑動
                 activeContainer.classList.add('is-dragging');
-
-                // 邊界檢查
-                if ((activeIndex === 0 && diffX > 0) || 
-                    (activeIndex === navItems.length - 1 && diffX < 0)) {
-                    return;
-                }
-
-                // 攔截瀏覽器行為 (防止畫面左右搖晃/上一頁)
                 if (e.cancelable) e.preventDefault(); 
 
-                const screenW = window.innerWidth;
-                const rotateDeg = (diffX / screenW) * 90; 
-                const clampedDeg = Math.max(-85, Math.min(85, rotateDeg));
-
-                // 核心物理公式
-                const scale = 1 - (Math.abs(clampedDeg) / 900); 
-                const brightness = 1 - (Math.abs(clampedDeg) / 200); 
-
-                activeContainer.style.transform = `perspective(1000px) rotateY(${clampedDeg}deg) scale(${scale})`;
-                activeContainer.style.filter = `brightness(${brightness})`;
+                // ★ [修改] 核心物理公式：改為 2D 平移 (TranslateX)
+                // 使用 translate3d 確保啟用 GPU 加速
+                activeContainer.style.transform = `translate3d(${diffX}px, 0, 0)`;
+                
+                // 💡 [選用] 根據滑動距離微調透明度 (模擬您提供的 opacity: 0 效果)
+                // 滑動越遠，透明度越低 (最多降到 0.8，保留一點可見度以免使用者迷失)
+                const opacity = 1 - (Math.abs(diffX) / window.innerWidth) * 0.5;
+                activeContainer.style.opacity = opacity;
+                activeContainer.style.filter = ''; // 移除舊的亮度濾鏡，保持乾淨
                 
                 currentTranslate = diffX;
             }, {passive: false});
@@ -4746,60 +4737,67 @@ function compressImage(file, maxWidth, quality) {
                 currentTranslate = 0;
             });
 
-            // 輔助：彈回原位
+            // 輔助：彈回原位 (Revert)
             function revertFlip(element) {
-                element.style.transform = 'perspective(1000px) rotateY(0deg) scale(1)';
-                element.style.filter = 'brightness(1)';
+                // 回到中心 (x: 0)
+                element.style.transform = 'translate3d(0, 0, 0)';
+                element.style.opacity = '1';
                 
                 setTimeout(() => {
                     element.classList.remove('is-animating');
                     element.style.transform = '';
-                    element.style.filter = '';
-                }, 400);
+                    element.style.opacity = '';
+                }, 250); // 對應 CSS 的 0.25s
             }
 
-            // 輔助：完成翻頁動作
+            // 輔助：完成翻頁動作 (Slide Out & Slide In)
             function finishFlip(oldElement, direction, nextNavItem) {
-                // 1. 把舊頁面「甩」出去
-                const targetDeg = direction === 'next' ? -90 : 90;
-                oldElement.style.transform = `perspective(1000px) rotateY(${targetDeg}deg) scale(0.8)`;
-                oldElement.style.opacity = '0'; // 漸隱
+                const screenW = window.innerWidth;
+                
+                // 1. 舊頁面滑出去 (Slide Exit)
+                // 往左滑(Next) -> 舊頁面去 -100%，往右滑(Prev) -> 舊頁面去 100%
+                const targetX = direction === 'next' ? -screenW : screenW;
+                
+                oldElement.style.transform = `translate3d(${targetX}px, 0, 0)`;
+                oldElement.style.opacity = '0'; // 滑出時淡出
 
-                // 2. 切換內容
+                // 2. 等舊頁面滑出去後，切換內容
                 setTimeout(() => {
-                    switchTab(nextNavItem); // 呼叫簡化版的 switchTab
+                    switchTab(nextNavItem); 
                     
                     const newTargetId = nextNavItem.getAttribute('data-target');
                     const newContainer = document.getElementById(newTargetId);
                     
-                    // 準備進場
-                    const startDeg = direction === 'next' ? 90 : -90;
+                    // 3. 新頁面準備進場 (Slide Enter)
+                    // 如果是 Next，新頁面從右邊(100%)進來；如果是 Prev，從左邊(-100%)進來
+                    const startX = direction === 'next' ? screenW : -screenW;
                     
-                    newContainer.classList.add('is-dragging'); 
-                    newContainer.style.transform = `perspective(1000px) rotateY(${startDeg}deg) scale(0.8)`;
+                    newContainer.classList.add('is-dragging'); // 暫時移除 transition 以便瞬間定位
+                    newContainer.style.transform = `translate3d(${startX}px, 0, 0)`;
                     newContainer.style.opacity = '0';
                     
-                    void newContainer.offsetWidth; // 強制重繪
+                    // 強制瀏覽器重繪 (Reflow) 確保定位生效
+                    void newContainer.offsetWidth;
 
-                    // 進場動畫
+                    // 4. 執行進場動畫 (Go to Center)
                     newContainer.classList.remove('is-dragging');
                     newContainer.classList.add('is-animating');
-                    newContainer.style.transform = 'perspective(1000px) rotateY(0deg) scale(1)';
+                    newContainer.style.transform = 'translate3d(0, 0, 0)';
                     newContainer.style.opacity = '1';
 
                     // 清理舊元素
                     oldElement.classList.remove('is-animating');
                     oldElement.style.transform = '';
                     oldElement.style.opacity = '';
-                    oldElement.style.filter = '';
 
                     // 清理新元素
                     setTimeout(() => {
                         newContainer.classList.remove('is-animating');
                         newContainer.style.transform = '';
-                    }, 400);
-                }, 200); 
-            }  
+                    }, 250); // 對應 CSS 的 0.25s
+
+                }, 200); // 稍微提早一點切換，讓銜接更緊密
+            }
         });
     </script>
 </body>
