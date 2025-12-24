@@ -3748,57 +3748,40 @@ function getSmartAdviceText(temp, weatherCode) {
         let isLocReady = false;
         let pendingShareData = null;
 
+        // [修改] 一鍵分享功能 (分析完直接彈出)
         function shareCurrentLocation() {
             const btn = document.getElementById('btn-share-loc');
 
-            // --- [階段 2] 資料已準備好，執行分享 (這時是同步執行，視窗一定會出來) ---
-            if (isLocReady && pendingShareData) {
-                if (navigator.share) {
-                    navigator.share(pendingShareData)
-                        .then(() => console.log('分享成功'))
-                        .catch((error) => console.log('分享取消', error));
-                } else {
-                    // 電腦版備案
-                    prompt("請複製以下資訊發送：", `${pendingShareData.text}\n${pendingShareData.url}`);
-                }
-                
-                // 分享後重置按鈕狀態 (讓使用者可以重新定位)
-                resetShareButton(btn);
-                return;
-            }
-
-            // --- [階段 1] 開始定位與 AI 分析 ---
             if (!navigator.geolocation) {
                 alert("您的裝置不支援定位功能。");
                 return;
             }
 
-            // 儲存按鈕原始外觀 (如果是第一次點擊)
+            // 1. 鎖定按鈕避免重複點擊
+            if (btn.style.opacity === "0.8") return;
+
+            // 2. 儲存原始外觀並改變狀態
             if (!btn.dataset.originalHtml) {
                 btn.dataset.originalHtml = btn.innerHTML;
             }
-
-            // 改變按鈕狀態：分析中
             btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:pulse 1s infinite;"><circle cx="12" cy="12" r="10"></circle></svg> 分析位置中...`;
             btn.style.opacity = "0.8";
-            btn.style.background = "#6B7280"; // 暫時變灰色
+            btn.style.background = "#6B7280"; 
 
             navigator.geolocation.getCurrentPosition(async position => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-
-                // [修正] 修正原本錯誤的網址格式，改用標準 Google Maps 連結
-                const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+                const mapUrl = `http://googleusercontent.com/maps.google.com/maps?q=${lat},${lon}`;
                 
                 let locationContext = "";
                 try {
-                    // 1. 先查真實地址 (OpenStreetMap)
+                    // A. 取得真實地址
                     const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`;
                     const geoRes = await fetch(geoUrl);
                     const geoData = await geoRes.json();
                     const rawAddress = geoData.display_name || "未知地點";
 
-                    // 2. 呼叫 AI 潤飾
+                    // B. AI 潤飾 (保持您的 API 省流原則，只用一次)
                     const prompt = `
                         Task: Summarize this location data into a short, urgent message.
                         Raw Data: "${rawAddress}"
@@ -3811,23 +3794,28 @@ function getSmartAdviceText(temp, weatherCode) {
                     locationContext = "我的位置";
                 }
 
-                // 準備好要分享的資料
-                const shareText = `【緊急/報平安】我目前位置：${locationContext} 附近`;
-                
-                pendingShareData = {
+                // C. 準備資料
+                const shareData = {
                     title: '我的即時位置',
-                    text: shareText,
+                    text: `【緊急/報平安】我目前位置：${locationContext} 附近`,
                     url: mapUrl
                 };
 
-                // --- 關鍵：改變按鈕狀態，等待使用者「第二次點擊」 ---
-                isLocReady = true;
-                btn.innerHTML = `✅ 分析完成！點此傳送`;
-                btn.style.background = "#10B981"; // 變綠色提示可點擊
-                btn.style.opacity = "1";
-                
-                // (選用) 可以震動一下手機提示完成
-                if (navigator.vibrate) navigator.vibrate(50);
+                // D. [修改重點] 分析完直接執行分享，不等待第二次點擊
+                try {
+                    if (navigator.share) {
+                        await navigator.share(shareData);
+                    } else {
+                        throw new Error("不支援 Share API");
+                    }
+                } catch (err) {
+                    // 若瀏覽器因等待時間過長而阻擋分享視窗，或不支援時，改用複製視窗
+                    console.log("自動分享被阻擋或取消，改用手動複製", err);
+                    prompt("請複製以下位置資訊：", `${shareData.text}\n${shareData.url}`);
+                } finally {
+                    // 無論成功失敗，最後都重置按鈕
+                    resetShareButton(btn);
+                }
 
             }, error => {
                 console.error(error);
