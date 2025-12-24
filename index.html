@@ -2982,6 +2982,11 @@
         
     </button>
 
+    <div id="lightbox-modal" class="lightbox-overlay" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
+    
     <script>
        // [修改] 原本的 const apiKey = ""; 替換成以下內容：
 
@@ -4997,9 +5002,6 @@ function compressImage(file, maxWidth, quality) {
                 }
             }
     </script>
-<div id="lightbox-modal" class="lightbox-overlay" onclick="closeLightbox()">
-        <span class="lightbox-close">&times;</span>
-        <img class="lightbox-content" id="lightbox-img">
     </div>
 </body>
 </html>
