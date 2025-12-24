@@ -3750,103 +3750,132 @@ function getSmartAdviceText(temp, weatherCode) {
 
         // [修改] 一鍵分享功能 (分析完直接彈出)
         // [修正] 一鍵分享功能 (修正網址格式)
-function shareCurrentLocation() {
-    const btn = document.getElementById('btn-share-loc');
+// [修正] 一鍵分享功能 (改為兩段式：先定位準備資料 -> 再點擊彈出視窗)
+        function shareCurrentLocation() {
+            const btn = document.getElementById('btn-share-loc');
 
-    if (!navigator.geolocation) {
-        alert("您的裝置不支援定位功能。");
-        return;
-    }
-
-    // 1. 鎖定按鈕避免重複點擊
-    if (btn.style.opacity === "0.8") return;
-
-    // 2. 儲存原始外觀並改變狀態 (這三行保留)
-    if (!btn.dataset.originalHtml) {
-        btn.dataset.originalHtml = btn.innerHTML;
-    }
-
-    // ★★★ [修改] 綠色雷達特效 (無文字版) ★★★
-    // 使用 SVG 內部動畫 (SMIL) 製作雷達波紋效果，不依賴外部 CSS
-    btn.innerHTML = `
-        <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; color: #10B981;">
-            <circle cx="12" cy="12" r="4" fill="currentColor"></circle>
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none">
-                <animate attributeName="r" from="4" to="12" dur="1.5s" repeatCount="indefinite" />
-                <animate attributeName="opacity" from="1" to="0" dur="1.5s" repeatCount="indefinite" />
-            </circle>
-        </svg>
-    `;
-
-    // 設定按鈕樣式：淺綠底 + 綠框 + 圓形化 (因無文字，按鈕會自動縮成圓形)
-    btn.style.background = "#ECFDF5"; 
-    btn.style.borderColor = "#10B981"; 
-    btn.style.color = "#10B981";      
-    btn.style.opacity = "1";
-    // ★★★ [修改結束] ★★★
-
-    // 接著是原本的定位程式碼 (這行保留)
-    navigator.geolocation.getCurrentPosition(async position => {
-       const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        
-        // ★★★ [修正重點] 改為標準 Google Maps 網址格式 ★★★
-        // 修正：移除多餘的字元，使用標準 query 參數
-        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-        
-        let locationContext = "";
-        try {
-            // A. 取得真實地址
-            const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`;
-            const geoRes = await fetch(geoUrl);
-            const geoData = await geoRes.json();
-            const rawAddress = geoData.display_name || "未知地點";
-
-            // B. AI 潤飾 (保持 API 省流原則)
-            const prompt = `
-                Task: Summarize this location data into a short, urgent message.
-                Raw Data: "${rawAddress}"
-                Output: A concise phrase in Traditional Chinese (e.g., "靠近泰村家").
-                Rule: Just the landmark name.
-            `;
-            locationContext = await getGeminiResponse(prompt);
-        } catch (e) {
-            console.error("分析失敗", e);
-            locationContext = "我的位置";
-        }
-
-        // C. 準備資料
-        const shareData = {
-            title: '我的即時位置',
-            text: `【緊急/報平安】我目前位置：${locationContext} 附近`,
-            url: mapUrl
-        };
-
-        // D. 執行分享
-        try {
-            if (navigator.share) {
-                await navigator.share(shareData);
-            } else {
-                throw new Error("不支援 Share API");
+            // --- 階段二：資料已準備好，直接彈出視窗 (這是第二下點擊) ---
+            if (pendingShareData) {
+                try {
+                    if (navigator.share) {
+                        navigator.share(pendingShareData)
+                            .then(() => {
+                                console.log("分享成功");
+                                // 分享後重置按鈕狀態
+                                resetShareButton(btn);
+                                pendingShareData = null; // 清空資料
+                            })
+                            .catch((err) => {
+                                console.log("分享被取消", err);
+                                // 取消分享通常不需重置，讓使用者可以再次點擊
+                            });
+                    } else {
+                        // 電腦版或不支援 Share API 的備案
+                        prompt("請複製以下位置資訊：", `${pendingShareData.text}\n${pendingShareData.url}`);
+                        resetShareButton(btn);
+                        pendingShareData = null;
+                    }
+                } catch (err) {
+                    console.error(err);
+                    resetShareButton(btn);
+                    pendingShareData = null;
+                }
+                return; // 結束函式，不執行下方的定位邏輯
             }
-        } catch (err) {
-            console.log("自動分享被阻擋或取消，改用手動複製", err);
-            // 在複製視窗中顯示正確的網址
-            prompt("請複製以下位置資訊：", `${shareData.text}\n${shareData.url}`);
-        } finally {
-            resetShareButton(btn);
-        }
 
-    }, error => {
-        console.error(error);
-        alert("無法取得位置，請確認 GPS 已開啟。");
-        resetShareButton(btn);
-    }, { 
-        enableHighAccuracy: true,
-        timeout: 10000, 
-        maximumAge: 0 
-    });
-}
+            // --- 階段一：開始定位與準備資料 (這是第一下點擊) ---
+            
+            if (!navigator.geolocation) {
+                alert("您的裝置不支援定位功能。");
+                return;
+            }
+
+            // 1. 鎖定按鈕避免重複點擊 (且當前沒有準備好的資料)
+            if (btn.style.opacity === "0.8") return;
+
+            // 2. 儲存原始外觀
+            if (!btn.dataset.originalHtml) {
+                btn.dataset.originalHtml = btn.innerHTML;
+            }
+
+            // 3. 變更為「雷達掃描」動畫 (表示正在定位中)
+            btn.innerHTML = `
+                <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; color: #10B981;">
+                    <circle cx="12" cy="12" r="4" fill="currentColor"></circle>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none">
+                        <animate attributeName="r" from="4" to="12" dur="1.5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" from="1" to="0" dur="1.5s" repeatCount="indefinite" />
+                    </circle>
+                </svg>
+            `;
+            // 設定定位中樣式 (淺綠底)
+            btn.style.background = "#ECFDF5"; 
+            btn.style.borderColor = "#10B981"; 
+            btn.style.color = "#10B981";      
+            btn.style.opacity = "0.8"; // 稍微半透明表示忙碌中
+
+            // 4. 執行定位
+            navigator.geolocation.getCurrentPosition(async position => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const mapUrl = `http://googleusercontent.com/maps.google.com/maps?q=${lat},${lon}`;
+                
+                let locationContext = "";
+                
+                try {
+                    // A. 取得真實地址 (OpenStreetMap)
+                    const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`;
+                    const geoRes = await fetch(geoUrl);
+                    const geoData = await geoRes.json();
+                    const rawAddress = geoData.display_name || "未知地點";
+
+                    // B. AI 潤飾 (保持 API 省流原則)
+                    const prompt = `
+                        Task: Summarize this location data into a short, urgent message.
+                        Raw Data: "${rawAddress}"
+                        Output: A concise phrase in Traditional Chinese (e.g., "靠近泰村家").
+                        Rule: Just the landmark name.
+                    `;
+                    locationContext = await getGeminiResponse(prompt);
+                } catch (e) {
+                    console.error("分析失敗", e);
+                    locationContext = "我的位置"; // 失敗時的備案
+                }
+
+                // C. 準備好資料，存入全域變數 pendingShareData
+                pendingShareData = {
+                    title: '我的即時位置',
+                    text: `【緊急/報平安】我目前位置：${locationContext} 附近`,
+                    url: mapUrl
+                };
+
+                // D. ★ 關鍵步驟：改變按鈕狀態為「準備發送」 (紙飛機圖示)
+                // 這裡不直接 call navigator.share，而是等待使用者第二次點擊
+                btn.style.opacity = "1"; // 恢復不透明
+                btn.style.background = "#10B981"; // 變深綠色
+                btn.style.color = "white";
+                btn.style.borderColor = "#10B981";
+                // 紙飛機 SVG
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px; animation: popIn 0.3s;">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                `;
+                
+                // (選用) 震動一下提示使用者好了
+                if(navigator.vibrate) navigator.vibrate(50);
+
+            }, error => {
+                console.error(error);
+                alert("無法取得位置，請確認 GPS 已開啟。");
+                resetShareButton(btn);
+            }, { 
+                enableHighAccuracy: true,
+                timeout: 10000, 
+                maximumAge: 0 
+            });
+        }
 
         // 輔助函式：重置按鈕
         // 請更新這個輔助函式 (通常在程式碼最下方)
