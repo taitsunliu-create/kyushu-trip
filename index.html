@@ -2986,7 +2986,7 @@
         <span class="lightbox-close">&times;</span>
         <img class="lightbox-content" id="lightbox-img">
     </div>
-    
+
     <script>
        // [修改] 原本的 const apiKey = ""; 替換成以下內容：
 
@@ -3760,13 +3760,37 @@ function getSmartAdviceText(temp, weatherCode) {
             btn.style.opacity = "0.8";
 
             // 3. 獲取高精確度位置
-            navigator.geolocation.getCurrentPosition(position => {
+            // 3. 獲取高精確度位置 (修改：加入 async 以等待 AI 分析)
+            navigator.geolocation.getCurrentPosition(async position => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 
-                // 產生 Google Maps 連結
+                // [新增] 呼叫 AI 分析座標位置
+                let locationContext = "";
+                try {
+                    // 暫時改變按鈕文字提示正在分析
+                    btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:pulse 1s infinite;"><circle cx="12" cy="12" r="10"></circle></svg> 分析地標中...`;
+                    
+                    const prompt = `
+                        Task: Analyze the coordinates ${lat},${lon}.
+                        Output: Identify the nearest obvious landmark (building, station, park) or specific street address/doorplate.
+                        Format: Traditional Chinese, short phrase (e.g., "靠近熊本城入口" or "位於博多站前二丁目7-1").
+                        Constraint: No explanations, just the location name.
+                    `;
+                    // 呼叫 Gemini (若未解鎖金鑰會跳到 catch)
+                    locationContext = await getGeminiResponse(prompt);
+                } catch (e) {
+                    console.log("位置分析略過或失敗");
+                }
+
+                // [修正] 產生標準 Google Maps 連結 (修正原本網址可能的格式錯誤)
                 const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
-                const shareText = `【緊急/報平安】我目前的位置在這裡，請點擊連結查看：`;
+                
+                // [修改] 組合分享文字
+                const baseText = "【緊急/報平安】我目前位置：";
+                const shareText = locationContext 
+                    ? `${baseText}${locationContext} 附近\n(${mapUrl})` 
+                    : `${baseText}請點擊連結查看\n(${mapUrl})`;
 
                 // 4. 呼叫原生分享選單 (Web Share API)
                 if (navigator.share) {
@@ -3781,7 +3805,7 @@ function getSmartAdviceText(temp, weatherCode) {
                     });
                 } else {
                     // 電腦版或不支援分享的瀏覽器 -> 改為複製連結
-                    prompt("請複製以下連結發送給朋友：", mapUrl);
+                    prompt("請複製以下位置資訊發送：", shareText);
                 }
 
                 // 復原按鈕
