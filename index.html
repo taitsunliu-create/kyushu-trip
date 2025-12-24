@@ -3743,101 +3743,112 @@ function getSmartAdviceText(temp, weatherCode) {
             if (event.target == nModal) nModal.style.display = "none";
             if (event.target == lModal) lModal.style.display = "none";
         }
-// [新增] 獲取 GPS 並透過 LINE/簡訊 分享 Google Maps 連結
-        // [修改] 獲取 GPS 並透過 LINE/簡訊 分享 (修正重複網址與 AI 幻覺問題)
+// [修改] 兩段式分享功能 (解決瀏覽器阻擋視窗問題)
+        // 狀態標記：紀錄目前是否已經分析完成
+        let isLocReady = false;
+        let pendingShareData = null;
+
         function shareCurrentLocation() {
-            // 1. 檢查支援度
+            const btn = document.getElementById('btn-share-loc');
+
+            // --- [階段 2] 資料已準備好，執行分享 (這時是同步執行，視窗一定會出來) ---
+            if (isLocReady && pendingShareData) {
+                if (navigator.share) {
+                    navigator.share(pendingShareData)
+                        .then(() => console.log('分享成功'))
+                        .catch((error) => console.log('分享取消', error));
+                } else {
+                    // 電腦版備案
+                    prompt("請複製以下資訊發送：", `${pendingShareData.text}\n${pendingShareData.url}`);
+                }
+                
+                // 分享後重置按鈕狀態 (讓使用者可以重新定位)
+                resetShareButton(btn);
+                return;
+            }
+
+            // --- [階段 1] 開始定位與 AI 分析 ---
             if (!navigator.geolocation) {
                 alert("您的裝置不支援定位功能。");
                 return;
             }
 
-            const btn = document.getElementById('btn-share-loc');
-            const originalContent = btn.innerHTML;
-            
-            // 2. 顯示讀取中狀態
-            btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:pulse 1s infinite;"><circle cx="12" cy="12" r="10"></circle></svg> 定位分析中...`;
-            btn.style.opacity = "0.8";
+            // 儲存按鈕原始外觀 (如果是第一次點擊)
+            if (!btn.dataset.originalHtml) {
+                btn.dataset.originalHtml = btn.innerHTML;
+            }
 
-            // 3. 獲取高精確度位置
+            // 改變按鈕狀態：分析中
+            btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:pulse 1s infinite;"><circle cx="12" cy="12" r="10"></circle></svg> 分析位置中...`;
+            btn.style.opacity = "0.8";
+            btn.style.background = "#6B7280"; // 暫時變灰色
+
             navigator.geolocation.getCurrentPosition(async position => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                
-                // [修正] 標準 Google Maps 連結格式
+
+                // [修正] 修正原本錯誤的網址格式，改用標準 Google Maps 連結
                 const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
                 
                 let locationContext = "";
-                
                 try {
-                    // [步驟 A] 使用免費的 OpenStreetMap (Nominatim) API 進行逆向地理編碼
-                    // 這能精準抓到建築物名稱 (如: 盛群半導體) 或道路名，解決 AI 對純座標的幻覺問題
+                    // 1. 先查真實地址 (OpenStreetMap)
                     const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`;
-                    
                     const geoRes = await fetch(geoUrl);
                     const geoData = await geoRes.json();
-                    
-                    // 提取關鍵資訊 (優先順序: 建築物名 > 商店名 > 道路名)
-                    // OSM 的資料結構通常在 display_name 或 address 物件中
                     const rawAddress = geoData.display_name || "未知地點";
-                    console.log("OSM Raw Data:", rawAddress);
 
-                    // [步驟 B] 將精確的地址資料傳給 AI 進行「人話」潤飾
-                    // 這樣 AI 就不是在猜座標，而是在幫你簡化地址
+                    // 2. 呼叫 AI 潤飾
                     const prompt = `
-                        Task: Summarize this location data into a short, urgent message for sharing.
+                        Task: Summarize this location data into a short, urgent message.
                         Raw Data: "${rawAddress}"
-                        Output: A concise phrase in Traditional Chinese indicating the nearest landmark or street.
-                        Example: "靠近盛群半導體" or "位於研新二路附近".
-                        Rule: Do not output coordinates. Just the landmark name.
+                        Output: A concise phrase in Traditional Chinese (e.g., "靠近盛群半導體").
+                        Rule: Just the landmark name.
                     `;
-                    
                     locationContext = await getGeminiResponse(prompt);
-
                 } catch (e) {
-                    console.error("地標分析失敗", e);
-                    // 失敗時的備案
+                    console.error("分析失敗", e);
                     locationContext = "我的位置";
                 }
 
-                // [修正] 組合分享文字
-                // 注意：這裡移除了 mapUrl，因為 navigator.share 的 url 欄位會自動幫你貼在最後面
-                // 這樣就不會出現兩次網址了
-                const baseText = "【緊急/報平安】";
-                const shareText = locationContext 
-                    ? `${baseText}${locationContext} 附近` 
-                    : `${baseText}請查看連結`;
+                // 準備好要分享的資料
+                const shareText = `【緊急/報平安】我目前位置：${locationContext} 附近`;
+                
+                pendingShareData = {
+                    title: '我的即時位置',
+                    text: shareText,
+                    url: mapUrl
+                };
 
-                // 4. 呼叫原生分享選單 (Web Share API)
-                if (navigator.share) {
-                    navigator.share({
-                        title: '我的即時位置',
-                        text: shareText, // 這裡只有文字
-                        url: mapUrl      // 這裡放網址，系統會自動接在文字後面
-                    }).then(() => {
-                        console.log('分享成功');
-                    }).catch((error) => {
-                        console.log('分享取消', error);
-                    });
-                } else {
-                    // 電腦版或不支援分享的瀏覽器 -> 改為複製連結 (這裡就需要手動把網址加回去顯示)
-                    prompt("請複製以下資訊發送：", `${shareText}\n${mapUrl}`);
-                }
-
-                // 復原按鈕
-                btn.innerHTML = originalContent;
+                // --- 關鍵：改變按鈕狀態，等待使用者「第二次點擊」 ---
+                isLocReady = true;
+                btn.innerHTML = `✅ 分析完成！點此傳送`;
+                btn.style.background = "#10B981"; // 變綠色提示可點擊
                 btn.style.opacity = "1";
+                
+                // (選用) 可以震動一下手機提示完成
+                if (navigator.vibrate) navigator.vibrate(50);
 
             }, error => {
                 console.error(error);
-                alert("無法取得位置，請確認 GPS 已開啟，並允許網頁存取位置。");
-                btn.innerHTML = originalContent;
-                btn.style.opacity = "1";
+                alert("無法取得位置，請確認 GPS 已開啟。");
+                resetShareButton(btn);
             }, { 
-                enableHighAccuracy: true, // 要求高精確度
+                enableHighAccuracy: true,
                 timeout: 10000, 
                 maximumAge: 0 
             });
+        }
+
+        // 輔助函式：重置按鈕
+        function resetShareButton(btn) {
+            isLocReady = false;
+            pendingShareData = null;
+            if (btn.dataset.originalHtml) {
+                btn.innerHTML = btn.dataset.originalHtml;
+            }
+            btn.style.background = ""; // 恢復原本 CSS 設定的漸層色
+            btn.style.opacity = "1";
         }
         async function submitManualLocation() {
             const manualCity = document.getElementById('modal-city-input').value.trim();
