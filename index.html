@@ -3833,7 +3833,7 @@ function getSmartAdviceText(temp, weatherCode) {
                     const prompt = `
                         Task: Summarize this location data into a short, urgent message.
                         Raw Data: "${rawAddress}"
-                        Output: A concise phrase in Traditional Chinese (e.g., "靠近盛群半導體").
+                        Output: A concise phrase in Traditional Chinese (e.g., "靠近HOLTEK").
                         Rule: Just the landmark name.
                     `;
                     locationContext = await getGeminiResponse(prompt);
