@@ -1054,7 +1054,7 @@
         
         /* 1. 設定 3D 舞台 */
         body {
-            perspective: 1200px; /* 設定視角深度 */
+        /* perspective: 1200px;  <-- 已移除，解決導航欄與浮動按鈕定位問題 */
             overflow-x: hidden;  /* 防止拖曳時出現橫向捲軸 */
         }
 
@@ -4613,9 +4613,10 @@ function compressImage(file, maxWidth, quality) {
             setupVoiceButton(); // Init voice listener
             getLocalWeather(); // Fetch local weather on load
             initChecklist(); // Init checklist
-            // [新增] 1:1 指隨心動物理翻頁引擎 (Physics Page Flip)
+            // [修正] 1:1 指隨心動物理翻頁引擎 (Physics Page Flip)
             let isDragging = false;
             let startX = 0;
+            let startY = 0; // [新增] 垂直起點，用來判斷是否為捲動
             let currentTranslate = 0;
             let activeContainer = null;
             let navItems = [];
@@ -4623,21 +4624,60 @@ function compressImage(file, maxWidth, quality) {
 
             // 1. 手指按下：鎖定目標，準備拖曳
             document.addEventListener('touchstart', (e) => {
-                // 如果正在播放動畫中，禁止打斷
                 const active = document.querySelector('.container.active');
                 if (!active || active.classList.contains('is-animating')) return;
 
-                isDragging = true;
+                // [修正] 改為「潛在拖曳中」，先不鎖死，等移動判斷方向後再決定
+                isDragging = true; 
                 startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY; // [新增] 紀錄垂直位置
                 activeContainer = active;
                 
-                // 取得當前分頁索引
                 navItems = Array.from(document.querySelectorAll('.nav-item'));
                 const activeNavItem = document.querySelector('.nav-item.active');
                 activeIndex = navItems.indexOf(activeNavItem);
+            }, {passive: false});
 
-                // 加上拖曳專用 class (移除 transition 以便即時跟隨)
+            // 2. 手指移動：計算物理量，即時更新畫面
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging || !activeContainer) return;
+
+                const currentX = e.touches[0].clientX;
+                const currentY = e.touches[0].clientY; // [新增]
+                const diffX = currentX - startX;
+                const diffY = currentY - startY;       // [新增]
+
+                // [關鍵修正] 優先判斷捲動：如果垂直移動 > 水平移動，視為捲動網頁
+                if (Math.abs(diffY) > Math.abs(diffX)) {
+                    isDragging = false; // 放棄翻頁權限
+                    activeContainer.classList.remove('is-dragging'); 
+                    return; // 讓瀏覽器執行預設的上下捲動
+                }
+
+                // 確定是水平滑動後，才攔截事件並加上樣式
                 activeContainer.classList.add('is-dragging');
+
+                // 邊界檢查
+                if ((activeIndex === 0 && diffX > 0) || 
+                    (activeIndex === navItems.length - 1 && diffX < 0)) {
+                    return;
+                }
+
+                // 攔截瀏覽器行為 (防止畫面左右搖晃/上一頁)
+                if (e.cancelable) e.preventDefault(); 
+
+                const screenW = window.innerWidth;
+                const rotateDeg = (diffX / screenW) * 90; 
+                const clampedDeg = Math.max(-85, Math.min(85, rotateDeg));
+
+                // 核心物理公式
+                const scale = 1 - (Math.abs(clampedDeg) / 900); 
+                const brightness = 1 - (Math.abs(clampedDeg) / 200); 
+
+                activeContainer.style.transform = `perspective(1000px) rotateY(${clampedDeg}deg) scale(${scale})`;
+                activeContainer.style.filter = `brightness(${brightness})`;
+                
+                currentTranslate = diffX;
             }, {passive: false});
 
             // 2. 手指移動：計算物理量，即時更新畫面
