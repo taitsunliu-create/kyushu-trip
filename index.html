@@ -4687,11 +4687,7 @@ function compressImage(file, maxWidth, quality) {
                 const currentX = e.touches[0].clientX;
                 const diffX = currentX - startX;
 
-                // 邊界檢查：第一頁不能右滑，最後一頁不能左滑
-                if ((activeIndex === 0 && diffX > 0) || 
-                    (activeIndex === navItems.length - 1 && diffX < 0)) {
-                    return;
-                }
+             
 
                 // 簡單防誤觸：如果垂直移動太多，可能是在捲動網頁，這裡暫不處理複雜判斷，先以 X 軸為主
                 if (e.cancelable) e.preventDefault(); 
@@ -4726,17 +4722,22 @@ function compressImage(file, maxWidth, quality) {
                 const threshold = 80; // 滑動超過 80px 就視為要翻頁
                 
                 // A. 決定翻頁 (滑動距離足夠)
+               // A. 決定翻頁 (滑動距離足夠)
                 if (Math.abs(currentTranslate) > threshold) {
                     const direction = currentTranslate > 0 ? 'prev' : 'next';
-                    const targetIndex = direction === 'next' ? activeIndex + 1 : activeIndex - 1;
+                    let targetIndex;
 
-                    // 再次確認邊界
-                    if (targetIndex >= 0 && targetIndex < navItems.length) {
-                        finishFlip(activeContainer, direction, navItems[targetIndex]);
+                    // [修正] 循環邏輯：使用餘數運算來實現無限循環
+                    if (direction === 'next') {
+                        // 往右翻 (下一頁): 如果是最後一頁，會回到 0
+                        targetIndex = (activeIndex + 1) % navItems.length;
                     } else {
-                        revertFlip(activeContainer);
+                        // 往左翻 (上一頁): 如果是第 0 頁，會回到最後一頁
+                        targetIndex = (activeIndex - 1 + navItems.length) % navItems.length;
                     }
-                } 
+
+                    finishFlip(activeContainer, direction, navItems[targetIndex]);
+                }
                 // B. 取消翻頁 (滑動距離不夠，彈回來)
                 else {
                     revertFlip(activeContainer);
