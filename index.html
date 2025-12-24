@@ -4671,36 +4671,7 @@ function compressImage(file, maxWidth, quality) {
                 currentTranslate = diffX;
             }, {passive: false});
 
-            // 2. 手指移動：計算物理量，即時更新畫面
-            document.addEventListener('touchmove', (e) => {
-                if (!isDragging || !activeContainer) return;
-
-                const currentX = e.touches[0].clientX;
-                const diffX = currentX - startX;
-
-             
-
-                // 簡單防誤觸：如果垂直移動太多，可能是在捲動網頁，這裡暫不處理複雜判斷，先以 X 軸為主
-                if (e.cancelable) e.preventDefault(); 
-
-                // 計算旋轉角度 (螢幕寬度的一半等於旋轉 90度)
-                const screenW = window.innerWidth;
-                const rotateDeg = (diffX / screenW) * 90; 
-                
-                // 限制最大旋轉角度
-                const clampedDeg = Math.max(-85, Math.min(85, rotateDeg));
-
-                // ★ 核心物理公式：即時套用 CSS 變形
-                // 加入 scale(0.9) 增加景深感，brightness 模擬光影
-                const scale = 1 - (Math.abs(clampedDeg) / 900); // 微微縮小
-                const brightness = 1 - (Math.abs(clampedDeg) / 200); // 微微變暗
-
-                activeContainer.style.transform = `perspective(1000px) rotateY(${clampedDeg}deg) scale(${scale})`;
-                activeContainer.style.filter = `brightness(${brightness})`;
-                
-                currentTranslate = diffX;
-            }, {passive: false});
-
+            
             // 3. 手指放開：判斷是「翻過去」還是「彈回來」
             document.addEventListener('touchend', (e) => {
                 if (!isDragging || !activeContainer) return;
