@@ -3830,11 +3830,13 @@ function getSmartAdviceText(temp, weatherCode) {
                     const rawAddress = geoData.display_name || "未知地點";
 
                     // B. AI 潤飾 (保持 API 省流原則)
+                    // [修改] 混合邏輯：優先找「顯著地標」，若無則回傳「精確門牌」
                     const prompt = `
-                        Task: Summarize this location data into a short, urgent message.
-                        Raw Data: "${rawAddress}"
-                        Output: A concise phrase in Traditional Chinese (e.g., "靠近HOLTEK").
-                        Rule: Just the landmark name.
+                        Task: Analyze this location data: "${rawAddress}" to describe the location for a friend.
+                        Logic:
+                        1. **Priority 1 (Landmark)**: If there is a distinct building name, store, school, or famous spot, output: "靠近 [Landmark Name]".
+                        2. **Priority 2 (Exact Address)**: If NO distinct landmark is found, output the precise street and house number: "[Street Name] [Number]".
+                        Output: A single concise phrase in Traditional Chinese.
                     `;
                     locationContext = await getGeminiResponse(prompt);
                 } catch (e) {
