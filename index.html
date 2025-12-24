@@ -3818,7 +3818,7 @@ function getSmartAdviceText(temp, weatherCode) {
             navigator.geolocation.getCurrentPosition(async position => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                const mapUrl = `http://googleusercontent.com/maps.google.com/maps?q=${lat},${lon}`;
+                const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
                 
                 let locationContext = "";
                 
