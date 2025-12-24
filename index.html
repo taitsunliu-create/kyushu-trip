@@ -3744,6 +3744,7 @@ function getSmartAdviceText(temp, weatherCode) {
             if (event.target == lModal) lModal.style.display = "none";
         }
 // [新增] 獲取 GPS 並透過 LINE/簡訊 分享 Google Maps 連結
+        // [修改] 獲取 GPS 並透過 LINE/簡訊 分享 (修正重複網址與 AI 幻覺問題)
         function shareCurrentLocation() {
             // 1. 檢查支援度
             if (!navigator.geolocation) {
@@ -3755,57 +3756,72 @@ function getSmartAdviceText(temp, weatherCode) {
             const originalContent = btn.innerHTML;
             
             // 2. 顯示讀取中狀態
-            // 2. 顯示讀取中狀態 (只留 loading 圖示)
-            btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:rotate 1s linear infinite;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" fill="none" stroke="currentColor" stroke-width="2"></path></svg>`;
+            btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:pulse 1s infinite;"><circle cx="12" cy="12" r="10"></circle></svg> 定位分析中...`;
             btn.style.opacity = "0.8";
 
             // 3. 獲取高精確度位置
-            // 3. 獲取高精確度位置 (修改：加入 async 以等待 AI 分析)
             navigator.geolocation.getCurrentPosition(async position => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 
-                // [新增] 呼叫 AI 分析座標位置
-                let locationContext = "";
-                try {
-                    // 暫時改變按鈕文字提示正在分析
-                    btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:pulse 1s infinite;"><circle cx="12" cy="12" r="10"></circle></svg> 分析地標中...`;
-                    
-                    const prompt = `
-                        Task: Analyze the coordinates ${lat},${lon}.
-                        Output: Identify the nearest obvious landmark (building, station, park) or specific street address/doorplate.
-                        Format: Traditional Chinese, short phrase (e.g., "靠近熊本城入口" or "位於博多站前二丁目7-1").
-                        Constraint: No explanations, just the location name.
-                    `;
-                    // 呼叫 Gemini (若未解鎖金鑰會跳到 catch)
-                    locationContext = await getGeminiResponse(prompt);
-                } catch (e) {
-                    console.log("位置分析略過或失敗");
-                }
-
-                // [修正] 產生標準 Google Maps 連結 (修正原本網址可能的格式錯誤)
+                // [修正] 標準 Google Maps 連結格式
                 const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
                 
-                // [修改] 組合分享文字
-                const baseText = "【緊急/報平安】我目前位置：";
+                let locationContext = "";
+                
+                try {
+                    // [步驟 A] 使用免費的 OpenStreetMap (Nominatim) API 進行逆向地理編碼
+                    // 這能精準抓到建築物名稱 (如: 盛群半導體) 或道路名，解決 AI 對純座標的幻覺問題
+                    const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`;
+                    
+                    const geoRes = await fetch(geoUrl);
+                    const geoData = await geoRes.json();
+                    
+                    // 提取關鍵資訊 (優先順序: 建築物名 > 商店名 > 道路名)
+                    // OSM 的資料結構通常在 display_name 或 address 物件中
+                    const rawAddress = geoData.display_name || "未知地點";
+                    console.log("OSM Raw Data:", rawAddress);
+
+                    // [步驟 B] 將精確的地址資料傳給 AI 進行「人話」潤飾
+                    // 這樣 AI 就不是在猜座標，而是在幫你簡化地址
+                    const prompt = `
+                        Task: Summarize this location data into a short, urgent message for sharing.
+                        Raw Data: "${rawAddress}"
+                        Output: A concise phrase in Traditional Chinese indicating the nearest landmark or street.
+                        Example: "靠近盛群半導體" or "位於研新二路附近".
+                        Rule: Do not output coordinates. Just the landmark name.
+                    `;
+                    
+                    locationContext = await getGeminiResponse(prompt);
+
+                } catch (e) {
+                    console.error("地標分析失敗", e);
+                    // 失敗時的備案
+                    locationContext = "我的位置";
+                }
+
+                // [修正] 組合分享文字
+                // 注意：這裡移除了 mapUrl，因為 navigator.share 的 url 欄位會自動幫你貼在最後面
+                // 這樣就不會出現兩次網址了
+                const baseText = "【緊急/報平安】";
                 const shareText = locationContext 
-                    ? `${baseText}${locationContext} 附近\n(${mapUrl})` 
-                    : `${baseText}請點擊連結查看\n(${mapUrl})`;
+                    ? `${baseText}${locationContext} 附近` 
+                    : `${baseText}請查看連結`;
 
                 // 4. 呼叫原生分享選單 (Web Share API)
                 if (navigator.share) {
                     navigator.share({
                         title: '我的即時位置',
-                        text: shareText,
-                        url: mapUrl
+                        text: shareText, // 這裡只有文字
+                        url: mapUrl      // 這裡放網址，系統會自動接在文字後面
                     }).then(() => {
                         console.log('分享成功');
                     }).catch((error) => {
                         console.log('分享取消', error);
                     });
                 } else {
-                    // 電腦版或不支援分享的瀏覽器 -> 改為複製連結
-                    prompt("請複製以下位置資訊發送：", shareText);
+                    // 電腦版或不支援分享的瀏覽器 -> 改為複製連結 (這裡就需要手動把網址加回去顯示)
+                    prompt("請複製以下資訊發送：", `${shareText}\n${mapUrl}`);
                 }
 
                 // 復原按鈕
@@ -3818,7 +3834,7 @@ function getSmartAdviceText(temp, weatherCode) {
                 btn.innerHTML = originalContent;
                 btn.style.opacity = "1";
             }, { 
-                enableHighAccuracy: true, // 要求高精確度 (重要!)
+                enableHighAccuracy: true, // 要求高精確度
                 timeout: 10000, 
                 maximumAge: 0 
             });
