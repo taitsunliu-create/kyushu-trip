@@ -3749,84 +3749,86 @@ function getSmartAdviceText(temp, weatherCode) {
         let pendingShareData = null;
 
         // [修改] 一鍵分享功能 (分析完直接彈出)
-        function shareCurrentLocation() {
-            const btn = document.getElementById('btn-share-loc');
+        // [修正] 一鍵分享功能 (修正網址格式)
+function shareCurrentLocation() {
+    const btn = document.getElementById('btn-share-loc');
 
-            if (!navigator.geolocation) {
-                alert("您的裝置不支援定位功能。");
-                return;
-            }
+    if (!navigator.geolocation) {
+        alert("您的裝置不支援定位功能。");
+        return;
+    }
 
-            // 1. 鎖定按鈕避免重複點擊
-            if (btn.style.opacity === "0.8") return;
+    // 1. 鎖定按鈕避免重複點擊
+    if (btn.style.opacity === "0.8") return;
 
-            // 2. 儲存原始外觀並改變狀態
-            if (!btn.dataset.originalHtml) {
-                btn.dataset.originalHtml = btn.innerHTML;
-            }
-            btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:pulse 1s infinite;"><circle cx="12" cy="12" r="10"></circle></svg> 分析位置中...`;
-            btn.style.opacity = "0.8";
-            btn.style.background = "#6B7280"; 
+    // 2. 儲存原始外觀並改變狀態
+    if (!btn.dataset.originalHtml) {
+        btn.dataset.originalHtml = btn.innerHTML;
+    }
+    btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:pulse 1s infinite;"><circle cx="12" cy="12" r="10"></circle></svg> 分析位置中...`;
+    btn.style.opacity = "0.8";
+    btn.style.background = "#6B7280"; 
 
-            navigator.geolocation.getCurrentPosition(async position => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                const mapUrl = `http://googleusercontent.com/maps.google.com/maps?q=${lat},${lon}`;
-                
-                let locationContext = "";
-                try {
-                    // A. 取得真實地址
-                    const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`;
-                    const geoRes = await fetch(geoUrl);
-                    const geoData = await geoRes.json();
-                    const rawAddress = geoData.display_name || "未知地點";
+    navigator.geolocation.getCurrentPosition(async position => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
+        // ★★★ [修正重點] 改為標準 Google Maps 網址格式 ★★★
+        const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+        
+        let locationContext = "";
+        try {
+            // A. 取得真實地址
+            const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`;
+            const geoRes = await fetch(geoUrl);
+            const geoData = await geoRes.json();
+            const rawAddress = geoData.display_name || "未知地點";
 
-                    // B. AI 潤飾 (保持您的 API 省流原則，只用一次)
-                    const prompt = `
-                        Task: Summarize this location data into a short, urgent message.
-                        Raw Data: "${rawAddress}"
-                        Output: A concise phrase in Traditional Chinese (e.g., "靠近盛群半導體").
-                        Rule: Just the landmark name.
-                    `;
-                    locationContext = await getGeminiResponse(prompt);
-                } catch (e) {
-                    console.error("分析失敗", e);
-                    locationContext = "我的位置";
-                }
-
-                // C. 準備資料
-                const shareData = {
-                    title: '我的即時位置',
-                    text: `【緊急/報平安】我目前位置：${locationContext} 附近`,
-                    url: mapUrl
-                };
-
-                // D. [修改重點] 分析完直接執行分享，不等待第二次點擊
-                try {
-                    if (navigator.share) {
-                        await navigator.share(shareData);
-                    } else {
-                        throw new Error("不支援 Share API");
-                    }
-                } catch (err) {
-                    // 若瀏覽器因等待時間過長而阻擋分享視窗，或不支援時，改用複製視窗
-                    console.log("自動分享被阻擋或取消，改用手動複製", err);
-                    prompt("請複製以下位置資訊：", `${shareData.text}\n${shareData.url}`);
-                } finally {
-                    // 無論成功失敗，最後都重置按鈕
-                    resetShareButton(btn);
-                }
-
-            }, error => {
-                console.error(error);
-                alert("無法取得位置，請確認 GPS 已開啟。");
-                resetShareButton(btn);
-            }, { 
-                enableHighAccuracy: true,
-                timeout: 10000, 
-                maximumAge: 0 
-            });
+            // B. AI 潤飾 (保持 API 省流原則)
+            const prompt = `
+                Task: Summarize this location data into a short, urgent message.
+                Raw Data: "${rawAddress}"
+                Output: A concise phrase in Traditional Chinese (e.g., "靠近盛群半導體").
+                Rule: Just the landmark name.
+            `;
+            locationContext = await getGeminiResponse(prompt);
+        } catch (e) {
+            console.error("分析失敗", e);
+            locationContext = "我的位置";
         }
+
+        // C. 準備資料
+        const shareData = {
+            title: '我的即時位置',
+            text: `【緊急/報平安】我目前位置：${locationContext} 附近`,
+            url: mapUrl
+        };
+
+        // D. 執行分享
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                throw new Error("不支援 Share API");
+            }
+        } catch (err) {
+            console.log("自動分享被阻擋或取消，改用手動複製", err);
+            // 在複製視窗中顯示正確的網址
+            prompt("請複製以下位置資訊：", `${shareData.text}\n${shareData.url}`);
+        } finally {
+            resetShareButton(btn);
+        }
+
+    }, error => {
+        console.error(error);
+        alert("無法取得位置，請確認 GPS 已開啟。");
+        resetShareButton(btn);
+    }, { 
+        enableHighAccuracy: true,
+        timeout: 10000, 
+        maximumAge: 0 
+    });
+}
 
         // 輔助函式：重置按鈕
         function resetShareButton(btn) {
