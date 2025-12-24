@@ -3787,11 +3787,12 @@ function shareCurrentLocation() {
 
     // 接著是原本的定位程式碼 (這行保留)
     navigator.geolocation.getCurrentPosition(async position => {
-        const lat = position.coords.latitude;
+       const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         
         // ★★★ [修正重點] 改為標準 Google Maps 網址格式 ★★★
-        const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+        // 修正：移除多餘的字元，使用標準 query 參數
+        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
         
         let locationContext = "";
         try {
