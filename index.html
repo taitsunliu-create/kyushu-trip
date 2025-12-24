@@ -3848,15 +3848,17 @@ function shareCurrentLocation() {
 }
 
         // 輔助函式：重置按鈕
-        function resetShareButton(btn) {
-            isLocReady = false;
-            pendingShareData = null;
-            if (btn.dataset.originalHtml) {
-                btn.innerHTML = btn.dataset.originalHtml;
-            }
-            btn.style.background = ""; // 恢復原本 CSS 設定的漸層色
-            btn.style.opacity = "1";
-        }
+        // 請更新這個輔助函式 (通常在程式碼最下方)
+function resetShareButton(btn) {
+    if (btn.dataset.originalHtml) {
+        btn.innerHTML = btn.dataset.originalHtml;
+    }
+    // 清除所有 JS 加上去的樣式，讓它回復成 CSS class (.float-share-btn) 的預設值
+    btn.style.background = ""; 
+    btn.style.borderColor = ""; 
+    btn.style.color = "";
+    btn.style.opacity = "";
+}
         async function submitManualLocation() {
             const manualCity = document.getElementById('modal-city-input').value.trim();
             if (!manualCity) return;
