@@ -1102,12 +1102,20 @@
         .lightbox-content {
             max-width: 95%;
             max-height: 95%;
-            border-radius: 4px;
-            box-shadow: 0 0 20px rgba(255,255,255,0.1);
             -o-object-fit: contain;
-               object-fit: contain; /* 保持比例完整顯示 */
-            transform: scale(1);
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+               object-fit: contain;
+            /* [修改] 移除 transition 以實現即時跟手效果 */
+            /* transform: scale(1); */ 
+            
+            /* [新增] 游標變更與觸控優化 */
+            cursor: grab;
+            touch-action: none; /* 關鍵：防止手機滑動時觸發瀏覽器換頁或捲動 */
+            transform-origin: center center;
+            will-change: transform; /* 效能優化 */
+        }
+        
+        .lightbox-content:active {
+            cursor: grabbing;
         }
 
         .lightbox-close {
@@ -4833,16 +4841,160 @@ function compressImage(file, maxWidth, quality) {
                 }, 200); // 稍微提早一點切換，讓銜接更緊密
             }
         });
-        // [新增] 圖片放大燈箱控制函式
+        // [升級版] 圖片放大燈箱控制函式 (含縮放與拖曳功能)
+            let lbState = {
+                scale: 1,
+                panning: false,
+                pointX: 0, pointY: 0, // 當前座標
+                startX: 0, startY: 0, // 拖曳起始點
+                lastX: 0, lastY: 0,   // 上一次結束點
+                initialDist: 0        // 雙指初始距離
+            };
+
+            const lbImg = document.getElementById('lightbox-img');
+            const lbModal = document.getElementById('lightbox-modal');
+
+            // 1. 開啟燈箱
             window.openLightbox = function(src) {
-                const modal = document.getElementById('lightbox-modal');
-                const img = document.getElementById('lightbox-img');
-                img.src = src;
-                modal.style.display = 'flex';
+                if(!lbImg || !lbModal) return;
+                
+                lbImg.src = src;
+                lbModal.style.display = 'flex';
+                
+                // 重置狀態
+                resetLightbox();
+                
+                // 阻擋圖片點擊冒泡 (避免點圖片時關閉燈箱)
+                lbImg.onclick = (e) => e.stopPropagation();
+                
+                // 加入事件監聽
+                addLightboxListeners();
             }
 
-            window.closeLightbox = function() {
-                document.getElementById('lightbox-modal').style.display = 'none';
+            // 2. 關閉燈箱
+            window.closeLightbox = function(e) {
+                // 只有點擊背景(遮罩)或關閉按鈕時才關閉
+                // (因為 img 已經阻擋冒泡，這裡通常是點到 overlay)
+                if (e && e.target !== lbModal && !e.target.classList.contains('lightbox-close')) return;
+
+                lbModal.style.display = 'none';
+                removeLightboxListeners();
+            }
+
+            function resetLightbox() {
+                lbState = { scale: 1, panning: false, pointX: 0, pointY: 0, startX: 0, startY: 0, lastX: 0, lastY: 0, initialDist: 0 };
+                updateTransform();
+            }
+
+            function updateTransform() {
+                // 限制縮小不能小於 1 (原尺寸)
+                if (lbState.scale < 1) lbState.scale = 1;
+                lbImg.style.transform = `translate(${lbState.pointX}px, ${lbState.pointY}px) scale(${lbState.scale})`;
+            }
+
+            // --- 事件處理區 ---
+
+            function addLightboxListeners() {
+                // 電腦版：滾輪縮放
+                lbImg.addEventListener('wheel', handleWheel, { passive: false });
+                // 電腦版：拖曳
+                lbImg.addEventListener('mousedown', handleMouseDown);
+                
+                // 手機版：觸控
+                lbImg.addEventListener('touchstart', handleTouchStart, { passive: false });
+                lbImg.addEventListener('touchmove', handleTouchMove, { passive: false });
+                lbImg.addEventListener('touchend', handleTouchEnd);
+            }
+
+            function removeLightboxListeners() {
+                lbImg.removeEventListener('wheel', handleWheel);
+                lbImg.removeEventListener('mousedown', handleMouseDown);
+                window.removeEventListener('mousemove', handleMouseMove);
+                window.removeEventListener('mouseup', handleMouseUp);
+                lbImg.removeEventListener('touchstart', handleTouchStart);
+                lbImg.removeEventListener('touchmove', handleTouchMove);
+                lbImg.removeEventListener('touchend', handleTouchEnd);
+            }
+
+            // [電腦] 滾輪縮放
+            function handleWheel(e) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.2 : 0.2;
+                lbState.scale += delta;
+                updateTransform();
+            }
+
+            // [電腦] 滑鼠拖曳
+            function handleMouseDown(e) {
+                if (lbState.scale <= 1) return; // 沒放大時不給拖
+                e.preventDefault();
+                lbState.startX = e.clientX - lbState.pointX;
+                lbState.startY = e.clientY - lbState.pointY;
+                lbState.panning = true;
+                
+                window.addEventListener('mousemove', handleMouseMove);
+                window.addEventListener('mouseup', handleMouseUp);
+            }
+
+            function handleMouseMove(e) {
+                if (!lbState.panning) return;
+                e.preventDefault();
+                lbState.pointX = e.clientX - lbState.startX;
+                lbState.pointY = e.clientY - lbState.startY;
+                updateTransform();
+            }
+
+            function handleMouseUp() {
+                lbState.panning = false;
+                window.removeEventListener('mousemove', handleMouseMove);
+                window.removeEventListener('mouseup', handleMouseUp);
+            }
+
+            // [手機] 觸控處理 (單指拖曳 / 雙指縮放)
+            function handleTouchStart(e) {
+                if (e.touches.length === 2) {
+                    // 雙指：開始縮放
+                    e.preventDefault(); // 防止背景捲動
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    lbState.initialDist = Math.hypot(touch1.pageX - touch2.pageX, touch1.pageY - touch2.pageY);
+                    lbState.lastScale = lbState.scale;
+                } else if (e.touches.length === 1 && lbState.scale > 1) {
+                    // 單指且已放大：開始拖曳
+                    const touch = e.touches[0];
+                    lbState.startX = touch.pageX - lbState.pointX;
+                    lbState.startY = touch.pageY - lbState.pointY;
+                    lbState.panning = true;
+                }
+            }
+
+            function handleTouchMove(e) {
+                if (e.touches.length === 2) {
+                    // 雙指縮放中
+                    e.preventDefault();
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    const dist = Math.hypot(touch1.pageX - touch2.pageX, touch1.pageY - touch2.pageY);
+                    
+                    // 計算縮放比例
+                    const delta = dist / lbState.initialDist;
+                    lbState.scale = lbState.lastScale * delta;
+                    updateTransform();
+                } else if (e.touches.length === 1 && lbState.panning) {
+                    // 單指拖曳中
+                    e.preventDefault(); // 防止背景捲動
+                    const touch = e.touches[0];
+                    lbState.pointX = touch.pageX - lbState.startX;
+                    lbState.pointY = touch.pageY - lbState.startY;
+                    updateTransform();
+                }
+            }
+
+            function handleTouchEnd(e) {
+                lbState.panning = false;
+                if (e.touches.length < 2) {
+                    lbState.initialDist = 0;
+                }
             }
     </script>
 <div id="lightbox-modal" class="lightbox-overlay" onclick="closeLightbox()">
