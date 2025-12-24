@@ -3762,13 +3762,23 @@ function shareCurrentLocation() {
     if (btn.style.opacity === "0.8") return;
 
     // 2. 儲存原始外觀並改變狀態
+    // 2. 儲存原始外觀並改變狀態 (這三行保留)
     if (!btn.dataset.originalHtml) {
         btn.dataset.originalHtml = btn.innerHTML;
     }
-    btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:pulse 1s infinite;"><circle cx="12" cy="12" r="10"></circle></svg> 分析位置中...`;
-    btn.style.opacity = "0.8";
-    btn.style.background = "#6B7280"; 
 
+    // ★★★ [修改] 紫色脈衝特效 (開始) ★★★
+    // 設定 SVG：雙圓圈設計 (外圈 stroke + 內圈 fill)，並加上 pulse 動畫
+    btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:pulse 0.8s infinite; color: #A855F7;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg> 分析位置中...`;
+
+    // 設定配色：極淺紫色背景 + 亮紫色文字 + 紫色邊框
+    btn.style.background = "#FAF5FF"; 
+    btn.style.color = "#A855F7";      
+    btn.style.border = "1px solid #A855F7"; 
+    btn.style.opacity = "1";          
+    // ★★★ [修改] 紫色脈衝特效 (結束) ★★★
+
+    // 接著是原本的定位程式碼 (這行保留)
     navigator.geolocation.getCurrentPosition(async position => {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
