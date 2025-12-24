@@ -3556,12 +3556,16 @@ function getSmartAdviceText(temp, weatherCode) {
                 const lon = position.coords.longitude;
                 
                 try {
-                    // A. 抓天氣
-                    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                    // A. 抓天氣 (加入 timezone=auto 以獲取精確時區)
+                    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
                     const weatherData = await weatherRes.json();
+                    
                     currentMyTemp = weatherData.current_weather.temperature;
                     const tempStr = `${Math.round(currentMyTemp)}°C`;
                     const code = weatherData.current_weather.weathercode;
+                    
+                    // [新增] 取得 API 回傳的當地時區 (例如 "Asia/Tokyo")
+                    const localTimezone = weatherData.timezone;
                     
                     // B. AI 解析地名
                     let displayZh = "我的位置";
@@ -3597,7 +3601,12 @@ function getSmartAdviceText(temp, weatherCode) {
                     window.appCache = window.appCache || {};
                     window.appCache['my_location_combined'] = {
                         timestamp: Date.now(),
-                        data: { temp: currentMyTemp, city: displayZh, code: code }
+                        data: { 
+                            temp: currentMyTemp, 
+                            city: displayZh, 
+                            code: code,
+                            timezone: localTimezone // [新增] 儲存時區
+                        }
                     };
                     const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
                     if (targetTempStr !== '--°') updateComparison(parseFloat(targetTempStr));
@@ -4251,15 +4260,30 @@ function getSmartAdviceText(temp, weatherCode) {
             // --- 模式 A: 行程諮詢 (Consult) ---
             if (mode === 'consult' || mode === 'auto') {
                 
-                // 1. 讀取快取中的「我的位置與天氣」
+                // 1. 讀取快取中的「我的位置、天氣與時區」
                 let liveContext = "";
                 if (window.appCache && window.appCache['my_location_combined']) {
                     const d = window.appCache['my_location_combined'].data;
                     const weatherDesc = typeof getWeatherDescText === 'function' ? getWeatherDescText(d.code) : '';
                     
+                    // [新增] 根據儲存的時區，計算「現在」的當地時間
+                    let localTimeStr = "未知";
+                    if (d.timezone) {
+                        try {
+                            // 使用 Intl API 轉換時間，確保不受手機系統時間影響
+                            localTimeStr = new Date().toLocaleString('zh-TW', { 
+                                timeZone: d.timezone, 
+                                hour12: false,
+                                year: 'numeric', month: '2-digit', day: '2-digit', 
+                                hour: '2-digit', minute: '2-digit'
+                            });
+                        } catch (e) { console.error("時間轉換錯誤", e); }
+                    }
+
                     liveContext = `
                     【使用者當下情境】
                     - 目前位置：${d.city}
+                    - 當地時間：${localTimeStr} (時區: ${d.timezone || '自動偵測'})
                     - 當地天氣：${weatherDesc} (氣溫 ${d.temp}°C)
                     `;
                 }
