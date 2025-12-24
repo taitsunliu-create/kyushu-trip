@@ -1083,6 +1083,44 @@
         .container.page-hidden {
             display: none;
         }
+        /* [新增] 圖片點擊放大 (Lightbox) 樣式 */
+        .lightbox-overlay {
+            display: none; /* 預設隱藏 */
+            position: fixed;
+            z-index: 10000; /* 最高層級，蓋過所有按鈕 */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9); /* 深黑背景 */
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.2s;
+        }
+        
+        .lightbox-content {
+            max-width: 95%;
+            max-height: 95%;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+            -o-object-fit: contain;
+               object-fit: contain; /* 保持比例完整顯示 */
+            transform: scale(1);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            color: #fff;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10001;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
@@ -4465,7 +4503,8 @@ function getSmartAdviceText(temp, weatherCode) {
 
         try {
             // 3. 在聊天室顯示圖片
-            const imgHtml = `<img src="data:image/jpeg;base64,${pendingImageBase64}" style="max-width:100%; border-radius:10px; border:1px solid #ccc; margin-top:5px;">`;
+            // [修改] 加入 onclick 事件與 cursor:zoom-in 樣式
+            const imgHtml = `<img src="data:image/jpeg;base64,${pendingImageBase64}" onclick="openLightbox(this.src)" style="max-width:100%; border-radius:10px; border:1px solid #ccc; margin-top:5px; cursor:zoom-in;">`;
             appendMessage('user', imgHtml);
 
             // 讀取位置
@@ -4794,6 +4833,21 @@ function compressImage(file, maxWidth, quality) {
                 }, 200); // 稍微提早一點切換，讓銜接更緊密
             }
         });
+        // [新增] 圖片放大燈箱控制函式
+            window.openLightbox = function(src) {
+                const modal = document.getElementById('lightbox-modal');
+                const img = document.getElementById('lightbox-img');
+                img.src = src;
+                modal.style.display = 'flex';
+            }
+
+            window.closeLightbox = function() {
+                document.getElementById('lightbox-modal').style.display = 'none';
+            }
     </script>
+<div id="lightbox-modal" class="lightbox-overlay" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
 </body>
 </html>
