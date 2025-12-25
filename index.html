@@ -3748,57 +3748,42 @@ function getSmartAdviceText(temp, weatherCode) {
         let isLocReady = false;
         let pendingShareData = null;
 
-        // [修改] 一鍵分享功能 (分析完直接彈出)
-        // [修正] 一鍵分享功能 (修正網址格式)
-// [修正] 一鍵分享功能 (改為兩段式：先定位準備資料 -> 再點擊彈出視窗)
+// [修改] 智慧分享功能 (嘗試一鍵完成，遇阻擋則優雅變身)
         function shareCurrentLocation() {
             const btn = document.getElementById('btn-share-loc');
 
-            // --- 階段二：資料已準備好，直接彈出視窗 (這是第二下點擊) ---
-            if (pendingShareData) {
-                try {
-                    if (navigator.share) {
-                        navigator.share(pendingShareData)
-                            .then(() => {
-                                console.log("分享成功");
-                                // 分享後重置按鈕狀態
-                                resetShareButton(btn);
-                                pendingShareData = null; // 清空資料
-                            })
-                            .catch((err) => {
-                                console.log("分享被取消", err);
-                                // 取消分享通常不需重置，讓使用者可以再次點擊
-                            });
-                    } else {
-                        // 電腦版或不支援 Share API 的備案
-                        prompt("請複製以下位置資訊：", `${pendingShareData.text}\n${pendingShareData.url}`);
-                        resetShareButton(btn);
-                        pendingShareData = null;
-                    }
-                } catch (err) {
-                    console.error(err);
-                    resetShareButton(btn);
-                    pendingShareData = null;
-                }
-                return; // 結束函式，不執行下方的定位邏輯
+            // --- [階段二] 如果按鈕已經是「準備完成」狀態，直接發射 ---
+            if (btn.dataset.shareState === 'ready' && window.pendingShareData) {
+                navigator.share(window.pendingShareData)
+                    .then(() => {
+                        resetShareButton(btn); // 分享成功後復原
+                    })
+                    .catch((err) => {
+                        console.log("使用者取消分享", err);
+                        // 取消後保持綠色按鈕，讓使用者有機會反悔再按一次
+                    });
+                return; // 結束，不重複執行定位
             }
 
-            // --- 階段一：開始定位與準備資料 (這是第一下點擊) ---
-            
+            // --- [階段一] 正常流程 (第一次點擊) ---
             if (!navigator.geolocation) {
                 alert("您的裝置不支援定位功能。");
                 return;
             }
 
-            // 1. 鎖定按鈕避免重複點擊 (且當前沒有準備好的資料)
-            if (btn.style.opacity === "0.8") return;
+            // 防止重複點擊 (如果正在分析中)
+            if (btn.dataset.shareState === 'analyzing') return;
 
-            // 2. 儲存原始外觀
+            // 1. 鎖定並變更為「雷達分析中」動畫
             if (!btn.dataset.originalHtml) {
                 btn.dataset.originalHtml = btn.innerHTML;
             }
-
-            // 3. 變更為「雷達掃描」動畫 (表示正在定位中)
+            
+            // 設定為分析中狀態
+            btn.dataset.shareState = 'analyzing';
+            btn.style.pointerEvents = "none"; // 暫時禁止點擊
+            
+            // 雷達動畫
             btn.innerHTML = `
                 <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; color: #10B981;">
                     <circle cx="12" cy="12" r="4" fill="currentColor"></circle>
@@ -3808,65 +3793,82 @@ function getSmartAdviceText(temp, weatherCode) {
                     </circle>
                 </svg>
             `;
-            // 設定定位中樣式 (淺綠底)
             btn.style.background = "#ECFDF5"; 
             btn.style.borderColor = "#10B981"; 
             btn.style.color = "#10B981";      
-            btn.style.opacity = "0.8"; // 稍微半透明表示忙碌中
+            btn.style.opacity = "0.8";
 
-            // 4. 執行定位
+            // 2. 執行定位
             navigator.geolocation.getCurrentPosition(async position => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
+                
+                // [修正] 確保網址格式正確 (移除之前的錯誤字元)
                 const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
                 
                 let locationContext = "";
-                
                 try {
-                    // A. 取得真實地址 (OpenStreetMap)
+                    // A. 取得真實地址
                     const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`;
                     const geoRes = await fetch(geoUrl);
                     const geoData = await geoRes.json();
                     const rawAddress = geoData.display_name || "未知地點";
 
-                    // B. AI 潤飾 (保持 API 省流原則)
-                    // [修改] 混合邏輯：店家/地標優先，若無才顯示門牌
+                    // B. AI 潤飾 (店家/地標優先邏輯)
                     const prompt = `
                         Task: Analyze this location data: "${rawAddress}" to describe the location for a friend.
                         Logic:
-                        1. **Priority 1 (Store/Landmark)**: If a specific Store Name (e.g., 7-11, Starbucks, McDonald's), Building Name, or Landmark exists, output: "靠近 [Name]".
-                        2. **Priority 2 (Exact Address)**: If NO specific store or landmark is found, output the precise street and house number: "[Street Name] [Number]".
+                        1. **Priority 1 (Store/Landmark)**: If a specific Store Name (e.g., 7-11, Starbucks), Building Name, or Landmark exists, output: "靠近 [Name]".
+                        2. **Priority 2 (Exact Address)**: If NO specific store is found, output the precise street and house number: "[Street Name] [Number]號".
                         Output: A single concise phrase in Traditional Chinese.
                     `;
                     locationContext = await getGeminiResponse(prompt);
                 } catch (e) {
                     console.error("分析失敗", e);
-                    locationContext = "我的位置"; // 失敗時的備案
+                    locationContext = "我的位置";
                 }
 
-                // C. 準備好資料，存入全域變數 pendingShareData
-                pendingShareData = {
+                // C. 準備全域資料
+                window.pendingShareData = {
                     title: '我的即時位置',
                     text: `【緊急/報平安】我目前位置：${locationContext} 附近`,
                     url: mapUrl
                 };
 
-                // D. ★ 關鍵步驟：改變按鈕狀態為「準備發送」 (紙飛機圖示)
-                // 這裡不直接 call navigator.share，而是等待使用者第二次點擊
-                btn.style.opacity = "1"; // 恢復不透明
-                btn.style.background = "#10B981"; // 變深綠色
-                btn.style.color = "white";
-                btn.style.borderColor = "#10B981";
-                // 紙飛機 SVG
-                btn.innerHTML = `
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px; animation: popIn 0.3s;">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                `;
-                
-                // (選用) 震動一下提示使用者好了
-                if(navigator.vibrate) navigator.vibrate(50);
+                // D. 嘗試觸發分享 (關鍵邏輯)
+                try {
+                    // 嘗試一鍵觸發
+                    await navigator.share(window.pendingShareData);
+                    // 若成功，重置按鈕
+                    resetShareButton(btn);
+                } catch (err) {
+                    // ⚠️ 如果進到這裡，代表被瀏覽器擋住了 (或使用者取消)
+                    // 我們不跳醜醜的視窗，而是將按鈕「進化」為發送鈕
+                    console.log("自動分享未觸發，切換為手動確認模式");
+                    
+                    // 解除鎖定
+                    btn.style.pointerEvents = "auto";
+                    
+                    // 變更為「紙飛機發送」樣式
+                    btn.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px; animation: popIn 0.3s;">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        點擊發送
+                    `;
+                    // 變更為醒目的綠色實心按鈕
+                    btn.style.background = "#10B981"; 
+                    btn.style.borderColor = "#10B981";
+                    btn.style.color = "white";
+                    btn.style.opacity = "1";
+                    
+                    // 標記狀態為 ready，讓下次點擊走上面的快速通道
+                    btn.dataset.shareState = 'ready';
+                    
+                    // (選用) 震動提示使用者
+                    if(navigator.vibrate) navigator.vibrate(50);
+                }
 
             }, error => {
                 console.error(error);
@@ -3878,18 +3880,21 @@ function getSmartAdviceText(temp, weatherCode) {
                 maximumAge: 0 
             });
         }
-
         // 輔助函式：重置按鈕
         // 請更新這個輔助函式 (通常在程式碼最下方)
 function resetShareButton(btn) {
     if (btn.dataset.originalHtml) {
         btn.innerHTML = btn.dataset.originalHtml;
     }
-    // 清除所有 JS 加上去的樣式，讓它回復成 CSS class (.float-share-btn) 的預設值
     btn.style.background = ""; 
     btn.style.borderColor = ""; 
     btn.style.color = "";
     btn.style.opacity = "";
+    btn.style.pointerEvents = "auto"; // 恢復可點擊
+    
+    // 清除狀態標記與暫存資料
+    delete btn.dataset.shareState;
+    window.pendingShareData = null;
 }
         async function submitManualLocation() {
             const manualCity = document.getElementById('modal-city-input').value.trim();
