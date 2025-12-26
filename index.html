@@ -4301,8 +4301,8 @@ function resetShareButton(btn) {
             if ('webkitSpeechRecognition' in window) {
                 recognition = new webkitSpeechRecognition();
                 // 關鍵修正：不再自動偵測，而是讀取使用者的選擇
-                recognition.continuous = false;
-                recognition.interimResults = false;
+                recognition.continuous = true;
+                recognition.interimResults = true;
 
                 recognition.onstart = function() {
                     // 在開始時動態設定語言
@@ -4325,19 +4325,34 @@ function resetShareButton(btn) {
                 };
 
                 recognition.onresult = function(event) {
-                    const transcript = event.results[0][0].transcript;
-                    document.getElementById('ai-user-input').value = transcript;
-                    sendToGemini('voice_auto');
-                };
-                
-                // Error handling for "no-speech" or "language mismatch"
-                recognition.onerror = function(event) {
-                    console.log('Voice Error:', event.error);
-                    voiceBtn.classList.remove('recording');
-                    voiceBtn.innerHTML = `
-                        <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:2px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                        重試
-                    `;
+                    let finalTranscript = '';
+                    let interimTranscript = '';
+
+                    // 遍歷所有回傳的結果 (因為是連續模式，會有這一次連線累積的所有句子)
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) {
+                            finalTranscript += event.results[i][0].transcript;
+                        } else {
+                            interimTranscript += event.results[i][0].transcript;
+                        }
+                    }
+
+                    const inputEl = document.getElementById('ai-user-input');
+                    
+                    // 這裡的邏輯是：如果是最後確認的文字，就「附加」到現有內容後面
+                    // 這樣你在講長篇大論時，中間停頓也不會洗掉前面的字
+                    if (finalTranscript) {
+                        // 簡單的游標處理：如果原本框內有字，補個空格再接下去
+                        if (inputEl.value && !inputEl.value.endsWith(' ')) {
+                             inputEl.value += ' ';
+                        }
+                        inputEl.value += finalTranscript;
+                    } 
+                    // 如果是還在變動的暫存文字 (灰色字)，也可以選擇顯示或不顯示
+                    // 為了介面乾淨，這裡我們只處理已確認的文字 (Final)
+                    
+                    // 視覺回饋
+                    inputEl.scrollLeft = inputEl.scrollWidth; // 自動捲動到最右邊
                 };
 
                 // [修改] 改為「開關式」邏輯：錄音中點擊則停止，未錄音點擊則開始
