@@ -4290,31 +4290,33 @@ function resetShareButton(btn) {
             const voiceBtn = document.getElementById('btn-voice-ja');
             if (!voiceBtn) return;
             
-            // 防止右鍵選單干擾
+            // 防止長按跳出選單
             voiceBtn.oncontextmenu = (e) => { e.preventDefault(); return false; };
 
             let recognition;
             
+            // 檢查瀏覽器支援度
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 recognition = new SpeechRecognition();
                 
-                // 針對 iPhone 的穩定性設定
-                recognition.continuous = true;      // 必須開啟，否則 iOS 會一直斷線
-                recognition.interimResults = true;  // 開啟以獲得即時回饋
+                // 設定連續模式：讓 iOS 不會講一句話就自己斷線，而是由我們程式控制何時斷
+                recognition.continuous = true;
+                recognition.interimResults = true;
 
+                // --- [關鍵修正 1] 設定語言與 UI 狀態 (onstart) ---
                 recognition.onstart = function() {
-                    const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
-                    recognition.lang = selectedLang;
-                    
                     voiceBtn.classList.add('recording');
+                    
+                    // 取得當前選擇的語言名稱，更新按鈕文字
+                    const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
                     const langText = selectedLang === 'zh-TW' ? '中文' : '日文';
                     
-                    // 視覺回饋
                     voiceBtn.innerHTML = `<span style="animation: pulse 1s infinite;">🔴 聆聽${langText}...</span>`;
-                    document.getElementById('ai-user-input').placeholder = `正在聆聽${langText} (說完自動翻譯)...`;
+                    document.getElementById('ai-user-input').placeholder = `正在聆聽${langText} (說完自動停止)...`;
                 };
 
+                // --- [關鍵修正 2] 結束時重置按鈕 (onend) ---
                 recognition.onend = function() {
                     voiceBtn.classList.remove('recording');
                     voiceBtn.innerHTML = `
@@ -4324,45 +4326,63 @@ function resetShareButton(btn) {
                     updatePlaceholder();
                 };
 
+                // --- [關鍵修正 3] 錯誤處理 (onerror) ---
+                // 過濾掉 iPhone 常見的良性錯誤，不再跳出煩人的 Alert
                 recognition.onerror = function(event) {
                     console.log('Voice Error:', event.error);
-                    voiceBtn.classList.remove('recording');
-                    // 如果是 iOS 常見的 no-speech 錯誤，安靜地重置即可
-                    if (event.error !== 'no-speech') {
-                         alert("語音辨識發生錯誤，請重試");
+                    
+                    // 忽略 "no-speech" (沒聽到聲音) 和 "aborted" (手動停止)
+                    if (event.error === 'no-speech' || event.error === 'aborted') {
+                        // 靜默失敗，只移除錄音狀態，不擾民
+                        voiceBtn.classList.remove('recording');
+                        return;
                     }
+                    
+                    // 只有真正的錯誤才跳通知
+                    voiceBtn.classList.remove('recording');
+                    alert("語音連線中斷，請重新點擊按鈕。");
                 };
 
+                // --- [核心邏輯] 處理辨識結果 (onresult) ---
                 recognition.onresult = function(event) {
                     let finalTranscript = '';
                     
-                    // 組合文字
+                    // 組合所有已確認的片段
                     for (let i = event.resultIndex; i < event.results.length; ++i) {
                         if (event.results[i].isFinal) {
                             finalTranscript += event.results[i][0].transcript;
                         }
                     }
 
-                    // ★ 關鍵修改：一旦有「最終結果」，立刻停止錄音並發送翻譯
+                    // 如果有偵測到完整的句子
                     if (finalTranscript.trim().length > 0) {
-                        recognition.stop(); // 停止錄音
+                        recognition.stop(); // 1. 聽到這句話就立刻停止錄音
                         
-                        // 1. 填入輸入框 (讓使用者知道聽到什麼)
+                        // 2. 填入輸入框顯示給使用者看
                         document.getElementById('ai-user-input').value = finalTranscript;
                         
-                        // 2. 直接觸發 AI 翻譯 (傳入新的模式 'voice_direct')
+                        // 3. 直接發送給 AI 進行翻譯
                         sendToGemini('voice_direct'); 
                     }
                 };
 
-                // 按鈕點擊邏輯：手動開/關
+                // --- [關鍵修正 4] 按鈕點擊事件 ---
                 voiceBtn.onclick = (e) => {
                     if (e && e.cancelable) e.preventDefault();
                     
                     if (voiceBtn.classList.contains('recording')) {
+                        // 如果正在錄音，按一下則停止
                         recognition.stop();
                     } else {
-                        recognition.start();
+                        // ★★★ 修正重點：在 start() 之前設定語言！ ★★★
+                        const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
+                        recognition.lang = selectedLang; 
+                        
+                        try {
+                            recognition.start();
+                        } catch (err) {
+                            console.error("啟動失敗:", err);
+                        }
                     }
                 };
                 
@@ -4417,14 +4437,12 @@ function resetShareButton(btn) {
 
             let finalPrompt = "";
             
-            // 取得目前選擇的語言 (zh-TW 或 ja-JP)
+            // 取得目前選擇的語言
             const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
             const isInputZh = selectedLang === 'zh-TW';
 
             // --- 模式 A: 行程諮詢 ---
             if (mode === 'consult' || mode === 'auto') {
-                // ... (保留原本行程諮詢的邏輯，這裡為了簡潔省略，請保留您原本的這段程式碼) ...
-                // 如果您這段原本有寫很多逻辑，請保留，只需修改下方新增的模式
                  let liveContext = "";
                 if (window.appCache && window.appCache['my_location_combined']) {
                     const d = window.appCache['my_location_combined'].data;
@@ -4442,33 +4460,29 @@ function resetShareButton(btn) {
             // --- 模式 B: 手動按翻譯按鈕 ---
             else if (mode === 'translate') {
                 finalPrompt = `
-                    你是一個中日雙向翻譯機。
-                    內容： "${text}"
-                    任務：
-                    1. 若是中文 -> 翻成日文 (禮貌形)，附上 Romaji。
-                    2. 若是日文 -> 翻成繁體中文。
-                    只輸出翻譯結果。
+                    Role: Professional JP/TW Translator.
+                    Input: "${text}"
+                    Rules:
+                    1. If input is Chinese -> Translate to Japanese (Polite). Add Pronunciation.
+                    2. If input is Japanese -> Translate to Traditional Chinese.
+                    Output: Translation result ONLY.
                 `;
             }
-            // --- ★ 新增模式 C: 語音直達翻譯 (Voice Direct) ---
+            // --- 模式 C: 語音直達翻譯 (Voice Direct) ---
             else if (mode === 'voice_direct') {
-                 // 邏輯：
-                 // 如果我是說中文 (isInputZh=true) -> 翻成日文 -> 顯示喇叭
-                 // 如果我是說日文 (isInputZh=false) -> 翻成中文 -> 不顯示喇叭
-                 
                  if (isInputZh) {
-                     // 中翻日
+                     // 使用者說中文 -> 翻成日文給店員聽
                      finalPrompt = `
                         Task: Translate this Traditional Chinese text to Japanese (Polite form).
                         Input: "${text}"
-                        Output: ONLY the Japanese translation. (No explanations, No Romaji).
+                        Output: ONLY the Japanese translation text. NO Romaji. NO explanations.
                      `;
                  } else {
-                     // 日翻中
+                     // 使用者(或店員)說日文 -> 翻成中文給自己看
                      finalPrompt = `
-                        Task: Translate this Japanese text to Traditional Chinese.
+                        Task: Translate this Japanese text to Traditional Chinese (Taiwan).
                         Input: "${text}"
-                        Output: ONLY the Chinese translation.
+                        Output: ONLY the Chinese translation. NO English. NO Romanization.
                      `;
                  }
             }
@@ -4478,18 +4492,17 @@ function resetShareButton(btn) {
                 const responseText = await getGeminiResponse(finalPrompt);
                 removeLoading();
                 
-                // ★ 決定是否顯示喇叭按鈕
-                // 規則：只有在「翻譯模式」且「結果是日文」(即使用者說中文) 時，才顯示喇叭
+                // 決定是否顯示喇叭按鈕
                 let showAudioBtn = false;
                 
                 if (mode === 'voice_direct') {
-                    // 如果輸入是中文，代表輸出是日文 -> 要給當地人聽 -> 顯示喇叭
+                    // 邏輯：如果你說中文(isInputZh)，代表你要翻成日文給別人聽 -> 顯示喇叭
                     if (isInputZh) {
                         showAudioBtn = true;
                     }
-                    // 如果輸入是日文，代表輸出是中文 -> 給自己看 -> 不顯示喇叭
+                    // 如果你錄的是日文，代表是翻譯成中文給自己看 -> 不顯示喇叭
                 } else {
-                    // 相容舊的手動翻譯模式邏輯
+                    // 手動翻譯模式：只要結果有日文就顯示喇叭
                     showAudioBtn = (mode === 'translate') && /[\u3040-\u309F\u30A0-\u30FF]/.test(responseText);
                 }
                 
