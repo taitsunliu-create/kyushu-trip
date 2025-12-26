@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>九州親子自駕遊 2026</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="apple-touch-icon" href="/kyushu-trip/assets/icon-192-b_DAMY5M.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -5097,6 +5100,14 @@ function compressImage(file, maxWidth, quality) {
                 if (e.touches.length < 2) {
                     lbState.initialDist = 0;
                 }
+            }
+    // --- PWA Service Worker Registration ---
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./service-worker.js')
+                        .then(reg => console.log('PWA Service Worker registered!', reg))
+                        .catch(err => console.log('PWA registration failed:', err));
+                });
             }
     </script>
     </div>
