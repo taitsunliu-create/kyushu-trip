@@ -4302,7 +4302,8 @@ function resetShareButton(btn) {
             // let recognition; <--- [修正] 這行刪除，改用上面的全域變數
             
             // 檢查瀏覽器支援度
-            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 recognition = new SpeechRecognition();
                 
                 // 設定連續模式：讓 iOS 不會講一句話就自己斷線，而是由我們程式控制何時斷
