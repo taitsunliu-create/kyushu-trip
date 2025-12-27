@@ -134,11 +134,12 @@
         }
         .check-item input { accent-color: #10B981; width: 18px; height: 18px; cursor: pointer; }
         /* [新增] 隨身筆記浮動按鈕 (位於分享按鈕上方) */
+        /* [修改] 隨身筆記浮動按鈕 (藍色) - 縮小與透明化 */
         .float-note-btn {
             position: fixed;
-            bottom: 160px; /* 90px + 按鈕高度 + 間距 */
-            left: 20px;    /* 對齊下方的分享按鈕 */
-            background: linear-gradient(135deg, #3B82F6, #2563EB); /* 藍色系 */
+            bottom: 155px; /* [調整] 因為按鈕變小了，高度稍微降低靠近下方 */
+            left: 20px;
+            background: linear-gradient(135deg, #3B82F6, #2563EB);
             color: white;
             border: 2px solid white;
             border-radius: 50%;
@@ -146,37 +147,41 @@
             box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
             z-index: 9999;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s; /* 改為 all 以支援 opacity 變化 */
             display: flex;
             align-items: center;
             justify-content: center;
             -webkit-user-select: none;
             -moz-user-select: none;
                  user-select: none;
+            
+            /* [新增] 縮小與透明度設定 */
+            transform: scale(0.7);   /* 縮小至 70% */
+            opacity: 0.6;            /* 透明度 60% */
+            transform-origin: center center; /* 以中心點縮放 */
         }
         
-        /* [新增] 匯率計算機浮動按鈕 (半透明毛玻璃/垂直堆疊) */
+        /* 讓使用者點擊(按住)時，稍微變回不透明，增加回饋感 */
+        .float-note-btn:active { 
+            transform: scale(0.65); /* 按下時稍微更小一點點 */
+            opacity: 1;             /* 按下時變清楚 */
+        }
+
+        /* [修改] 匯率計算機浮動按鈕 (橘色) - 縮小與透明化 */
         .float-calc-btn {
             position: fixed;
-            /* 藍色筆記是 160px，這個往上疊加 (160 + 75) */
-            bottom: 235px; 
-            left: 20px;    /* 保持靠左對齊 */
+            bottom: 205px; /* [調整] 配合藍色按鈕的高度調整 */
+            left: 20px;
             
-            /* 半透明橘色背景 (RGBA) */
             background: rgba(245, 158, 11, 0.65); 
-            
-            /* 毛玻璃效果：模糊背景，讓透出的文字變模糊 */
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
             
             color: white;
-            border: 2px solid rgba(255, 255, 255, 0.6); /* 邊框也稍微透明 */
+            border: 2px solid rgba(255, 255, 255, 0.6);
             border-radius: 50%;
             padding: 16px;
-            
-            /* 調整陰影，保留層次感但不過重 */
             box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-            
             z-index: 9999;
             cursor: pointer;
             transition: all 0.2s;
@@ -186,7 +191,21 @@
             -webkit-user-select: none;
             -moz-user-select: none;
                  user-select: none;
+
+            /* [新增] 縮小與透明度設定 */
+            transform: scale(0.7);   /* 縮小至 70% */
+            opacity: 0.6;            /* 透明度 60% (會疊加背景本身的透明度) */
+            transform-origin: center center;
         }
+
+        /* 點擊時的回饋 */
+        .float-calc-btn:active { 
+            transform: scale(0.65); 
+            opacity: 1;
+            background: rgba(245, 158, 11, 0.85); 
+        }
+        
+        .float-note-btn svg, .float-calc-btn svg { width: 20px; height: 20px; stroke-width: 2.5; }
         .float-calc-btn:active { 
             transform: scale(0.95); 
             background: rgba(245, 158, 11, 0.85); /* 按下時變實心一點 */
