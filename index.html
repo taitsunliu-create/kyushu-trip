@@ -87,52 +87,75 @@
      /* [修改] SOS 浮動分享按鈕 (層級加強版) */
      /* [新增] 行前檢查清單樣式 */
         /* [修改] 行前檢查清單樣式 (加入折疊功能) */
+        /* [修改] 行前檢查清單樣式 (含捲動與新增刪除功能) */
         .checklist-card-header {
             border-bottom: 1px dashed #E5E7EB; 
             padding-bottom: 10px; 
             margin-bottom: 0;
-            /* 新增: 讓標題可點擊並對齊箭頭 */
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
-        /* 收合容器 (預設隱藏 max-height: 0) */
         .checklist-container {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
             opacity: 0;
         }
-        /* 展開狀態 (加上 .show 類別時) */
+        
         .checklist-container.show {
-            max-height: 800px; /* 設定一個足夠的高度讓內容顯示 */
+            /* 設定高度約為 5 行的高度 (每行約 50px)，超過出現捲軸 */
+            max-height: 280px; 
             opacity: 1;
-            margin-top: 15px; /* 展開時才給上方間距 */
+            margin-top: 15px;
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; 
         }
 
-        /* 沿用原本的格線與項目樣式 */
         .checklist-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 10px; 
-            /* margin-top: 10px; <-- 移除這行，改由 container 控制 */
+            display: flex; 
+            flex-direction: column; /* 改為垂直排列 */
+            gap: 8px; 
+            padding-bottom: 5px;
         }
+
         .check-item {
-            display: flex; align-items: center; gap: 8px;
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; /* 讓刪除按鈕靠右 */
+            gap: 8px;
             background: #F9FAFB; padding: 10px 12px; border-radius: 8px;
-            cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+            font-size: 0.9rem; transition: all 0.2s;
             border: 1px solid #E5E7EB; -webkit-user-select: none; -moz-user-select: none; user-select: none;
         }
-        /* 手機版改為單欄 */
-        @media (max-width: 600px) { .checklist-grid { grid-template-columns: 1fr; } }
         
         .check-item:has(input:checked) {
             background: #ECFDF5; border-color: #10B981; color: #065F46; font-weight: 600;
-            box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1);
         }
         .check-item input { accent-color: #10B981; width: 18px; height: 18px; cursor: pointer; }
+        
+        /* 刪除按鈕樣式 */
+        .btn-del-item {
+            color: #EF4444; background: none; border: none; font-size: 1.2rem;
+            line-height: 1; cursor: pointer; padding: 0 8px; opacity: 0.6;
+        }
+        .btn-del-item:hover { opacity: 1; transform: scale(1.1); }
+
+        /* 新增項目輸入框區域 */
+        .add-item-box {
+            display: flex; gap: 8px; margin-bottom: 10px; padding: 5px;
+            position: sticky; top: 0; background: var(--bg); z-index: 5; /* 背景色與body一致避免透明 */
+            border-bottom: 1px solid #eee;
+        }
+        .input-add-item {
+            flex: 1; padding: 10px; border: 1px solid #D1D5DB; border-radius: 6px; outline: none; font-size: 0.9rem;
+        }
+        .btn-add-item {
+            background: var(--secondary); color: white; border: none; 
+            padding: 0 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.2rem;
+        }
         /* [新增] 隨身筆記浮動按鈕 (位於分享按鈕上方) */
         /* [修改] 隨身筆記浮動按鈕 (藍色) - 縮小與透明化 */
         .float-note-btn {
@@ -1391,31 +1414,17 @@
                     行前準備 Check List
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <div class="tag tag-tip" id="checklist-progress" style="background:#FFFBEB; color:#D97706; font-weight:700;">0/8</div>
-                    <div class="toggle-icon" style="font-size: 0.8rem; color: #6B7280; font-weight: 700; transition: transform 0.3s;">▼
-
-                    </div>
+                    <div class="tag tag-tip" id="checklist-progress" style="background:#FFFBEB; color:#D97706; font-weight:700;">計算中...</div>
+                    <div class="toggle-icon" style="font-size: 0.8rem; color: #6B7280; font-weight: 700; transition: transform 0.3s;">▼</div>
                 </div>
             </div>
             
             <div id="checklist-container" class="checklist-container">
-                <div class="checklist-grid">
-                    <label class="check-item"><input type="checkbox" data-id="c1"> <span>機場停車預約 (截圖備份)</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c2"> <span>護照 & 機票 (截圖備份)</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c3"> <span>旅遊保險單 (紙本/電子)</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c4"> <span>日幣現金 & 信用卡 & 西瓜卡</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c5"> <span>eSIM / 漫遊開通</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c6"> <span>Visit Japan Web 填寫</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c7"> <span>行動電源 & 充電線 & 車用充電器</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c8"> <span>國際駕照 (日文譯本) / 租車資料</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c9"> <span>牙刷/常備藥品</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c10"> <span>健保卡 / 大頭照</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c11"> <span>小工具醫療箱 / 雪松</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c12"> <span>耳溫槍 / 刮鬍刀</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c13"> <span>相機 / 讀卡機 / 拍立得</span></label>
-                    <label class="check-item"><input type="checkbox" data-id="c14"> <span>手套 / 脖圍</span></label>
-
+                <div class="add-item-box" onclick="event.stopPropagation()">
+                    <input type="text" id="new-item-input" class="input-add-item" placeholder="新增準備項目...">
+                    <button class="btn-add-item" onclick="addNewCheckItem()">＋</button>
                 </div>
+                <div class="checklist-grid" id="checklist-list-area"></div>
             </div>
         </div>
 
@@ -4830,62 +4839,138 @@ function resetShareButton(btn) {
             window.location.reload(); // 重新整理網頁
         }
     }
-    // [新增] 行前清單功能：自動儲存勾選狀態到手機
-        function initChecklist() {
-            const checkboxes = document.querySelectorAll('.check-item input');
-            const progressEl = document.getElementById('checklist-progress');
-            const STORAGE_KEY = 'kyushu_trip_checklist_2026'; // 本地儲存的專屬金鑰
+    // [修改] 行前清單功能：支援動態新增、刪除與狀態儲存
+        const CHECKLIST_KEY = 'kyushu_trip_checklist_v2'; // 改用新 Key 避免舊資料衝突
+        
+        // 預設清單資料 (若使用者第一次開啟)
+        const defaultItems = [
+            { id: 'c1', text: '機場停車預約 (截圖備份)', checked: false },
+            { id: 'c2', text: '護照 & 機票 (截圖備份)', checked: false },
+            { id: 'c3', text: '旅遊保險單 (紙本/電子)', checked: false },
+            { id: 'c4', text: '日幣現金 & 信用卡 & 西瓜卡', checked: false },
+            { id: 'c5', text: 'eSIM / 漫遊開通', checked: false },
+            { id: 'c6', text: 'Visit Japan Web 填寫', checked: false },
+            { id: 'c7', text: '行動電源 & 充電線 & 車充', checked: false },
+            { id: 'c8', text: '國際駕照 (日文譯本)', checked: false },
+            { id: 'c9', text: '牙刷/常備藥品', checked: false },
+            { id: 'c10', text: '健保卡 / 大頭照', checked: false },
+            { id: 'c11', text: '小工具醫療箱 / 雪松', checked: false },
+            { id: 'c12', text: '耳溫槍 / 刮鬍刀', checked: false },
+            { id: 'c13', text: '相機 / 讀卡機 / 拍立得', checked: false },
+            { id: 'c14', text: '手套 / 脖圍', checked: false }
+        ];
 
-            function updateProgress() {
-                const checkedCount = document.querySelectorAll('.check-item input:checked').length;
-                const total = checkboxes.length;
-                
-                // 更新數字
-                if(progressEl) progressEl.innerText = `${checkedCount}/${total}`;
-                
-                // 視覺回饋：全選完變綠色
-                if(progressEl && checkedCount === total) {
+        let checklistData = [];
+
+        function initChecklist() {
+            // 1. 讀取資料
+            const saved = localStorage.getItem(CHECKLIST_KEY);
+            if (saved) {
+                try {
+                    checklistData = JSON.parse(saved);
+                } catch(e) {
+                    checklistData = JSON.parse(JSON.stringify(defaultItems));
+                }
+            } else {
+                checklistData = JSON.parse(JSON.stringify(defaultItems)); // 深拷貝
+            }
+            renderChecklist();
+        }
+
+        // 渲染清單畫面 (包含計算進度)
+        function renderChecklist() {
+            const listArea = document.getElementById('checklist-list-area');
+            const progressEl = document.getElementById('checklist-progress');
+            if (!listArea) return;
+
+            listArea.innerHTML = ''; // 清空目前畫面
+            let checkedCount = 0;
+
+            checklistData.forEach((item, index) => {
+                if (item.checked) checkedCount++;
+
+                const label = document.createElement('label');
+                label.className = 'check-item';
+                // 點擊 label 本身切換 checkbox，防止點擊刪除按鈕時觸發
+                label.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px; flex:1; cursor:pointer;">
+                        <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleItemStatus(${index})">
+                        <span>${item.text}</span>
+                    </div>
+                    <button class="btn-del-item" onclick="deleteCheckItem(${index}, event)">×</button>
+                `;
+                listArea.appendChild(label);
+            });
+
+            // 更新進度文字
+            if (progressEl) {
+                progressEl.innerText = `${checkedCount}/${checklistData.length}`;
+                if (checkedCount === checklistData.length && checklistData.length > 0) {
                     progressEl.style.background = '#ECFDF5';
                     progressEl.style.color = '#059669';
                     progressEl.innerText = '準備完成！';
+                } else {
+                    progressEl.style.background = '#FFFBEB';
+                    progressEl.style.color = '#D97706';
                 }
-
-                // 儲存狀態
-                const states = {};
-                checkboxes.forEach(cb => states[cb.dataset.id] = cb.checked);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
             }
-
-            // 1. 讀取舊紀錄
-            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
             
-            // 2. 恢復勾選狀態
-            checkboxes.forEach(cb => {
-                if(saved[cb.dataset.id]) cb.checked = true;
-                // 綁定點擊事件
-                cb.addEventListener('change', updateProgress);
-            });
+            // 儲存到 LocalStorage
+            localStorage.setItem(CHECKLIST_KEY, JSON.stringify(checklistData));
+        }
 
-            // 3. 初始更新一次 UI
-            updateProgress();
+        // 切換勾選狀態
+        function toggleItemStatus(index) {
+            checklistData[index].checked = !checklistData[index].checked;
+            renderChecklist(); // 重新渲染 (會自動儲存)
         }
+
+        // 新增項目
+        function addNewCheckItem() {
+            const input = document.getElementById('new-item-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            checklistData.unshift({ // 加在最上面
+                id: 'new_' + Date.now(),
+                text: text,
+                checked: false
+            });
+            
+            input.value = '';
+            renderChecklist();
+        }
+
+        // 刪除項目
+        function deleteCheckItem(index, event) {
+            // 阻止事件冒泡，避免點擊刪除時觸發 label 的勾選
+            event.stopPropagation();
+            event.preventDefault();
+            
+            if (confirm('確定要刪除這個項目嗎？')) {
+                checklistData.splice(index, 1);
+                renderChecklist();
+            }
+        }
+
+        // 折疊/展開控制
         function toggleChecklist(headerEl) {
-        const container = document.getElementById('checklist-container');
-        const icon = headerEl.querySelector('.toggle-icon');
-        
-        // 切換顯示容器 (加上或移除 .show 類別)
-        const isClosed = !container.classList.contains('show');
-        
-        if (isClosed) {
-            container.classList.add('show');
-            icon.style.transform = 'rotate(180deg)';
-            icon.style.color = '#2563EB'; // 這行可以改成 #F59E0B (配合清單的主色黃)
-        } else {
-            container.classList.remove('show');
-            icon.style.transform = 'rotate(0deg)';
-            icon.style.color = '#6B7280';
+            const container = document.getElementById('checklist-container');
+            const icon = headerEl.querySelector('.toggle-icon');
+            
+            // 切換顯示容器 (加上或移除 .show 類別)
+            const isClosed = !container.classList.contains('show');
+            
+            if (isClosed) {
+                container.classList.add('show');
+                icon.style.transform = 'rotate(180deg)';
+                icon.style.color = '#2563EB'; 
+            } else {
+                container.classList.remove('show');
+                icon.style.transform = 'rotate(0deg)';
+                icon.style.color = '#6B7280';
+            }
         }
-    }
     // [新增] 圖片預覽全域變數
     let pendingImageBase64 = null;
 
