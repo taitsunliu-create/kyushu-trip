@@ -1267,6 +1267,94 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
 }
+/* --- [新增] 住宿頁面優化樣式 Start --- */
+.stay-card-grid {
+    display: grid;
+    gap: 12px;
+    font-size: 0.95rem;
+}
+.stay-row {
+    display: grid;
+    grid-template-columns: 85px 1fr;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #E5E7EB;
+}
+.stay-row:last-child { border-bottom: none; }
+
+.stay-label { 
+    color: #6B7280; 
+    font-weight: 500; 
+    display: flex; 
+    align-items: center; 
+    gap: 4px;
+}
+/* 地址與 MapCode 的顯示區塊 */
+.stay-val { 
+    font-weight: 600; 
+    color: #1F2937; 
+    word-break: break-all;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 複製按鈕 */
+.btn-copy-small {
+    background: white;
+    border: 1px solid #D1D5DB;
+    color: #4B5563;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+}
+.btn-copy-small:active { transform: scale(0.95); background: #F3F4F6; }
+.btn-copy-small.copied { 
+    border-color: #10B981; 
+    color: #059669; 
+    background: #ECFDF5; 
+}
+
+/* 底部大導航按鈕 */
+.btn-nav-large {
+    width: 100%;
+    background: linear-gradient(135deg, #2563EB, #1D4ED8);
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    text-decoration: none; /* 移除底線 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+    transition: transform 0.2s;
+}
+.btn-nav-large:active { transform: scale(0.98); }
+
+/* MapCode 專用樣式 */
+.map-code-box {
+    font-family: 'Roboto Mono', monospace;
+    color: #D97706;
+    background: #FFFBEB;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #FCD34D;
+    letter-spacing: 1px;
+}
+/* --- [新增] 住宿頁面優化樣式 End --- */
     </style>
 </head>
 <body>
@@ -2032,185 +2120,206 @@
     </div>
 
     <!-- TAB 2: 住宿資訊 (Updated Day 3) -->
-    </div> <div id="view-stay" class="container">
-        <!-- Day 1: THE BLOSSOM -->
+    <div id="view-stay" class="container">
+        
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Day 1: 熊本 - THE BLOSSOM KUMAMOTO</div>
-                <div class="tag tag-stay">市區/車站</div>
+                <div class="card-title">Day 1: 熊本 - THE BLOSSOM</div>
+                <div class="tag tag-stay">車站直結</div>
             </div>
             
-            <div class="info-grid">
-                <div class="info-label">地址</div>
-                <div class="info-val">熊本県熊本市西区春日3丁目15-26</div>
+            <div class="stay-card-grid">
+                <div class="stay-row">
+                    <div class="stay-label">
+                        <svg class="icon-mini" style="color:#6B7280"><use href="#icon-loc"></use></svg> 地址
+                    </div>
+                    <div class="stay-val">
+                        <span>熊本県熊本市西区春日3-15-26</span>
+                        <button class="btn-copy-small" onclick="copyText(this, '熊本県熊本市西区春日3-15-26')">
+                            <svg class="icon-mini" style="width:12px;height:12px;"><path d="M8 2h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                            複製
+                        </button>
+                    </div>
+                </div>
+                <div class="stay-row">
+                    <div class="stay-label">
+                        <svg class="icon-mini" style="color:#6B7280"><use href="#icon-consult"></use></svg> 電話
+                    </div>
+                    <div class="stay-val">
+                        <a href="tel:0963278777" style="color:#2563EB; text-decoration:none;">096-327-8777</a>
+                    </div>
+                </div>
+                <div class="stay-row">
+                    <div class="stay-label">
+                        <svg class="icon-mini" style="color:#D97706"><use href="#icon-car"></use></svg> MapCode
+                    </div>
+                    <div class="stay-val">
+                        <span class="map-code-box">29 459 270*76</span>
+                    </div>
+                </div>
             </div>
-            
-            <div class="info-detail-box">
-                <h4 style="color: var(--primary);">✨ 飯店特色與服務</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
-                    <li><b>絕佳位置：</b>與 JR 熊本站直結 (AMU PLAZA 樓上)，下樓即可逛街用餐。</li>
-                    <li><b>大浴場：</b>設有住客專用的大浴場與桑拿 (9F)，玩了一天可以好好放鬆。</li>
-                    <li><b>景觀大廳：</b>大廳位於 9 樓，視野開闊，可眺望熊本市區。</li>
-                    <li><b>親子友善：</b>提供兒童備品 (需向櫃台索取)，房間新穎寬敞。</li>
+
+            <div class="info-detail-box" style="margin-top: 15px; border-color: #BFDBFE; background-color: #EFF6FF;">
+                <h4 style="color: #1D4ED8;">✨ 特色與注意</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; margin-top:5px; color:#444;">
+                    <li><b>位置：</b>JR熊本站旁 AMU PLAZA 樓上 (9F大廳)。</li>
+                    <li><b>停車：</b>請停 AMU PLAZA 地下停車場 (住客優惠約 ¥1,000)，將停車券帶至櫃台。</li>
+                    <li><b>設施：</b>大浴場位於 9F，房卡感應進入。</li>
                 </ul>
             </div>
 
-            <div class="info-detail-box" style="margin-top: 10px; background-color: #FFFBEB; border-color: #F59E0B;">
-                <h4 style="color: #D97706;">⚠️ 注意事項</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
-                    <li><b>入口位置：</b>飯店入口位於 AMU PLAZA 旁，需搭乘專用電梯至 9 樓 Check-in。</li>
-                    <li><b>停車資訊：</b>使用 AMU PLAZA 地下停車場 (住客優惠約 ¥1,000/晚)。請務必將停車券帶至櫃台消磁。</li>
-                    <li><b>早餐：</b>早餐評價極高，建議預留充裕時間享用。</li>
-                </ul>
-            </div>
-            <a href="https://www.google.com/maps/search/?api=1&query=THE+BLOSSOM+KUMAMOTO" target="_blank" class="btn-link">開啟地圖</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=THE+BLOSSOM+KUMAMOTO" target="_blank" class="btn-nav-large">
+                <svg class="icon-mini" style="width:20px;height:20px;color:white;"><use href="#icon-nav-arrow"></use></svg>
+                啟動 Google 導航
+            </a>
         </div>
 
-        <!-- Day 2: Kurokawa -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Day 2: 黑川溫泉 (兩備選比較)</div>
-                <div class="tag tag-stay">溫泉鄉</div>
-            </div>
-            
-            <!-- 備選 A: 麓旅館 -->
-            <div class="info-detail-box">
-                <h4>備選 A: 麓旅館 (Fumoto Ryokan)</h4>
-                 <div class="info-grid">
-                    <div class="info-label">地址</div>
-                    <div class="info-val">熊本県阿蘇郡南小国町満願寺6618</div>
-                </div>
-                
-                <div style="margin-top: 10px;">
-                    <strong style="color: #059669;">✨ 特色與服務：</strong>
-                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
-                        <li><b>湯池巡禮：</b>擁有 15 個湯池，包含多個「貸切風呂 (私人湯屋)」供住客免費使用，不需預約，看燈號即可進入。</li>
-                        <li><b>餐食：</b>通常提供部屋食 (在房間內用餐) 或包廂，適合帶小孩的家庭。</li>
-                    </ul>
-                </div>
-
-                <div style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 5px;">
-                    <strong style="color: #D97706;">⚠️ 注意事項：</strong>
-                    <p style="font-size: 0.9rem; margin-top: 5px;">
-                        館內保留古老建築結構，<b>樓梯非常多且陡</b>，若有大型行李或推車會較吃力。建議將大行李留在車上，只帶輕便過夜包。
-                    </p>
-                </div>
-
-                <a href="tel:0967440103" class="btn-link-tel">撥打 0967-44-0103 (導航電話)</a>
-                <a href="https://www.google.com/maps/search/?api=1&query=麓旅館+黑川溫泉" target="_blank" class="btn-link-sub">開啟 Google 地圖導航 📍</a>
-            </div>
-
-            <!-- 備選 B: 湯本莊 -->
-            <div class="info-detail-box" style="margin-top: 15px; border-color: #F59E0B;">
-                <h4 style="color: #F59E0B;">備選 B: 湯本莊 (Yumoto So)</h4>
-                 <div class="info-grid">
-                    <div class="info-label">地址</div>
-                    <div class="info-val">熊本県阿蘇郡南小国町満願寺6692</div>
-                </div>
-                
-                <div style="margin-top: 10px;">
-                    <strong style="color: #D97706;">✨ 特色與服務：</strong>
-                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
-                        <li><b>位置絕佳：</b>位於溫泉街正中心，出門逛街最方便。</li>
-                        <li><b>特色溫泉：</b>以手工挖掘的「釜風呂」和視野好的露天風呂聞名。</li>
-                    </ul>
-                </div>
-
-                 <div style="margin-top: 10px; border-top: 1px dashed #F59E0B; padding-top: 5px;">
-                    <strong style="color: #D97706;">⚠️ 注意事項：</strong>
-                    <p style="font-size: 0.9rem; margin-top: 5px;">
-                        飯店門口道路狹窄，建議先將車停在溫泉街入口的共同停車場，再致電旅館派接駁車接送，或請旅館人員指引停車。
-                    </p>
-                </div>
-
-                <a href="tel:0967440211" class="btn-link-tel">撥打 0967-44-0211 (導航電話)</a>
-                <a href="https://www.google.com/maps/search/?api=1&query=湯本莊+黑川溫泉" target="_blank" class="btn-map">開啟 Google 地圖導航 📍</a>
-            </div>
-        </div>
-
-        <!-- Day 3: Yufuin -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 3: 由布院 - 湯布院 山燈館</div>
+                <div class="card-title">Day 2: 黑川溫泉 - 麓旅館</div>
                 <div class="tag tag-stay">傳統日式</div>
             </div>
-            <div class="info-grid">
-                <div class="info-label">地址</div>
-                <div class="info-val">大分県由布市湯布院町川上1553</div>
-            </div>
             
-            <div class="info-detail-box">
-                <h4 style="color: var(--primary);">✨ 飯店特色與服務</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
-                    <li><b>純京風建築：</b>全館僅13間客房，全室檜木造，環境清幽雅致。</li>
-                    <li><b>金鱗湖旁：</b>步行至金鱗湖僅需 1-2 分鐘，非常適合清晨去欣賞晨霧。</li>
-                    <li><b>會席料理：</b>提供高品質的懷石料理，晚餐通常安排在房內或包廂享用。</li>
-                    <li><b>姊妹館溫泉：</b>可免費使用隔壁姊妹館「田乃倉」的露天溫泉。</li>
+            <div class="stay-card-grid">
+                <div class="stay-row">
+                    <div class="stay-label">
+                        <svg class="icon-mini" style="color:#6B7280"><use href="#icon-loc"></use></svg> 地址
+                    </div>
+                    <div class="stay-val">
+                        <span>熊本県阿蘇郡南小国町満願寺6618</span>
+                        <button class="btn-copy-small" onclick="copyText(this, '熊本県阿蘇郡南小国町満願寺6618')">複製</button>
+                    </div>
+                </div>
+                <div class="stay-row">
+                    <div class="stay-label">電話</div>
+                    <div class="stay-val">
+                        <a href="tel:0967440103" style="color:#2563EB; text-decoration:none;">0967-44-0103</a>
+                    </div>
+                </div>
+                <div class="stay-row">
+                    <div class="stay-label">MapCode</div>
+                    <div class="stay-val">
+                        <span class="map-code-box">440 542 454*47</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-detail-box" style="margin-top: 15px; border-color: #FCD34D; background-color: #FFFBEB;">
+                <h4 style="color: #B45309;">⚠️ 注意事項</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; margin-top:5px; color:#444;">
+                    <li><b>抵達：</b>溫泉街道路極狹窄，強烈建議天黑前抵達。</li>
+                    <li><b>行李：</b>館內為古老建築，樓梯多且陡，建議攜帶輕便過夜包，大行李留車上。</li>
+                    <li><b>溫泉：</b>擁有 15 個湯池 (含貸切風呂)，無需預約，看燈號使用。</li>
                 </ul>
             </div>
 
-            <div class="info-detail-box" style="margin-top: 10px; background-color: #FFFBEB; border-color: #F59E0B;">
-                <h4 style="color: #D97706;">⚠️ 注意事項</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
-                    <li><b>抵達時間：</b>因包含晚餐，請務必於 17:30 - 18:00 前辦理入住。若會晚到請務必電話聯繫。</li>
-                    <li><b>停車：</b>旅館備有免費停車場。</li>
-                    <li><b>隔音：</b>日式木造建築隔音較弱，夜間請放輕腳步。</li>
-                </ul>
-            </div>
-
-            <a href="tel:0977845310" class="btn-link-tel">撥打 0977-84-5310 (導航電話)</a>
-            <a href="https://www.google.com/maps/search/?api=1&query=Yufuin+Santoukan" target="_blank" class="btn-link-sub">開啟 Google 地圖導航 📍</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=Fumoto+Ryokan+Kurokawa" target="_blank" class="btn-nav-large" style="background: linear-gradient(135deg, #D97706, #B45309);">
+                <svg class="icon-mini" style="width:20px;height:20px;color:white;"><use href="#icon-nav-arrow"></use></svg>
+                啟動 Google 導航
+            </a>
         </div>
 
-        <!-- Day 4-5: Fukuoka -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Day 4-5: 福岡 (兩備選比較)</div>
-                <div class="tag tag-stay">市區</div>
+                <div class="card-title">Day 3: 由布院 - 湯布院山燈舘</div>
+                <div class="tag tag-stay">金鱗湖旁</div>
             </div>
             
-            <!-- 福岡選項 A -->
-            <div class="info-detail-box">
-                <h4>備選 A: 西鐵飯店 Croom 博多</h4>
-                <div class="info-grid">
-                    <div class="info-label">地址</div>
-                    <div class="info-val">福岡県福岡市博多区博多駅前1-17-6</div>
+            <div class="stay-card-grid">
+                <div class="stay-row">
+                    <div class="stay-label">
+                        <svg class="icon-mini" style="color:#6B7280"><use href="#icon-loc"></use></svg> 地址
+                    </div>
+                    <div class="stay-val">
+                        <span>大分県由布市湯布院町川上1553</span>
+                        <button class="btn-copy-small" onclick="copyText(this, '大分県由布市湯布院町川上1553')">複製</button>
+                    </div>
                 </div>
-                <div style="margin-top: 10px;">
-                    <strong style="color: #2563EB;">✨ 推薦理由 (親子首選)：</strong>
-                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
-                        <li><b>溫泉大浴場：</b>市區少見設有舒適大浴場的飯店，並提供泡湯後的免費冰棒/飲料。</li>
-                        <li><b>交通便利：</b>位於博多巴士總站對面，距離博多站博多口步行約 5 分鐘。</li>
-                        <li><b>便利商店：</b>飯店一樓即是 Lawson，補給非常方便。</li>
-                    </ul>
+                <div class="stay-row">
+                    <div class="stay-label">電話</div>
+                    <div class="stay-val">
+                        <a href="tel:0977845310" style="color:#2563EB; text-decoration:none;">0977-84-5310</a>
+                    </div>
                 </div>
-                 <div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
-                    ⚠️ <b>注意：</b>停車場為立體機械式 (¥1,500/晚)，若車輛較大(如休旅車)可能需停至特約平面停車場。
+                <div class="stay-row">
+                    <div class="stay-label">MapCode</div>
+                    <div class="stay-val">
+                        <span class="map-code-box">269 359 525*30</span>
+                    </div>
                 </div>
-                 <a href="https://www.google.com/maps/search/?api=1&query=Nishitetsu+Hotel+Croom+Hakata" target="_blank" class="btn-link-sub">地圖</a>
             </div>
 
-            <!-- 福岡選項 B -->
-            <div class="info-detail-box" style="margin-top: 15px; border-color: #EF4444;">
-                <h4 style="color: #EF4444;">備選 B: 日航飯店福岡 (Hotel Nikko)</h4>
-                <div class="info-grid">
-                    <div class="info-label">地址</div>
-                    <div class="info-val">福岡県福岡市博多区博多駅前2-18-25</div>
-                </div>
-                <div style="margin-top: 10px;">
-                    <strong style="color: #DC2626;">✨ 推薦理由 (舒適尊榮)：</strong>
-                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
-                        <li><b>地下連通：</b>有地下道直通博多車站，下雨天完全不用淋雨。</li>
-                        <li><b>服務一流：</b>五星級日式服務，房間相對較寬敞，隔音佳。</li>
-                        <li><b>早餐豐盛：</b>自助早餐種類豐富，品質穩定。</li>
-                    </ul>
-                </div>
-                 <div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
-                    ⚠️ <b>注意：</b>通常無免費大浴場 (除部分會員/房型外)。地下停車場費用較高 (約 ¥2,000/晚)。
-                </div>
-                 <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Nikko+Fukuoka" target="_blank" class="btn-link-sub">地圖</a>
+            <div class="info-detail-box" style="margin-top: 15px; border-color: #A7F3D0; background-color: #ECFDF5;">
+                <h4 style="color: #047857;">✨ 住宿重點</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; margin-top:5px; color:#444;">
+                    <li><b>晚餐：</b>包含精緻懷石料理，請務必於 17:30 前抵達辦理入住。</li>
+                    <li><b>晨間：</b>走路 2 分鐘即達金鱗湖，必看清晨霧氣美景。</li>
+                    <li><b>設施：</b>全館檜木造，隔音較弱，夜間請放輕腳步。</li>
+                </ul>
             </div>
+
+            <a href="https://www.google.com/maps/search/?api=1&query=Yufuin+Santoukan" target="_blank" class="btn-nav-large" style="background: linear-gradient(135deg, #059669, #047857);">
+                <svg class="icon-mini" style="width:20px;height:20px;color:white;"><use href="#icon-nav-arrow"></use></svg>
+                啟動 Google 導航
+            </a>
         </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Day 4-5: 福岡 - THE GATE HOTEL</div>
+                <div class="tag tag-stay">天神站直結</div>
+            </div>
+            
+            <div class="stay-card-grid">
+                <div class="stay-row">
+                    <div class="stay-label">
+                        <svg class="icon-mini" style="color:#6B7280"><use href="#icon-loc"></use></svg> 地址
+                    </div>
+                    <div class="stay-val">
+                        <span>福岡県福岡市中央区天神2-8-49</span>
+                        <button class="btn-copy-small" onclick="copyText(this, '福岡県福岡市中央区天神2-8-49')">複製</button>
+                    </div>
+                </div>
+                <div class="stay-row">
+                    <div class="stay-label">電話</div>
+                    <div class="stay-val">
+                        <a href="tel:0924062605" style="color:#2563EB; text-decoration:none;">092-406-2605</a>
+                    </div>
+                </div>
+                <div class="stay-row">
+                    <div class="stay-label">MapCode</div>
+                    <div class="stay-val">
+                        <span class="map-code-box">13 317 683*55</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-detail-box" style="margin-top: 15px; border-color: #F472B6; background-color: #FFF1F2;">
+                <h4 style="color: #BE185D;">✨ 特色 (THE GATE HOTEL by HULIC)</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; margin-top:5px; color:#444;">
+                    <li><b>位置：</b>天神核心地帶，地鐵天神站 Exit 5 直結。</li>
+                    <li><b>景觀：</b>大廳位於 19 樓，視野極佳。</li>
+                    <li><b>禮遇：</b>13 樓設有房客專屬 Lounge (6:00-24:00)，提供免費飲料與露台座位。</li>
+                </ul>
+            </div>
+
+            <div class="info-detail-box" style="margin-top: 10px; border-color: #FCA5A5; background-color: #FEF2F2;">
+                <h4 style="color: #991B1B;">⚠️ 自駕重要注意事項 (無停車場)</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; margin-top:5px; color:#444;">
+                    <li><b>無停車場：</b>飯店本身**沒有**停車場。</li>
+                    <li><b>推薦停車：</b>請停放於附近的 <b>Solaria Terminal Parking (ソラリアターミナル駐車場)</b>。
+                        <br><span style="font-size:0.85rem; color:#666;">(導航電話: 092-721-6821)</span>
+                    </li>
+                    <li><b>費用：</b>過夜費用約 ¥2,000-¥3,000，無飯店補助。</li>
+                </ul>
+            </div>
+
+            <a href="https://www.google.com/maps/search/?api=1&query=THE+GATE+HOTEL+Fukuoka+by+HULIC" target="_blank" class="btn-nav-large" style="background: linear-gradient(135deg, #DB2777, #BE185D);">
+                <svg class="icon-mini" style="width:20px;height:20px;color:white;"><use href="#icon-nav-arrow"></use></svg>
+                啟動 Google 導航
+            </a>
+        </div>
+        
     </div>
 
     <!-- TAB 3: 交通資訊 -->
@@ -5479,6 +5588,40 @@ function compressImage(file, maxWidth, quality) {
                     lbState.initialDist = 0;
                 }
             }
+            // [新增] 複製文字功能 (含回饋動畫)
+    function copyText(btn, text) {
+        if (!navigator.clipboard) {
+            // 備案：若瀏覽器不支援 Clipboard API (較舊的安卓 Webview)
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("Copy");
+            document.body.removeChild(textArea);
+            showCopyFeedback(btn);
+            return;
+        }
+
+        navigator.clipboard.writeText(text).then(() => {
+            showCopyFeedback(btn);
+        }).catch(err => {
+            console.error('複製失敗', err);
+            alert('複製失敗，請手動複製');
+        });
+    }
+
+    function showCopyFeedback(btn) {
+        const originalHtml = btn.innerHTML;
+        // 變更為綠色勾勾
+        btn.innerHTML = `<svg class="icon-mini" style="width:12px;height:12px;"><path d="M20 6L9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 已複製`;
+        btn.classList.add('copied');
+        
+        // 2秒後復原
+        setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.classList.remove('copied');
+        }, 2000);
+    }
     // --- PWA Service Worker Registration ---
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
