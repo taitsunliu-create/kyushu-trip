@@ -154,6 +154,53 @@
             -moz-user-select: none;
                  user-select: none;
         }
+        
+        /* [新增] 匯率計算機浮動按鈕 (半透明毛玻璃/垂直堆疊) */
+        .float-calc-btn {
+            position: fixed;
+            /* 藍色筆記是 160px，這個往上疊加 (160 + 75) */
+            bottom: 235px; 
+            left: 20px;    /* 保持靠左對齊 */
+            
+            /* 半透明橘色背景 (RGBA) */
+            background: rgba(245, 158, 11, 0.65); 
+            
+            /* 毛玻璃效果：模糊背景，讓透出的文字變模糊 */
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.6); /* 邊框也稍微透明 */
+            border-radius: 50%;
+            padding: 16px;
+            
+            /* 調整陰影，保留層次感但不過重 */
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+            
+            z-index: 9999;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+                 user-select: none;
+        }
+        .float-calc-btn:active { 
+            transform: scale(0.95); 
+            background: rgba(245, 158, 11, 0.85); /* 按下時變實心一點 */
+        }
+        .float-calc-btn svg { width: 20px; height: 20px; stroke-width: 2.5; }
+
+        /* 計算機視窗樣式 */
+        .calc-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .calc-input { width: 60%; padding: 10px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1.2rem; text-align: right; outline: none; }
+        .calc-input:focus { border-color: #F59E0B; }
+        .calc-label { font-weight: 600; color: #4B5563; }
+
+/* --- 插入結束 --- */
+
         .float-note-btn:active { transform: scale(0.95); }
         .float-note-btn svg { width: 20px; height: 20px; stroke-width: 2.5; }
         .float-share-btn {
@@ -2972,6 +3019,33 @@
             </div>
         </div>
     </div>
+    <div id="calc-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 300px;">
+            <div class="modal-title" style="color: #D97706; border-bottom: 1px solid #FDE68A; padding-bottom: 10px;">
+                💱 匯率試算 (JPY ↔ TWD)
+            </div>
+            
+            <div style="margin: 10px 0; font-size: 0.85rem; color: #666; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
+                <span id="rate-status" style="font-size: 0.75rem; color: #9CA3AF;">● 準備中...</span>
+                <label>匯率:</label>
+                <input type="number" id="calc-rate" step="0.0001" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; text-align: center;" oninput="calculateExchange()">
+            </div>
+
+            <div class="calc-row">
+                <span class="calc-label">🇯🇵 日幣</span>
+                <input type="number" id="inp-jpy" class="calc-input" placeholder="¥" inputmode="decimal" oninput="calculateExchange('jpy')">
+            </div>
+
+            <div class="calc-row">
+                <span class="calc-label">🇹🇼 台幣</span>
+                <input type="number" id="inp-twd" class="calc-input" placeholder="NT$" inputmode="decimal" oninput="calculateExchange('twd')">
+            </div>
+
+            <div class="modal-btns" style="margin-top: 20px;">
+                <button class="modal-btn btn-confirm" style="background: #F59E0B;" onclick="closeCalcModal()">關閉</button>
+            </div>
+        </div>
+    </div>
     <div id="img-preview-modal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-title">確認圖片</div>
@@ -3032,10 +3106,17 @@
     <button id="btn-quick-note" class="float-note-btn" onclick="openNoteModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
     </button>
+    <button id="btn-calc" class="float-calc-btn" onclick="openCalcModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+    </button>
     <button id="btn-share-loc" class="float-share-btn" onclick="shareCurrentLocation()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
         
     </button>
+
 
     <div id="lightbox-modal" class="lightbox-overlay" onclick="closeLightbox()">
         <span class="lightbox-close">&times;</span>
@@ -3810,13 +3891,113 @@ function getSmartAdviceText(temp, weatherCode) {
         function closeNoteModal() {
             document.getElementById('note-modal').style.display = 'none';
         }
+/* --- 在 function closeNoteModal() { ... } 結束後插入 --- */
 
-        // 點擊背景關閉視窗 (通用)
+        // [新增] 匯率計算機與 API 串接邏輯
+        function openCalcModal() {
+            document.getElementById('calc-modal').style.display = 'flex';
+            
+            // 1. 先嘗試讀取快取 (避免每次開都打 API)
+            const savedRateData = JSON.parse(localStorage.getItem('live_exchange_rate_cache') || '{}');
+            const now = Date.now();
+            const oneHour = 3600000; // 1小時毫秒數
+            
+            // 如果有快取且在 1 小時內，就用快取，否則抓新的
+            if (savedRateData.rate && (now - savedRateData.timestamp < oneHour)) {
+                updateRateUI(savedRateData.rate, '快取');
+            } else {
+                fetchLiveRate();
+            }
+            
+            document.getElementById('inp-jpy').focus();
+        }
+
+        function closeCalcModal() {
+            document.getElementById('calc-modal').style.display = 'none';
+        }
+
+        // 抓取即時匯率 (來源: 免費公開 API)
+        async function fetchLiveRate() {
+            const statusEl = document.getElementById('rate-status');
+            statusEl.innerText = '⟳ 更新中...';
+            statusEl.style.color = '#F59E0B';
+
+            try {
+                // 使用 ExchangeRate-API (以日幣 JPY 為基準)
+                const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
+                const data = await res.json();
+                
+                // 抓取對台幣 (TWD) 的匯率
+                const newRate = data.rates.TWD;
+                
+                if (newRate) {
+                    // 儲存到 LocalStorage
+                    localStorage.setItem('live_exchange_rate_cache', JSON.stringify({
+                        rate: newRate,
+                        timestamp: Date.now()
+                    }));
+                    updateRateUI(newRate, '即時');
+                    
+                    // 如果原本有輸入數字，自動重算
+                    if(document.getElementById('inp-jpy').value) calculateExchange('jpy');
+                }
+            } catch (e) {
+                console.error("匯率更新失敗", e);
+                statusEl.innerText = '⚠️ 連線失敗';
+                statusEl.style.color = '#EF4444';
+                // 失敗時若沒值，給個預設值
+                if(!document.getElementById('calc-rate').value) document.getElementById('calc-rate').value = 0.22;
+            }
+        }
+
+        function updateRateUI(rate, type) {
+            document.getElementById('calc-rate').value = rate;
+            const statusEl = document.getElementById('rate-status');
+            statusEl.innerText = `● ${type}匯率`;
+            statusEl.style.color = '#10B981'; // 綠色
+        }
+
+        function calculateExchange(source) {
+            const rateInput = document.getElementById('calc-rate');
+            const jpyInput = document.getElementById('inp-jpy');
+            const twdInput = document.getElementById('inp-twd');
+            
+            let rate = parseFloat(rateInput.value);
+            if (isNaN(rate) || rate <= 0) rate = 0.22; 
+
+            if (source === 'jpy') {
+                const jpy = parseFloat(jpyInput.value);
+                if (!isNaN(jpy)) {
+                    twdInput.value = Math.round(jpy * rate);
+                } else {
+                    twdInput.value = '';
+                }
+            } else if (source === 'twd') {
+                const twd = parseFloat(twdInput.value);
+                if (!isNaN(twd)) {
+                    jpyInput.value = Math.round(twd / rate);
+                } else {
+                    jpyInput.value = '';
+                }
+            } else {
+                // 修改匯率時 -> 更新台幣
+                const jpy = parseFloat(jpyInput.value);
+                if (!isNaN(jpy)) {
+                    twdInput.value = Math.round(jpy * rate);
+                }
+            }
+        }
+
+
+        // 點擊背景關閉視窗 (修改版)
         window.onclick = function(event) {
             const nModal = document.getElementById('note-modal');
             const lModal = document.getElementById('location-modal');
+            const cModal = document.getElementById('calc-modal'); // [新增]
+            
             if (event.target == nModal) nModal.style.display = "none";
             if (event.target == lModal) lModal.style.display = "none";
+            if (event.target == cModal) cModal.style.display = "none"; // [新增]
         }
 // [修改] 兩段式分享功能 (解決瀏覽器阻擋視窗問題)
         // 狀態標記：紀錄目前是否已經分析完成
