@@ -98,13 +98,7 @@
             align-items: center;
         }
         
-        /* 收合容器 (預設隱藏 max-height: 0) */
-        .checklist-container {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
-            opacity: 0;
-        }
+        
         /* 展開狀態 (加上 .show 類別時) */
         /* --- 請取代原本的 .checklist-container 相關樣式 --- */
 
@@ -1468,10 +1462,10 @@
                 
                 <div id="custom-list-area" style="display: contents;"></div>
 
-            </div> <div class="add-check-wrapper">
-                <input type="text" id="new-item-input" class="add-check-input" placeholder="新增檢查項目..." onkeypress="handleAddItem(event)">
-                <button class="add-check-btn" onclick="addCustomItem()">＋ 新增</button>
-            </div>
+            </div> </div> <div class="add-check-wrapper">
+            <input type="text" id="new-item-input" class="add-check-input" placeholder="新增檢查項目..." onkeypress="handleAddItem(event)">
+            <button class="add-check-btn" onclick="addCustomItem()">＋ 新增</button>
+        </div>
 
         </div>      
                 </div>
