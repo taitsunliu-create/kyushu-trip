@@ -106,11 +106,60 @@
             opacity: 0;
         }
         /* 展開狀態 (加上 .show 類別時) */
-        .checklist-container.show {
-            max-height: 800px; /* 設定一個足夠的高度讓內容顯示 */
-            opacity: 1;
-            margin-top: 15px; /* 展開時才給上方間距 */
+        /* --- 請取代原本的 .checklist-container 相關樣式 --- */
+
+        /* 收合容器 */
+        .checklist-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+            opacity: 0;
+            /* [新增] 確保內容過多時顯示卷軸 */
+            overflow-y: hidden; 
         }
+        /* 展開狀態 (修改高度限制與捲動) */
+        .checklist-container.show {
+            /* [修改] 限制高度約 5 行 (每行約 45px + 間距) */
+            max-height: 250px; 
+            opacity: 1;
+            margin-top: 15px;
+            /* [新增] 開啟垂直捲動 */
+            overflow-y: auto; 
+            /* 優化捲軸觸控體驗 */
+            -webkit-overflow-scrolling: touch;
+            padding-right: 5px; /* 避免捲軸蓋住內容 */
+        }
+
+        /* [新增] 自訂新增項目區域樣式 */
+        .add-check-wrapper {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #E5E7EB;
+            display: flex;
+            gap: 8px;
+        }
+        .add-check-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .add-check-input:focus { border-color: #F59E0B; }
+        .add-check-btn {
+            background: #F59E0B;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0 16px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .add-check-btn:active { transform: scale(0.95); }
+
+/* --- CSS 修改結束 --- */
 
         /* 沿用原本的格線與項目樣式 */
         .checklist-grid { 
@@ -119,6 +168,7 @@
             gap: 10px; 
             /* margin-top: 10px; <-- 移除這行，改由 container 控制 */
         }
+        
         .check-item {
             display: flex; align-items: center; gap: 8px;
             background: #F9FAFB; padding: 10px 12px; border-radius: 8px;
@@ -1400,6 +1450,7 @@
             
             <div id="checklist-container" class="checklist-container">
                 <div class="checklist-grid">
+                    
                     <label class="check-item"><input type="checkbox" data-id="c1"> <span>機場停車預約 (截圖備份)</span></label>
                     <label class="check-item"><input type="checkbox" data-id="c2"> <span>護照 & 機票 (截圖備份)</span></label>
                     <label class="check-item"><input type="checkbox" data-id="c3"> <span>旅遊保險單 (紙本/電子)</span></label>
@@ -1414,7 +1465,15 @@
                     <label class="check-item"><input type="checkbox" data-id="c12"> <span>耳溫槍 / 刮鬍刀</span></label>
                     <label class="check-item"><input type="checkbox" data-id="c13"> <span>相機 / 讀卡機 / 拍立得</span></label>
                     <label class="check-item"><input type="checkbox" data-id="c14"> <span>手套 / 脖圍</span></label>
+                
+                <div id="custom-list-area" style="display: contents;"></div>
 
+            </div> <div class="add-check-wrapper">
+                <input type="text" id="new-item-input" class="add-check-input" placeholder="新增檢查項目..." onkeypress="handleAddItem(event)">
+                <button class="add-check-btn" onclick="addCustomItem()">＋ 新增</button>
+            </div>
+
+        </div>      
                 </div>
             </div>
         </div>
@@ -4831,44 +4890,97 @@ function resetShareButton(btn) {
         }
     }
     // [新增] 行前清單功能：自動儲存勾選狀態到手機
-        function initChecklist() {
-            const checkboxes = document.querySelectorAll('.check-item input');
-            const progressEl = document.getElementById('checklist-progress');
-            const STORAGE_KEY = 'kyushu_trip_checklist_2026'; // 本地儲存的專屬金鑰
+        /* --- 請完全取代原本的 function initChecklist() { ... } --- */
 
+        // [修改] 行前清單功能：支援勾選狀態與「自訂項目」儲存
+        function initChecklist() {
+            const STORAGE_KEY_CHECK = 'kyushu_trip_checklist_2026'; // 存勾選狀態
+            const STORAGE_KEY_CUSTOM = 'kyushu_trip_custom_items';  // 存自訂項目文字
+
+            // 1. 更新進度顯示
             function updateProgress() {
+                const checkboxes = document.querySelectorAll('.check-item input');
+                const progressEl = document.getElementById('checklist-progress');
                 const checkedCount = document.querySelectorAll('.check-item input:checked').length;
                 const total = checkboxes.length;
                 
-                // 更新數字
                 if(progressEl) progressEl.innerText = `${checkedCount}/${total}`;
                 
-                // 視覺回饋：全選完變綠色
-                if(progressEl && checkedCount === total) {
+                if(progressEl && total > 0 && checkedCount === total) {
                     progressEl.style.background = '#ECFDF5';
                     progressEl.style.color = '#059669';
-                    progressEl.innerText = '準備完成！';
+                } else if (progressEl) {
+                    progressEl.style.background = '#FFFBEB';
+                    progressEl.style.color = '#D97706';
                 }
 
-                // 儲存狀態
+                // 儲存勾選狀態
                 const states = {};
                 checkboxes.forEach(cb => states[cb.dataset.id] = cb.checked);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
+                localStorage.setItem(STORAGE_KEY_CHECK, JSON.stringify(states));
             }
 
-            // 1. 讀取舊紀錄
-            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            // 2. 載入自訂項目 (Custom Items)
+            const customItems = JSON.parse(localStorage.getItem(STORAGE_KEY_CUSTOM) || '[]');
+            const customArea = document.getElementById('custom-list-area');
             
-            // 2. 恢復勾選狀態
-            checkboxes.forEach(cb => {
-                if(saved[cb.dataset.id]) cb.checked = true;
-                // 綁定點擊事件
+            // 清空並重建自訂項目
+            customArea.innerHTML = '';
+            customItems.forEach(item => {
+                const label = document.createElement('label');
+                label.className = 'check-item';
+                // 加入長按刪除提示 (選用)
+                label.title = '長按可刪除此項目'; 
+                label.innerHTML = `<input type="checkbox" data-id="${item.id}"> <span>${item.text}</span>`;
+                customArea.appendChild(label);
+            });
+
+            // 3. 恢復所有勾選狀態 (包含原生與自訂)
+            const savedChecks = JSON.parse(localStorage.getItem(STORAGE_KEY_CHECK) || '{}');
+            const allCheckboxes = document.querySelectorAll('.check-item input');
+            
+            allCheckboxes.forEach(cb => {
+                if(savedChecks[cb.dataset.id]) cb.checked = true;
                 cb.addEventListener('change', updateProgress);
             });
 
-            // 3. 初始更新一次 UI
+            // 初始更新 UI
             updateProgress();
         }
+
+        // [新增] 處理新增項目的邏輯
+        function addCustomItem() {
+            const input = document.getElementById('new-item-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const STORAGE_KEY_CUSTOM = 'kyushu_trip_custom_items';
+            const customItems = JSON.parse(localStorage.getItem(STORAGE_KEY_CUSTOM) || '[]');
+            
+            // 產生唯一 ID (使用時間戳記)
+            const newId = 'custom_' + Date.now();
+            
+            // 加入陣列
+            customItems.push({ id: newId, text: text });
+            localStorage.setItem(STORAGE_KEY_CUSTOM, JSON.stringify(customItems));
+
+            // 清空輸入框
+            input.value = '';
+
+            // 重新初始化清單 (讓新項目顯示並綁定事件)
+            initChecklist();
+            
+            // 捲動到底部
+            const container = document.getElementById('checklist-container');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // [新增] 支援按 Enter 鍵新增
+        function handleAddItem(e) {
+            if (e.key === 'Enter') addCustomItem();
+        }
+
+/* --- JS 修改結束 --- */
         function toggleChecklist(headerEl) {
         const container = document.getElementById('checklist-container');
         const icon = headerEl.querySelector('.toggle-icon');
