@@ -6,6 +6,7 @@
     <title>九州親子自駕遊 2026</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563EB">
+    <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <!-- Google Fonts -->
@@ -2449,7 +2450,10 @@
         <!-- [新增] Map Code 一覽表 -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">📍行程景點 Map Code 一覽</div>
+                <div class="card-title" style="display: flex; align-items: center; gap: 6px;">
+                    <svg class="icon-mini" style="color: var(--primary);"><use href="#icon-loc"></use></svg>
+                    行程景點 Map Code 一覽
+                </div>
                 <div class="tag tag-car">車機導航</div>
             </div>
             
@@ -2816,7 +2820,7 @@
                         <li><b>動物餵食：</b>園區內有養山羊、兔子甚至松鼠，小朋友會很愛。</li>
                     </ul>
                 </div>
-                <a href="https://www.google.com/maps/search/?api=1&query=Yufuin+Floral+Village" target="_blank" class="btn-link">導航至童話村 📍</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=Yufuin+Floral+Village" target="_blank" class="btn-link" style="display: flex; align-items: center; justify-content: center; gap: 6px;">導航至童話村 <svg class="icon-mini" style="color: white;"><use href="#icon-loc"></use></svg></a>
             </div>
         </div>
 
@@ -3050,7 +3054,13 @@
             </div>
 
             <div class="info-section" style="border-color: #FBBF24; background-color: #FFFBEB;">
-                <h3 style="color: #B45309; border-bottom-color: #FBBF24;">🇯🇵 日本退稅規定 (Tax Free)</h3>
+                <h3 style="color: #B45309; border-bottom-color: #FBBF24; display: flex; align-items: center; gap: 8px;">
+                    <svg style="width:24px;height:24px;flex-shrink:0;" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="11" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+                        <circle cx="12" cy="12" r="6" fill="#BC002D"/>
+                    </svg>
+                    日本退稅規定 (Tax Free)
+                </h3>
                 <div class="method-detail">
                     <p>2026年日本持續推動電子化退稅，建議事先於 <b>Visit Japan Web</b> 登錄護照資訊以產生免稅 QR Code。</p>
                     <ul style="list-style-type: disc; margin-top: 10px; padding-left: 20px;">
@@ -3419,7 +3429,7 @@ let apiKey = "";
     3. 準確：只能根據上述行程回答，不要編造不在行程內的景點。
     4. 語言：請使用繁體中文 (台灣)。
     5. 導航支援：若使用者詢問地點位置或如何前往，請務必在回答中附上 Google Maps 連結，格式請嚴格遵守：
-       <br><a href='https://www.google.com/maps/search/?api=1&query=地點名稱' target='_blank' style='display:inline-block; margin-top:5px; color:#2563EB; font-weight:bold; text-decoration:none; border:1px solid #2563EB; padding:2px 8px; border-radius:12px;'>📍 導航至 [地點]</a>
+       <br><a href='https://www.google.com/maps/search/?api=1&query=地點名稱' target='_blank' style='display:inline-flex; align-items:center; gap:4px; margin-top:5px; color:#2563EB; font-weight:bold; text-decoration:none; border:1px solid #2563EB; padding:2px 8px; border-radius:12px;'><svg style='width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;' viewBox='0 0 24 24'><use href='#icon-loc'></use></svg>導航至 [地點]</a>
     `;
 // 3. 解密函式 (會在需要 API 時自動呼叫)
 function getDecryptedKey() {
