@@ -4406,7 +4406,7 @@ function getSmartAdviceText(temp, weatherCode) {
                         const suburb = addr.suburb || addr.neighbourhood || "";
                         
                         if (road) {
-                            locationName = `${road}${houseNum ? " " + houseNum + "號" : ""}`;
+                            locationName = `${road}${houseNum ? " " + houseNum + "" : ""}`;
                         } else if (suburb) {
                             locationName = suburb;
                         } else {
