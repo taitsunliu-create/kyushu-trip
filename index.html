@@ -4291,7 +4291,7 @@ function getSmartAdviceText(temp, weatherCode) {
 // [修改] 兩段式分享功能 (解決瀏覽器阻擋視窗問題)
         // 狀態標記：紀錄目前是否已經分析完成
         // --- [新增] Google Places API 救援函式 (三階段定位邏輯用) ---
-    const fetchGooglePlaces = async (lat, lng, radius = 50) => {
+    const fetchGooglePlaces = async (lat, lng, radius = 100) => {
     // [修改] 指定獲取 Google Places 的 Key
     const currentKey = getKey('places'); 
     if (!currentKey) return [];
@@ -4307,7 +4307,8 @@ function getSmartAdviceText(temp, weatherCode) {
             "government_office", "convenience_store", "clothing_store", "shopping_mall",
             "corporate_office", "local_government_office",
             "establishment",      // 萬用救援：只要是個「地點」都算
-            "point_of_interest"   // 萬用救援：興趣點
+            "point_of_interest",   // 萬用救援：興趣點
+            "general_contractor", "finance", "establishment", "point_of_interest",
         ];
 
         const url = `https://places.googleapis.com/v1/places:searchNearby`;
