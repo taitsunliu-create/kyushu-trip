@@ -4292,7 +4292,7 @@ function getSmartAdviceText(temp, weatherCode) {
 // [修改] 兩段式分享功能 (解決瀏覽器阻擋視窗問題)
         // 狀態標記：紀錄目前是否已經分析完成
         // --- [新增] Google Places API 救援函式 (三階段定位邏輯用) ---
-    const fetchGooglePlaces = async (lat, lng, radius = 500) => {
+    const fetchGooglePlaces = async (lat, lng, radius = 50) => {
     // [修改] 指定獲取 Google Places 的 Key
     const currentKey = getKey('places'); 
     if (!currentKey) return [];
@@ -4414,7 +4414,7 @@ function getSmartAdviceText(temp, weatherCode) {
                     if (!locationName) {
                         console.log("OSM 無地標名，啟用 Google Places 救援...");
                         // 呼叫我們剛剛新增的輔助函式
-                        const googlePlaces = await fetchGooglePlaces(lat, lon, 50); 
+                        const googlePlaces = await fetchGooglePlaces(lat, lon, 500); 
                         
                         if (googlePlaces.length > 0 && googlePlaces[0].displayName) {
                             locationName = googlePlaces[0].displayName.text;
