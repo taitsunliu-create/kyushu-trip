@@ -3409,11 +3409,18 @@
 
        // [修改] 原本的 const apiKey = ""; 替換成以下內容：
 
-// 1. 填入你剛剛產生的加密亂碼
-const encryptedApiKey = "U2FsdGVkX1/64ozwLOVc7Q7oTx058ndDWtXLLJ6Ri7cafbqjyyabFrsg2GixFXZV8bGjn7m7O7ZkH4CKCQjIjA=="; 
 
-// 2. 用來暫存解密後的 Key
-let apiKey = ""; 
+// [修改] 1. 定義兩組加密亂碼 (請將您的 AES 加密字串分別填入)
+// 用於 Gemini AI 對話、翻譯
+const encryptedGeminiKey = "U2FsdGVkX1/64ozwLOVc7Q7oTx058ndDWtXLLJ6Ri7cafbqjyyabFrsg2GixFXZV8bGjn7m7O7ZkH4CKCQjIjA=="; 
+// 用於 Google Places (分享位置時抓地標名稱)
+const encryptedPlacesKey = "U2FsdGVkX18lboyLOHvSireLOqo+Tfbx70XCgJaQinOaeYW+husBH5S/JaqTRG1zw3ggoldpqX89EHoR9R87iQ=="; 
+
+// [修改] 2. 用來暫存解密後的 Key
+let geminiKey = ""; 
+let googleKey = "";
+
+
 // [新增] 對話歷史紀錄 (讓 AI 記住前幾句話)
     let conversationHistory = [];
 // [新增] AI 導遊的系統提示詞 (這裡定義了它的記憶與人設)
@@ -3438,26 +3445,41 @@ let apiKey = "";
        <br><a href='https://www.google.com/maps/search/?api=1&query=地點名稱' target='_blank' style='display:inline-flex; align-items:center; gap:4px; margin-top:5px; color:#2563EB; font-weight:bold; text-decoration:none; border:1px solid #2563EB; padding:2px 8px; border-radius:12px;'><svg style='width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;' viewBox='0 0 24 24'><use href='#icon-loc'></use></svg>導航至 [地點]</a>
     `;
 // 3. 解密函式 (會在需要 API 時自動呼叫)
-function getDecryptedKey() {
-    if (apiKey) return apiKey; // 如果已經解密過，直接回傳
+// [修改] 3. 雙鑰匙解密函式 (傳入 'gemini' 或 'places' 取得對應 Key)
+function getKey(type) {
+    // A. 如果記憶體中已經有解好的 Key，直接回傳
+    if (type === 'gemini' && geminiKey) return geminiKey;
+    if (type === 'places' && googleKey) return googleKey;
 
-    // 簡單的防呆機制：利用 localStorage 記住密碼，避免每次重新整理都要輸入
+    // B. 讀取密碼 (兩把鑰匙共用同一個密碼 'app_password')
     let password = localStorage.getItem("app_password");
     
     if (!password) {
-        password = prompt("請輸入 API 金鑰密碼以解鎖 AI 功能：");
+        password = prompt("請輸入 API 金鑰密碼 (將同時解鎖 AI 與地圖功能)：");
     }
 
-    if (!password) return null; // 使用者取消
+    if (!password) return null; // 使用者按取消
 
     try {
-        const bytes = CryptoJS.AES.decrypt(encryptedApiKey, password);
-        const originalText = bytes.toString(CryptoJS.enc.Utf8);
-        
-        if (originalText.startsWith("AIza")) { // Google Key 通常以 AIza 開頭，用來簡單驗證
-            apiKey = originalText;
-            localStorage.setItem("app_password", password); // 密碼正確才存起來
-            return apiKey;
+        // C. 內部輔助：單純解密字串
+        const decrypt = (cipher) => {
+            if (!cipher) return "";
+            const bytes = CryptoJS.AES.decrypt(cipher, password);
+            return bytes.toString(CryptoJS.enc.Utf8);
+        };
+
+        // D. 嘗試用同一組密碼解開兩把鑰匙
+        const g_key = decrypt(encryptedGeminiKey);
+        const p_key = decrypt(encryptedPlacesKey);
+
+        // E. 驗證 (只要其中一把成功解出 AIza 開頭，就視為密碼正確)
+        // 注意：若您只有設其中一個，另一個留空字串也沒關係
+        if (g_key.startsWith("AIza") || p_key.startsWith("AIza")) {
+            geminiKey = g_key;
+            googleKey = p_key;
+            localStorage.setItem("app_password", password); // 密碼正確，存起來
+            
+            return type === 'gemini' ? geminiKey : googleKey;
         } else {
             alert("密碼錯誤，無法解密 API Key。");
             localStorage.removeItem("app_password"); // 清除錯誤密碼
@@ -3762,9 +3784,10 @@ function getSmartAdviceText(temp, weatherCode) {
         // 新增：獨立的 Gemini 呼叫函數，只回傳文字，不操作 UI
  // [修改] Gemini API 呼叫函式：升級支援圖片傳送 (Multimodal)
 // [修改] Gemini API 呼叫函式：升級為最新的 Gemini 3 Flash Preview
-        async function getGeminiResponse(promptText, imageBase64 = null) {
-            const currentKey = getDecryptedKey();
-            if (!currentKey) {
+       async function getGeminiResponse(promptText, imageBase64 = null) {
+    // [修改] 指定獲取 Gemini 的 Key
+    const currentKey = getKey('gemini');
+    if (!currentKey) {
                 appendMessage('ai', '⚠️ 尚未輸入正確密碼，無法使用 AI 功能。');
                 throw new Error("API Key Missing");
             }
@@ -4269,8 +4292,9 @@ function getSmartAdviceText(temp, weatherCode) {
         // 狀態標記：紀錄目前是否已經分析完成
         // --- [新增] Google Places API 救援函式 (三階段定位邏輯用) ---
     const fetchGooglePlaces = async (lat, lng, radius = 50) => {
-        const currentKey = getDecryptedKey(); // 使用您現有的解密函式
-        if (!currentKey) return [];
+    // [修改] 指定獲取 Google Places 的 Key
+    const currentKey = getKey('places'); 
+    if (!currentKey) return [];
 
         const centerLat = Number(lat);
         const centerLng = Number(lng);
