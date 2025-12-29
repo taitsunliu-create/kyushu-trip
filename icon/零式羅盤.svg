@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="128" fill="#3B82F6" />
+  
+  <g fill="none" stroke-linecap="round">
+    <circle cx="256" cy="256" r="210" stroke="#FFFFFF" stroke-width="30" opacity="0.3" />
+    <circle cx="256" cy="256" r="230" stroke="#FFFFFF" stroke-width="8" opacity="0.15" stroke-dasharray="20 40"/>
+  </g>
+
+  <g stroke="#FFFFFF" stroke-width="3" fill="none" opacity="0.4">
+    <circle cx="256" cy="256" r="140" stroke-width="5" opacity="0.6"/>
+    <circle cx="256" cy="256" r="100" opacity="0.3"/>
+    <path d="M256 106 L256 156 M256 406 L256 356" />
+    <path d="M106 256 L156 256 M406 256 L356 256" />
+    <line x1="150" y1="150" x2="180" y2="180" />
+    <line x1="362" y1="150" x2="332" y2="180" />
+    <line x1="150" y1="362" x2="180" y2="332" />
+    <line x1="362" y1="362" x2="332" y2="332" />
+  </g>
+
+  <g fill="#FFFFFF">
+    <path d="M256 60 L295 220 L217 220 L256 60Z" />
+    <path d="M256 452 L217 292 L295 292 L256 452Z" />
+    
+    <path d="M256 80 L256 210 M256 432 L256 302" stroke="#3B82F6" stroke-width="2" opacity="0.3"/>
+  </g>
+
+  <g fill="#3B82F6" font-family="Arial, sans-serif" font-weight="900" text-anchor="middle">
+    <text x="256" y="175" font-size="55">K</text>
+    <text x="256" y="375" font-size="55">A</text>
+  </g>
+  
+  <g>
+    <circle cx="256" cy="256" r="65" fill="#FFFFFF" stroke="#3B82F6" stroke-width="8"/>
+    <text x="256" y="280" fill="#3B82F6" font-family="Arial, sans-serif" font-weight="900" text-anchor="middle" font-size="75">B</text>
+  </g>
+</svg>

@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>九州親子自駕遊 2026</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2563EB">
-    <link rel="apple-touch-icon" href="icon-192.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -87,82 +84,58 @@
      /* [修改] SOS 浮動分享按鈕 (層級加強版) */
      /* [新增] 行前檢查清單樣式 */
         /* [修改] 行前檢查清單樣式 (加入折疊功能) */
-        /* [修改] 行前檢查清單樣式 (含捲動與新增刪除功能) */
         .checklist-card-header {
             border-bottom: 1px dashed #E5E7EB; 
             padding-bottom: 10px; 
             margin-bottom: 0;
+            /* 新增: 讓標題可點擊並對齊箭頭 */
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
+        /* 收合容器 (預設隱藏 max-height: 0) */
         .checklist-container {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
             opacity: 0;
         }
-        
+        /* 展開狀態 (加上 .show 類別時) */
         .checklist-container.show {
-            /* 設定高度約為 5 行的高度 (每行約 50px)，超過出現捲軸 */
-            max-height: 280px; 
+            max-height: 800px; /* 設定一個足夠的高度讓內容顯示 */
             opacity: 1;
-            margin-top: 15px;
-            overflow-y: auto; 
-            -webkit-overflow-scrolling: touch; 
+            margin-top: 15px; /* 展開時才給上方間距 */
         }
 
+        /* 沿用原本的格線與項目樣式 */
         .checklist-grid { 
-            display: flex; 
-            flex-direction: column; /* 改為垂直排列 */
-            gap: 8px; 
-            padding-bottom: 5px;
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            /* margin-top: 10px; <-- 移除這行，改由 container 控制 */
         }
-
         .check-item {
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; /* 讓刪除按鈕靠右 */
-            gap: 8px;
+            display: flex; align-items: center; gap: 8px;
             background: #F9FAFB; padding: 10px 12px; border-radius: 8px;
-            font-size: 0.9rem; transition: all 0.2s;
+            cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
             border: 1px solid #E5E7EB; user-select: none;
         }
+        /* 手機版改為單欄 */
+        @media (max-width: 600px) { .checklist-grid { grid-template-columns: 1fr; } }
         
         .check-item:has(input:checked) {
             background: #ECFDF5; border-color: #10B981; color: #065F46; font-weight: 600;
+            box-shadow: 0 1px 2px rgba(16, 185, 129, 0.1);
         }
         .check-item input { accent-color: #10B981; width: 18px; height: 18px; cursor: pointer; }
-        
-        /* 刪除按鈕樣式 */
-        .btn-del-item {
-            color: #EF4444; background: none; border: none; font-size: 1.2rem;
-            line-height: 1; cursor: pointer; padding: 0 8px; opacity: 0.6;
-        }
-        .btn-del-item:hover { opacity: 1; transform: scale(1.1); }
-
-        /* 新增項目輸入框區域 */
-        .add-item-box {
-            display: flex; gap: 8px; margin-bottom: 10px; padding: 5px;
-            position: sticky; top: 0; background: var(--bg); z-index: 5; /* 背景色與body一致避免透明 */
-            border-bottom: 1px solid #eee;
-        }
-        .input-add-item {
-            flex: 1; padding: 10px; border: 1px solid #D1D5DB; border-radius: 6px; outline: none; font-size: 0.9rem;
-        }
-        .btn-add-item {
-            background: var(--secondary); color: white; border: none; 
-            padding: 0 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.2rem;
-        }
         /* [新增] 隨身筆記浮動按鈕 (位於分享按鈕上方) */
-        /* [修改] 隨身筆記浮動按鈕 (藍色) - 縮小與透明化 */
         .float-note-btn {
             position: fixed;
-            bottom: 155px; /* [調整] 因為按鈕變小了，高度稍微降低靠近下方 */
-            left: 20px;
-            background: linear-gradient(135deg, #3B82F6, #2563EB);
+            bottom: 160px; /* 90px + 按鈕高度 + 間距 */
+            left: 20px;    /* 對齊下方的分享按鈕 */
+            background: linear-gradient(135deg, #3B82F6, #2563EB); /* 藍色系 */
             color: white;
             border: 2px solid white;
             border-radius: 50%;
@@ -170,77 +143,13 @@
             box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
             z-index: 9999;
             cursor: pointer;
-            transition: all 0.2s; /* 改為 all 以支援 opacity 變化 */
+            transition: transform 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             -webkit-user-select: none;
             user-select: none;
-            
-            /* [新增] 縮小與透明度設定 */
-            transform: scale(0.7);   /* 縮小至 70% */
-            opacity: 0.6;            /* 透明度 60% */
-            transform-origin: center center; /* 以中心點縮放 */
         }
-        
-        /* 讓使用者點擊(按住)時，稍微變回不透明，增加回饋感 */
-        .float-note-btn:active { 
-            transform: scale(0.65); /* 按下時稍微更小一點點 */
-            opacity: 1;             /* 按下時變清楚 */
-        }
-
-        /* [修改] 匯率計算機浮動按鈕 (橘色) - 縮小與透明化 */
-        .float-calc-btn {
-            position: fixed;
-            bottom: 205px; /* [調整] 配合藍色按鈕的高度調整 */
-            left: 20px;
-            
-            background: rgba(245, 158, 11, 0.65); 
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            padding: 16px;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-            z-index: 9999;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            -webkit-user-select: none;
-            user-select: none;
-
-            /* [新增] 縮小與透明度設定 */
-            transform: scale(0.7);   /* 縮小至 70% */
-            opacity: 0.6;            /* 透明度 60% (會疊加背景本身的透明度) */
-            transform-origin: center center;
-        }
-
-        /* 點擊時的回饋 */
-        .float-calc-btn:active { 
-            transform: scale(0.65); 
-            opacity: 1;
-            background: rgba(245, 158, 11, 0.85); 
-        }
-        
-        .float-note-btn svg, .float-calc-btn svg { width: 20px; height: 20px; stroke-width: 2.5; }
-        .float-calc-btn:active { 
-            transform: scale(0.95); 
-            background: rgba(245, 158, 11, 0.85); /* 按下時變實心一點 */
-        }
-        .float-calc-btn svg { width: 20px; height: 20px; stroke-width: 2.5; }
-
-        /* 計算機視窗樣式 */
-        .calc-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .calc-input { width: 60%; padding: 10px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1.2rem; text-align: right; outline: none; }
-        .calc-input:focus { border-color: #F59E0B; }
-        .calc-label { font-weight: 600; color: #4B5563; }
-
-/* --- 插入結束 --- */
-
         .float-note-btn:active { transform: scale(0.95); }
         .float-note-btn svg { width: 20px; height: 20px; stroke-width: 2.5; }
         .float-share-btn {
@@ -339,15 +248,15 @@
             .hw-col-my-loc {
                 padding-right: 8px;
                 margin-right: 0;
-                border-right: 1px solid rgba(255,255,255,0.2); 
-                
-                /* [新增] 下面這兩行是解決擠壓的關鍵 */
-                min-width: auto;  /* [修正] 改為 auto，讓寬度隨內容調整 */
-                flex-shrink: 0;   /* [新增] 防止內容被擠扁 */
-                white-space: nowrap; /* 禁止文字換行 */
+                border-right: 1px solid rgba(255,255,255,0.2); /* 手機版保留分隔線 */
             }
         }
-        
+        .hw-col-loc {
+            padding-right: 15px;
+            border-right: 1px solid rgba(255,255,255,0.3);
+            text-align: center;
+            min-width: 80px;
+        }
         .hw-loc { font-size: 1.1rem; font-weight: 700; display: block; line-height: 1.2; }
         .hw-date { font-size: 0.75rem; opacity: 0.9; display: block; margin-top: 4px; }
 
@@ -997,11 +906,7 @@
             background: linear-gradient(135deg, #EF4444, #F87171); 
             animation: pulse 1.5s infinite;
         }
-/* [新增] 相機按鈕樣式 */
-        .btn-mode.camera { background: linear-gradient(135deg, #8B5CF6, #D946EF); }
-        
-        /* 隱藏原本的檔案上傳 Input，改用按鈕觸發 */
-        #img-upload-input { display: none; }
+
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
@@ -1031,417 +936,70 @@
             60% { content: ' ...'; }
             80%, 100% { content: ' ....'; }
         }
-/* [新增] SVG Sprite 通用樣式 */
-        .icon-sprite {
-            width: 100%;
-            height: 100%;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-        /* Mobile Optimization - 修正後的完整手機版設定 */
+
+        /* Mobile Optimization */
         @media (max-width: 600px) {
-            .container { padding: 15px 12px; } 
+            .container { padding: 15px 12px; } /* Adjust padding */
             
-            /* Header 調整 */
+            /* Header adjustments */
             .header-content { flex-direction: column; align-items: flex-start; gap: 10px; }
             .header-title-area h1 { font-size: 1.5rem; white-space: normal; line-height: 1.3; }
             
-            /* 天氣區塊容器：縮小間距 */
+            /* Compact Weather Box - Modified to show Advice */
             .header-weather-box { 
                 width: 100%; 
                 justify-content: space-between; 
-                padding: 10px 8px ; /*15px*/
+                padding: 10px 15px;
                 border-radius: 12px;
                 background: rgba(255, 255, 255, 0.15);
                 min-height: auto;
-                flex-wrap: wrap; 
-                gap: 5px; /* [修正] 間距縮小 */
-            }
-
-            /* 1. 左側：我的位置 (修正寬度) */
-            .hw-col-my-loc {
-                padding-right: 8px;
-                margin-right: 0;
-                border-right: 1px solid rgba(255,255,255,0.2); 
-                min-width: auto;
-                flex-shrink: 0;
-                white-space: nowrap;
-            }
-
-            /* 2. 中間：目的地 (關鍵修正：填滿剩餘空間) */
-            .hw-col-loc { 
-                flex: 1; /* [關鍵] 自動填滿中間剩餘所有空間 */
-                min-width: 0; /* [關鍵] 允許內容壓縮，防止撐破 */
-                border: none; 
-                padding: 0 4px;
-                text-align: left; 
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
-            .hw-col-loc .hw-loc {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis; /* 文字太長變 ... */
-                font-size: 1rem; /* [新增] 手機版字體縮小一點 (原本是 1.1rem)，避免長地名擠壓 */
+                flex-wrap: wrap; /* Allow items to wrap to next line */
+                gap: 8px; /* Gap between rows */
             }
             
-            /* 3. 右側：天氣 (關鍵修正：不准搶空間) */
-            .hw-col-main { 
-                flex: 0 0 auto; /* [關鍵] 固定寬度，不准自動變大 */
-                padding: 0;     /* [關鍵] 移除內距 */
-                justify-content: flex-end; 
-                gap: 5px;
-            }
-
-            /* 底部建議文字 */
+            /* Show Advice on Mobile now */
             .hw-col-advice { 
-                display: block; 
-                width: 100%; 
-                border-left: none; 
-                border-top: 1px solid rgba(255,255,255,0.3); 
+                display: block; /* Force display */
+                width: 100%; /* Take full width */
+                border-left: none; /* Remove side separator */
+                border-top: 1px solid rgba(255,255,255,0.3); /* Add top separator */
                 padding-left: 0;
                 padding-top: 8px;
                 max-width: none;
                 min-height: auto;
                 font-size: 0.8rem;
                 line-height: 1.4;
-                margin-top: 5px;
             }
+
+            .hw-col-main { flex-grow: 1; justify-content: flex-end; }
+            .hw-col-loc { min-width: auto; border: none; padding-right: 0; text-align: left; }
             
-            /* 其他手機版優化 */
+            /* Compact Timeline */
             .timeline { padding-left: 15px; padding-right: 5px; } 
             .event { padding-left: 15px; }
             .event::before { left: -6px; }
 
-            .ai-actions-row { gap: 8px; }
+            /* Optimized AI Buttons for Thumb Use */
+            .ai-actions-row { 
+                gap: 8px; 
+            }
             .btn-mode {
                 padding: 10px 4px;
                 font-size: 0.8rem;
-                flex-direction: column; 
+                flex-direction: column; /* Icon top, Text bottom */
                 gap: 6px;
                 line-height: 1.2;
-                height: 70px; 
+                height: 70px; /* Taller easy to hit area */
             }
             .btn-mode svg { width: 24px; height: 24px; margin-bottom: 0; }
             
+            /* Price Table scrollable if needed */
             .price-table { font-size: 0.85rem; }
         }
-        /* [最終修正] 強制限制 AI 按鈕圖示大小 */
-        .btn-mode .icon-sprite {
-            width: 24px !important;
-            height: 24px !important;
-            margin-bottom: 5px;
-            flex-shrink: 0;
-        }
-        /* [修改] 2D 高效能滑動引擎樣式 (High Performance Slide) */
-        
-        body {
-            overflow-x: hidden;
-            /* 移除 perspective，改為平面滑動 */
-        }
-
-        .container {
-            /* 💡 [優化] 強制開啟 GPU 硬體加速，減少閃爍 */
-            transform: translate3d(0, 0, 0); 
-            will-change: transform, opacity; 
-            
-            /* 保持隱藏背面的設定，雖然是 2D 但可以防止渲染錯誤 */
-            backface-visibility: hidden; 
-        }
-
-        /* 2. 手指拖曳中 (絕對跟隨，無延遲) */
-        .container.is-dragging {
-            transition: none !important;
-            cursor: grabbing;
-        }
-
-        /* 3. 放手後的慣性動畫 (使用您指定的 Bezier 曲線) */
-        .container.is-animating {
-            /* 💡 [優化] 使用 cubic-bezier(0.23, 1, 0.32, 1) 讓回彈更自然 */
-            transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), 
-                        opacity 0.25s ease !important;
-        }
-
-        /* 輔助：當頁面被隱藏時的狀態 */
-        .container.page-hidden {
-            display: none;
-        }
-        /* [新增] 圖片點擊放大 (Lightbox) 樣式 */
-        .lightbox-overlay {
-            display: none; /* 預設隱藏 */
-            position: fixed;
-            z-index: 10000; /* 最高層級，蓋過所有按鈕 */
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9); /* 深黑背景 */
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-            animation: fadeIn 0.2s;
-        }
-        
-        .lightbox-content {
-            max-width: 95%;
-            max-height: 95%;
-            object-fit: contain;
-            /* [修改] 移除 transition 以實現即時跟手效果 */
-            /* transform: scale(1); */ 
-            
-            /* [新增] 游標變更與觸控優化 */
-            cursor: grab;
-            touch-action: none; /* 關鍵：防止手機滑動時觸發瀏覽器換頁或捲動 */
-            transform-origin: center center;
-            will-change: transform; /* 效能優化 */
-        }
-        
-        .lightbox-content:active {
-            cursor: grabbing;
-        }
-
-        .lightbox-close {
-            position: absolute;
-            top: 20px;
-            right: 25px;
-            color: #fff;
-            font-size: 35px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 10001;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-    /* [新增] PWA 啟動過場畫面 (Splash Screen) */
-#splash-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #2563EB; /* 必須與您的 theme-color 一致 */
-    z-index: 99999; /* 確保蓋在所有內容最上面 */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.6s ease-out, visibility 0.6s;
-}
-
-/* 讓過場畫面消失的狀態 */
-#splash-screen.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none; /* 穿透點擊 */
-}
-
-/* 中間的飛機圖示 */
-.splash-logo {
-    width: 120px; /* 可依需求調整大小 */
-    height: 120px;
-    margin-bottom: 20px;
-    /* 這裡可以加動畫，例如輕微浮動 */
-    animation: floatPlane 3s ease-in-out infinite;
-}
-
-/* 下方的文字 */
-.splash-text {
-    color: white;
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    opacity: 0.9;
-}
-
-/* 簡單的浮動動畫 */
-@keyframes floatPlane {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-  /* --- [新增] 住宿頁面優化樣式 Start --- */
-.stay-card-grid {
-    display: grid;
-    gap: 12px;
-    font-size: 0.95rem;
-}
-.stay-row {
-    display: grid;
-    grid-template-columns: 85px 1fr;
-    align-items: center;
-    gap: 10px;
-    padding-bottom: 8px;
-    border-bottom: 1px dashed #E5E7EB;
-}
-.stay-row:last-child { border-bottom: none; }
-
-.stay-label { 
-    color: #6B7280; 
-    font-weight: 500; 
-    display: flex; 
-    align-items: center; 
-    gap: 4px;
-}
-/* 地址與 MapCode 的顯示區塊 */
-.stay-val { 
-    font-weight: 600; 
-    color: #1F2937; 
-    word-break: break-all;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-}
-
-/* 複製按鈕 */
-.btn-copy-small {
-    background: white;
-    border: 1px solid #D1D5DB;
-    color: #4B5563;
-    font-size: 0.75rem;
-    padding: 3px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.2s;
-}
-.btn-copy-small:active { transform: scale(0.95); background: #F3F4F6; }
-.btn-copy-small.copied { 
-    border-color: #10B981; 
-    color: #059669; 
-    background: #ECFDF5; 
-}
-
-/* 底部大導航按鈕 */
-.btn-nav-large {
-    width: 100%;
-    background: linear-gradient(135deg, #2563EB, #1D4ED8);
-    color: white;
-    font-size: 1rem;
-    font-weight: 700;
-    padding: 14px;
-    border-radius: 12px;
-    border: none;
-    text-decoration: none; /* 移除底線 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    margin-top: 15px;
-    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
-    transition: transform 0.2s;
-}
-.btn-nav-large:active { transform: scale(0.98); }
-
-/* MapCode 專用樣式 */
-.map-code-box {
-    font-family: 'Roboto Mono', monospace;
-    color: #D97706;
-    background: #FFFBEB;
-    padding: 2px 6px;
-    border-radius: 4px;
-    border: 1px solid #FCD34D;
-    letter-spacing: 1px;
-}
-/* --- [新增] 住宿頁面優化樣式 End --- */
-  </style>
+    </style>
 </head>
 <body>
-        <div id="splash-screen">
-        <img src="icon-512.png" alt="App Logo" class="splash-logo">
-        <div class="splash-text">九州親子自駕遊</div>
-    </div>
 
-    
-<svg style="display: none;">
-        <defs>
-            <symbol id="icon-schedule" viewBox="0 0 24 24">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-            </symbol>
-            
-            <symbol id="icon-stay" viewBox="0 0 24 24">
-                <path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"></path>
-            </symbol>
-            
-            <symbol id="icon-car" viewBox="0 0 24 24">
-                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
-                <circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>
-                <path d="M5 17h2"/><path d="M15 17h2"/>
-            </symbol>
-            
-            <symbol id="icon-info" viewBox="0 0 24 24">
-                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
-                <path d="M9 18h6"/><path d="M10 22h4"/>
-            </symbol>
-            
-            <symbol id="icon-weather" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="5"></circle>
-                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
-            </symbol>
-            
-            <symbol id="icon-ai" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-            </symbol>
-            <symbol id="icon-consult" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
-            </symbol>
-
-            <symbol id="icon-trans" viewBox="0 0 24 24">
-                <path d="M7 10h14"></path>
-                <path d="M17 6l4 4-4 4"></path>
-                <path d="M17 14H3"></path>
-                <path d="M7 18l-4-4 4-4"></path>
-            </symbol>
-
-            <symbol id="icon-voice" viewBox="0 0 24 24">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                <line x1="12" y1="19" x2="12" y2="23"></line>
-                <line x1="8" y1="23" x2="16" y2="23"></line>
-            </symbol>
-
-            <symbol id="icon-camera" viewBox="0 0 24 24">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                <circle cx="12" cy="13" r="4"></circle>
-            </symbol>
-
-            <symbol id="icon-loc" viewBox="0 0 24 24">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-            </symbol>
-            <symbol id="icon-earth" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            </symbol>
-
-            <symbol id="icon-temp" viewBox="0 0 24 24">
-                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
-            </symbol>
-
-            <symbol id="icon-shirt" viewBox="0 0 24 24">
-                <path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path>
-            </symbol>
-
-            <symbol id="icon-reset" viewBox="0 0 24 24">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </symbol>
-
-            <symbol id="icon-nav-arrow" viewBox="0 0 24 24">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-            </symbol>
-        </defs>
-    </svg>
     <header>
         <div class="header-content">
             <div class="header-title-area">
@@ -1455,7 +1013,7 @@
                 
                 <div class="hw-col-my-loc" id="hw-my-loc-box" onclick="getLocalWeather()">
                     <div class="hw-sub-label">
-                        <svg class="icon-mini" style="width:12px;height:12px;vertical-align:text-top;"><use href="#icon-nav-arrow"></use></svg>
+                        <svg class="icon-mini" style="width:12px;height:12px;vertical-align:text-top;" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
                         我的位置
                     </div>
                     <div class="hw-my-data">
@@ -1496,27 +1054,41 @@
                     行前準備 Check List
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <div class="tag tag-tip" id="checklist-progress" style="background:#FFFBEB; color:#D97706; font-weight:700;">計算中...</div>
-                    <div class="toggle-icon" style="font-size: 0.8rem; color: #6B7280; font-weight: 700; transition: transform 0.3s;">▼</div>
+                    <div class="tag tag-tip" id="checklist-progress" style="background:#FFFBEB; color:#D97706; font-weight:700;">0/8</div>
+                    <div class="toggle-icon" style="font-size: 0.8rem; color: #6B7280; font-weight: 700; transition: transform 0.3s;">▼
+
+                    </div>
                 </div>
             </div>
             
             <div id="checklist-container" class="checklist-container">
-                <div class="add-item-box" onclick="event.stopPropagation()">
-                    <input type="text" id="new-item-input" class="input-add-item" placeholder="新增準備項目...">
-                    <button class="btn-add-item" onclick="addNewCheckItem()">＋</button>
+                <div class="checklist-grid">
+                    <label class="check-item"><input type="checkbox" data-id="c1"> <span>機場停車預約 (截圖備份)</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c2"> <span>護照 & 機票 (截圖備份)</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c3"> <span>旅遊保險單 (紙本/電子)</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c4"> <span>日幣現金 & 信用卡 & 西瓜卡</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c5"> <span>eSIM / 漫遊開通</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c6"> <span>Visit Japan Web 填寫</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c7"> <span>行動電源 & 充電線 & 車用充電器</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c8"> <span>國際駕照 (日文譯本) / 租車資料</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c9"> <span>牙刷/常備藥品</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c10"> <span>健保卡 / 大頭照</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c11"> <span>小工具醫療箱 / 雪松</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c12"> <span>耳溫槍 / 刮鬍刀</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c13"> <span>相機 / 讀卡機 / 拍立得</span></label>
+                    <label class="check-item"><input type="checkbox" data-id="c14"> <span>手套 / 脖圍</span></label>
+
                 </div>
-                <div class="checklist-grid" id="checklist-list-area"></div>
             </div>
         </div>
 
-        
+        <div class="day-wrapper">
         <!-- Day 1 -->
         <div class="day-wrapper">
             <div class="day-toggle" id="toggle-d1" onclick="toggleTimeline('d1', this)">
                 <div class="day-info">
                     <h3>Day 1: 抵達與熊本市區</h3>
-                    <span>1/25 (日) • 住宿: 熊本 The Blossom</span>
+                    <span>1/25 (日) • 住宿: The Blossom</span>
                 </div>
                 <div class="toggle-icon">▼</div>
             </div>
@@ -1625,7 +1197,7 @@
             <div class="day-toggle" id="toggle-d2" onclick="toggleTimeline('d2', this)">
                 <div class="day-info">
                     <h3>Day 2: 觀光列車 & 黑川溫泉</h3>
-                    <span>1/26 (一) • 住宿: 黑川溫泉 麓旅館</span>
+                    <span>1/26 (一) • 住宿: 黑川溫泉</span>
                 </div>
                 <div class="toggle-icon">▼</div>
             </div>
@@ -1758,7 +1330,7 @@
             <div class="day-toggle" id="toggle-d3" onclick="toggleTimeline('d3', this)">
                 <div class="day-info">
                     <h3>Day 3: 別府海地獄、野生動物園 & 由布院</h3>
-                    <span>1/27 (二) • 住宿: 由布院 湯布院山燈舘</span>
+                    <span>1/27 (二) • 住宿: 由布院</span>
                 </div>
                 <div class="toggle-icon">▼</div>
             </div>
@@ -1768,25 +1340,25 @@
                     <div><b>行程提示：：</b>海地獄已加入此行程！您將從黑川溫泉出發，**在前往由布院的途中經過別府並參觀海地獄**，完美串聯行程。</div>
                 </div>
                 <div class="event event-meal">
-                    <div class="time">06:30</div>
+                    <div class="time">08:00</div>
                     <div class="activity">早餐: 旅館內享用</div>
                     <div class="desc">享用黑川溫泉旅館豐盛的日式早餐。</div>
                      <div class="tags"><span class="tag tag-stay">溫泉旅館</span><span class="tag tag-food">已包含</span></div>
                 </div>
                 <div class="event">
-                    <div class="time">08:00</div>
+                    <div class="time">09:30</div>
                     <div class="activity">黑川溫泉散策 & Check-out</div>
                     <div class="desc">在退房前購買「入湯手形」逛溫泉街，享受早晨的寧靜。</div>
                     <div class="tags"><span class="tag tag-relax">散步</span></div>
                 </div>
                 <div class="event">
-                    <div class="time">09:00</div>
+                    <div class="time">11:00</div>
                     <div class="activity">移動至別府地獄區 (自駕 1小時30分)</div>
                     <div class="desc">車程較長，建議準備好孩子的零食和娛樂。</div>
                     <div class="tags"><span class="tag tag-move">移動</span><span class="tag tag-car">高速/山路</span></div>
                 </div>
                 <div class="event">
-                    <div class="time" style="color: var(--beppu-info); font-weight: 700;">10:30</div>
+                    <div class="time" style="color: var(--beppu-info); font-weight: 700;">12:30</div>
                     <div class="activity" style="color: var(--beppu-info); font-weight: 700;">抵達 別府 海地獄 (Umi Jigoku)</div>
                     <div class="desc">
                         地獄巡禮中最夢幻的一處！因佔地較大，建議停留約 **75分鐘**。
@@ -1810,15 +1382,15 @@
                      <div class="tags"><span class="tag tag-food">選擇午餐</span></div>
                 </div>
                 <div class="event">
-                    <div class="time">12:30</div>
+                    <div class="time">14:30</div>
                     <div class="activity">抵達 九州自然動物公園 (African Safari)</div>
                     <div class="desc">從地獄區自駕約 15-20 分鐘可抵達。停車場很大，請留意路標。</div>
                     <a href="https://www.google.com/maps/search/?api=1&query=African+Safari+Oita" target="_blank" class="btn-map">導航</a>
                     <div class="tags"><span class="tag tag-move">抵達</span></div>
                 </div>
                 <div class="event">
-                    <div class="time">12:30 - 16:30</div>
-                    <div class="activity">九州自然動物公園 (4小時遊玩)</div>
+                    <div class="time">14:30 - 17:30</div>
+                    <div class="activity">九州自然動物公園 (3小時遊玩)</div>
                     <div class="desc">
                         **時間建議：** 自駕觀賞 (30分鐘) + 叢林巴士 (50分鐘) + 親近區 (1小時30分鐘)。
                         **請務必提早預約叢林巴士場次，並安排在 15:00 左右開始。** 詳情請見「旅遊資訊」頁籤。
@@ -1829,7 +1401,7 @@
                     <div class="tags"><span class="tag tag-kids">親子必遊</span><span class="tag tag-spot">動物園</span></div>
                 </div>
                 <div class="event">
-                    <div class="time">16:30</div>
+                    <div class="time">17:30</div>
                     <div class="activity">前往由布院溫泉 (山燈館)</div>
                     <div class="desc">車程約 40分鐘，天色已暗，請小心駕駛。</div>
                     <a href="https://www.google.com/maps/search/?api=1&query=Yufuin+Santoukan" target="_blank" class="btn-map">導航至山燈館</a>
@@ -1858,7 +1430,7 @@
             <div class="day-toggle" id="toggle-d4" onclick="toggleTimeline('d4', this)">
                 <div class="day-info">
                     <h3>Day 4: 由布院至福岡</h3>
-                    <span>1/28 (三) • 住宿: 福岡 休雷克蓋特</span>
+                    <span>1/28 (三) • 住宿: 福岡</span>
                 </div>
                 <div class="toggle-icon">▼</div>
             </div>
@@ -1975,7 +1547,7 @@
             <div class="day-toggle" id="toggle-d5" onclick="toggleTimeline('d5', this)">
                 <div class="day-info">
                     <h3>Day 5: 太宰府與福岡購物</h3>
-                    <span>1/29 (四) • 住宿: 福岡 休雷克蓋特</span>
+                    <span>1/29 (四) • 住宿: 福岡</span>
                 </div>
                 <div class="toggle-icon">▼</div>
             </div>
@@ -2033,8 +1605,8 @@
                     <div class="activity">晚餐時段：屋台體驗或購物中心</div>
                     <div class="desc">
                         <ul style="list-style-type: disc;">
-                            <li><b>中洲屋台：</b> 體驗福岡的路邊攤文化 (親子需注意環境)。</li>
-                            <li><b>運河城內餐廳：</b> 選擇多樣，用餐環境較舒適。</li>
+                            <li><b>中洲屋台：：</b> 體驗福岡的路邊攤文化 (親子需注意環境)。</li>
+                            <li><b>運河城內餐廳：：：</b> 選擇多樣，用餐環境較舒適。</li>
                         </ul>
                     </div>
                     <a href="https://www.google.com/maps/search/?api=1&query=Nakasu+Yatai" target="_blank" class="btn-map">屋台導航</a>
@@ -2114,215 +1686,185 @@
     </div>
 
     <!-- TAB 2: 住宿資訊 (Updated Day 3) -->
-    <div id="view-stay" class="container">
-        
+    </div> <div id="view-stay" class="container">
+        <!-- Day 1: THE BLOSSOM -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Day 1: 熊本 - THE BLOSSOM</div>
-                <div class="tag tag-stay">車站直結</div>
+                <div class="card-title">Day 1: 熊本 - THE BLOSSOM KUMAMOTO</div>
+                <div class="tag tag-stay">市區/車站</div>
             </div>
             
-            <div class="stay-card-grid">
-                <div class="stay-row">
-                    <div class="stay-label">
-                        <svg class="icon-mini" style="color:#6B7280"><use href="#icon-loc"></use></svg> 地址
-                    </div>
-                    <div class="stay-val">
-                        <span>熊本県熊本市西区春日3-15-26</span>
-                        <button class="btn-copy-small" onclick="copyText(this, '熊本県熊本市西区春日3-15-26')">
-                            <svg class="icon-mini" style="width:12px;height:12px;"><path d="M8 2h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-                            複製
-                        </button>
-                    </div>
-                </div>
-                <div class="stay-row">
-                    <div class="stay-label">
-                        <svg class="icon-mini" style="color:#6B7280"><use href="#icon-consult"></use></svg> 電話
-                    </div>
-                    <div class="stay-val">
-                        <a href="tel:0963278777" style="color:#2563EB; text-decoration:none;">096-327-8777</a>
-                    </div>
-                </div>
-                <div class="stay-row">
-                    <div class="stay-label">
-                        <svg class="icon-mini" style="color:#D97706"><use href="#icon-car"></use></svg> MapCode
-                    </div>
-                    <div class="stay-val">
-                        <span class="map-code-box">29 459 270*76</span>
-                    </div>
-                </div>
+            <div class="info-grid">
+                <div class="info-label">地址</div>
+                <div class="info-val">熊本県熊本市西区春日3丁目15-26</div>
             </div>
-
-            <div class="info-detail-box" style="margin-top: 15px; border-color: #BFDBFE; background-color: #EFF6FF;">
-                <h4 style="color: #1D4ED8;">✨ 特色與注意</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; margin-top:5px; color:#444;">
-                    <li><b>位置：</b>JR熊本站旁 AMU PLAZA 樓上 (9F大廳)。</li>
-                    <li><b>停車：</b>請停 AMU PLAZA 地下停車場 (住客優惠約 ¥1,000)，將停車券帶至櫃台。</li>
-                    <li><b>設施：</b>大浴場位於 9F，房卡感應進入。</li>
+            
+            <div class="info-detail-box">
+                <h4 style="color: var(--primary);">✨ 飯店特色與服務</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
+                    <li><b>絕佳位置：</b>與 JR 熊本站直結 (AMU PLAZA 樓上)，下樓即可逛街用餐。</li>
+                    <li><b>大浴場：</b>設有住客專用的大浴場與桑拿 (9F)，玩了一天可以好好放鬆。</li>
+                    <li><b>景觀大廳：</b>大廳位於 9 樓，視野開闊，可眺望熊本市區。</li>
+                    <li><b>親子友善：</b>提供兒童備品 (需向櫃台索取)，房間新穎寬敞。</li>
                 </ul>
             </div>
 
-            <a href="https://www.google.com/maps/search/?api=1&query=THE+BLOSSOM+KUMAMOTO" target="_blank" class="btn-nav-large">
-                <svg class="icon-mini" style="width:20px;height:20px;color:white;"><use href="#icon-nav-arrow"></use></svg>
-                啟動 Google 導航
-            </a>
+            <div class="info-detail-box" style="margin-top: 10px; background-color: #FFFBEB; border-color: #F59E0B;">
+                <h4 style="color: #D97706;">⚠️ 注意事項</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
+                    <li><b>入口位置：</b>飯店入口位於 AMU PLAZA 旁，需搭乘專用電梯至 9 樓 Check-in。</li>
+                    <li><b>停車資訊：</b>使用 AMU PLAZA 地下停車場 (住客優惠約 ¥1,000/晚)。請務必將停車券帶至櫃台消磁。</li>
+                    <li><b>早餐：</b>早餐評價極高，建議預留充裕時間享用。</li>
+                </ul>
+            </div>
+            <a href="https://www.google.com/maps/search/?api=1&query=THE+BLOSSOM+KUMAMOTO" target="_blank" class="btn-link">開啟地圖</a>
         </div>
 
+        <!-- Day 2: Kurokawa -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Day 2: 黑川溫泉 - 麓旅館</div>
+                <div class="card-title">Day 2: 黑川溫泉 (兩備選比較)</div>
+                <div class="tag tag-stay">溫泉鄉</div>
+            </div>
+            
+            <!-- 備選 A: 麓旅館 -->
+            <div class="info-detail-box">
+                <h4>備選 A: 麓旅館 (Fumoto Ryokan)</h4>
+                 <div class="info-grid">
+                    <div class="info-label">地址</div>
+                    <div class="info-val">熊本県阿蘇郡南小国町満願寺6618</div>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    <strong style="color: #059669;">✨ 特色與服務：</strong>
+                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
+                        <li><b>湯池巡禮：</b>擁有 15 個湯池，包含多個「貸切風呂 (私人湯屋)」供住客免費使用，不需預約，看燈號即可進入。</li>
+                        <li><b>餐食：</b>通常提供部屋食 (在房間內用餐) 或包廂，適合帶小孩的家庭。</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 5px;">
+                    <strong style="color: #D97706;">⚠️ 注意事項：</strong>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">
+                        館內保留古老建築結構，<b>樓梯非常多且陡</b>，若有大型行李或推車會較吃力。建議將大行李留在車上，只帶輕便過夜包。
+                    </p>
+                </div>
+
+                <a href="tel:0967440103" class="btn-link-tel">撥打 0967-44-0103 (導航電話)</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=麓旅館+黑川溫泉" target="_blank" class="btn-link-sub">開啟 Google 地圖導航 📍</a>
+            </div>
+
+            <!-- 備選 B: 湯本莊 -->
+            <div class="info-detail-box" style="margin-top: 15px; border-color: #F59E0B;">
+                <h4 style="color: #F59E0B;">備選 B: 湯本莊 (Yumoto So)</h4>
+                 <div class="info-grid">
+                    <div class="info-label">地址</div>
+                    <div class="info-val">熊本県阿蘇郡南小国町満願寺6692</div>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    <strong style="color: #D97706;">✨ 特色與服務：</strong>
+                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
+                        <li><b>位置絕佳：</b>位於溫泉街正中心，出門逛街最方便。</li>
+                        <li><b>特色溫泉：</b>以手工挖掘的「釜風呂」和視野好的露天風呂聞名。</li>
+                    </ul>
+                </div>
+
+                 <div style="margin-top: 10px; border-top: 1px dashed #F59E0B; padding-top: 5px;">
+                    <strong style="color: #D97706;">⚠️ 注意事項：</strong>
+                    <p style="font-size: 0.9rem; margin-top: 5px;">
+                        飯店門口道路狹窄，建議先將車停在溫泉街入口的共同停車場，再致電旅館派接駁車接送，或請旅館人員指引停車。
+                    </p>
+                </div>
+
+                <a href="tel:0967440211" class="btn-link-tel">撥打 0967-44-0211 (導航電話)</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=湯本莊+黑川溫泉" target="_blank" class="btn-map">開啟 Google 地圖導航 📍</a>
+            </div>
+        </div>
+
+        <!-- Day 3: Yufuin -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Day 3: 由布院 - 湯布院 山燈館</div>
                 <div class="tag tag-stay">傳統日式</div>
             </div>
-            
-            <div class="stay-card-grid">
-                <div class="stay-row">
-                    <div class="stay-label">
-                        <svg class="icon-mini" style="color:#6B7280"><use href="#icon-loc"></use></svg> 地址
-                    </div>
-                    <div class="stay-val">
-                        <span>熊本県阿蘇郡南小国町満願寺6618</span>
-    <button class="btn-copy-small" onclick="copyText(this, '熊本県阿蘇郡南小国町満願寺6618')">
-        <svg class="icon-mini" style="width:12px;height:12px;"><path d="M8 2h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-        複製
-    </button>
-</div>
-                </div>
-                <div class="stay-row">
-                    <div class="stay-label">電話</div>
-                    <div class="stay-val">
-                        <a href="tel:0967440103" style="color:#2563EB; text-decoration:none;">0967-44-0103</a>
-                    </div>
-                </div>
-                <div class="stay-row">
-                    <div class="stay-label">MapCode</div>
-                    <div class="stay-val">
-                        <span class="map-code-box">440 542 454*47</span>
-                    </div>
-                </div>
+            <div class="info-grid">
+                <div class="info-label">地址</div>
+                <div class="info-val">大分県由布市湯布院町川上1553</div>
             </div>
-
-            <div class="info-detail-box" style="margin-top: 15px; border-color: #FCD34D; background-color: #FFFBEB;">
-                <h4 style="color: #B45309;">⚠️ 注意事項</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; margin-top:5px; color:#444;">
-                    <li><b>抵達：</b>溫泉街道路極狹窄，強烈建議天黑前抵達。</li>
-                    <li><b>行李：</b>館內為古老建築，樓梯多且陡，建議攜帶輕便過夜包，大行李留車上。</li>
-                    <li><b>溫泉：</b>擁有 15 個湯池 (含貸切風呂)，無需預約，看燈號使用。</li>
+            
+            <div class="info-detail-box">
+                <h4 style="color: var(--primary);">✨ 飯店特色與服務</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
+                    <li><b>純京風建築：</b>全館僅13間客房，全室檜木造，環境清幽雅致。</li>
+                    <li><b>金鱗湖旁：</b>步行至金鱗湖僅需 1-2 分鐘，非常適合清晨去欣賞晨霧。</li>
+                    <li><b>會席料理：</b>提供高品質的懷石料理，晚餐通常安排在房內或包廂享用。</li>
+                    <li><b>姊妹館溫泉：</b>可免費使用隔壁姊妹館「田乃倉」的露天溫泉。</li>
                 </ul>
             </div>
 
-            <a href="https://www.google.com/maps/search/?api=1&query=Fumoto+Ryokan+Kurokawa" target="_blank" class="btn-nav-large" style="background: linear-gradient(135deg, #D97706, #B45309);">
-                <svg class="icon-mini" style="width:20px;height:20px;color:white;"><use href="#icon-nav-arrow"></use></svg>
-                啟動 Google 導航
-            </a>
+            <div class="info-detail-box" style="margin-top: 10px; background-color: #FFFBEB; border-color: #F59E0B;">
+                <h4 style="color: #D97706;">⚠️ 注意事項</h4>
+                <ul style="padding-left: 20px; font-size: 0.9rem; line-height: 1.6;">
+                    <li><b>抵達時間：</b>因包含晚餐，請務必於 17:30 - 18:00 前辦理入住。若會晚到請務必電話聯繫。</li>
+                    <li><b>停車：</b>旅館備有免費停車場。</li>
+                    <li><b>隔音：</b>日式木造建築隔音較弱，夜間請放輕腳步。</li>
+                </ul>
+            </div>
+
+            <a href="tel:0977845310" class="btn-link-tel">撥打 0977-84-5310 (導航電話)</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=Yufuin+Santoukan" target="_blank" class="btn-link-sub">開啟 Google 地圖導航 📍</a>
         </div>
 
+        <!-- Day 4-5: Fukuoka -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Day 3: 由布院 - 湯布院山燈舘</div>
-                <div class="tag tag-stay">金鱗湖旁</div>
+                <div class="card-title">Day 4-5: 福岡 (兩備選比較)</div>
+                <div class="tag tag-stay">市區</div>
             </div>
             
-            <div class="stay-card-grid">
-                <div class="stay-row">
-                    <div class="stay-label">
-                        <svg class="icon-mini" style="color:#6B7280"><use href="#icon-loc"></use></svg> 地址
-                    </div>
-                    <div class="stay-val">
-                        <span>大分県由布市湯布院町川上1553</span>
-    <button class="btn-copy-small" onclick="copyText(this, '大分県由布市湯布院町川上1553')">
-        <svg class="icon-mini" style="width:12px;height:12px;"><path d="M8 2h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-        複製
-    </button>
-</div>
+            <!-- 福岡選項 A -->
+            <div class="info-detail-box">
+                <h4>備選 A: 西鐵飯店 Croom 博多</h4>
+                <div class="info-grid">
+                    <div class="info-label">地址</div>
+                    <div class="info-val">福岡県福岡市博多区博多駅前1-17-6</div>
                 </div>
-                <div class="stay-row">
-                    <div class="stay-label">電話</div>
-                    <div class="stay-val">
-                        <a href="tel:0977845310" style="color:#2563EB; text-decoration:none;">0977-84-5310</a>
-                    </div>
+                <div style="margin-top: 10px;">
+                    <strong style="color: #2563EB;">✨ 推薦理由 (親子首選)：</strong>
+                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
+                        <li><b>溫泉大浴場：</b>市區少見設有舒適大浴場的飯店，並提供泡湯後的免費冰棒/飲料。</li>
+                        <li><b>交通便利：</b>位於博多巴士總站對面，距離博多站博多口步行約 5 分鐘。</li>
+                        <li><b>便利商店：</b>飯店一樓即是 Lawson，補給非常方便。</li>
+                    </ul>
                 </div>
-                <div class="stay-row">
-                    <div class="stay-label">MapCode</div>
-                    <div class="stay-val">
-                        <span class="map-code-box">269 359 525*30</span>
-                    </div>
+                 <div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
+                    ⚠️ <b>注意：</b>停車場為立體機械式 (¥1,500/晚)，若車輛較大(如休旅車)可能需停至特約平面停車場。
                 </div>
+                 <a href="https://www.google.com/maps/search/?api=1&query=Nishitetsu+Hotel+Croom+Hakata" target="_blank" class="btn-link-sub">地圖</a>
             </div>
 
-            <div class="info-detail-box" style="margin-top: 15px; border-color: #A7F3D0; background-color: #ECFDF5;">
-                <h4 style="color: #047857;">✨ 住宿重點</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; margin-top:5px; color:#444;">
-                    <li><b>晚餐：</b>包含精緻懷石料理，請務必於 17:30 前抵達辦理入住。</li>
-                    <li><b>晨間：</b>走路 2 分鐘即達金鱗湖，必看清晨霧氣美景。</li>
-                    <li><b>設施：</b>全館檜木造，隔音較弱，夜間請放輕腳步。</li>
-                </ul>
+            <!-- 福岡選項 B -->
+            <div class="info-detail-box" style="margin-top: 15px; border-color: #EF4444;">
+                <h4 style="color: #EF4444;">備選 B: 日航飯店福岡 (Hotel Nikko)</h4>
+                <div class="info-grid">
+                    <div class="info-label">地址</div>
+                    <div class="info-val">福岡県福岡市博多区博多駅前2-18-25</div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <strong style="color: #DC2626;">✨ 推薦理由 (舒適尊榮)：</strong>
+                    <ul style="padding-left: 20px; font-size: 0.9rem; margin-top: 5px;">
+                        <li><b>地下連通：</b>有地下道直通博多車站，下雨天完全不用淋雨。</li>
+                        <li><b>服務一流：</b>五星級日式服務，房間相對較寬敞，隔音佳。</li>
+                        <li><b>早餐豐盛：</b>自助早餐種類豐富，品質穩定。</li>
+                    </ul>
+                </div>
+                 <div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
+                    ⚠️ <b>注意：</b>通常無免費大浴場 (除部分會員/房型外)。地下停車場費用較高 (約 ¥2,000/晚)。
+                </div>
+                 <a href="https://www.google.com/maps/search/?api=1&query=Hotel+Nikko+Fukuoka" target="_blank" class="btn-link-sub">地圖</a>
             </div>
-
-            <a href="https://www.google.com/maps/search/?api=1&query=Yufuin+Santoukan" target="_blank" class="btn-nav-large" style="background: linear-gradient(135deg, #059669, #047857);">
-                <svg class="icon-mini" style="width:20px;height:20px;color:white;"><use href="#icon-nav-arrow"></use></svg>
-                啟動 Google 導航
-            </a>
         </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 4-5: 福岡 - THE GATE HOTEL</div>
-                <div class="tag tag-stay">天神站直結</div>
-            </div>
-            
-            <div class="stay-card-grid">
-                <div class="stay-row">
-                    <div class="stay-label">
-                        <svg class="icon-mini" style="color:#6B7280"><use href="#icon-loc"></use></svg> 地址
-                    </div>
-                    <div class="stay-val">
-                        <span>福岡県福岡市中央区天神2-8-49</span>
-    <button class="btn-copy-small" onclick="copyText(this, '福岡県福岡市中央区天神2-8-49')">
-        <svg class="icon-mini" style="width:12px;height:12px;"><path d="M8 2h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-        複製
-    </button>
-</div>
-                </div>
-                <div class="stay-row">
-                    <div class="stay-label">電話</div>
-                    <div class="stay-val">
-                        <a href="tel:0924062605" style="color:#2563EB; text-decoration:none;">092-406-2605</a>
-                    </div>
-                </div>
-                <div class="stay-row">
-                    <div class="stay-label">MapCode</div>
-                    <div class="stay-val">
-                        <span class="map-code-box">13 317 683*55</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-detail-box" style="margin-top: 15px; border-color: #F472B6; background-color: #FFF1F2;">
-                <h4 style="color: #BE185D;">✨ 特色 (THE GATE HOTEL by HULIC)</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; margin-top:5px; color:#444;">
-                    <li><b>位置：</b>天神核心地帶，地鐵天神站 Exit 5 直結。</li>
-                    <li><b>景觀：</b>大廳位於 19 樓，視野極佳。</li>
-                    <li><b>禮遇：</b>13 樓設有房客專屬 Lounge (6:00-24:00)，提供免費飲料與露台座位。</li>
-                </ul>
-            </div>
-
-            <div class="info-detail-box" style="margin-top: 10px; border-color: #FCA5A5; background-color: #FEF2F2;">
-                <h4 style="color: #991B1B;">⚠️ 自駕重要注意事項 (無停車場)</h4>
-                <ul style="padding-left: 20px; font-size: 0.9rem; margin-top:5px; color:#444;">
-                    <li><b>無停車場：</b>飯店本身**沒有**停車場。</li>
-                    <li><b>推薦停車：</b>請停放於附近的 <b>Solaria Terminal Parking (ソラリアターミナル駐車場)</b>。
-                        <br><span style="font-size:0.85rem; color:#666;">(導航電話: 092-721-6821)</span>
-                    </li>
-                    <li><b>費用：</b>過夜費用約 ¥2,000-¥3,000，無飯店補助。</li>
-                </ul>
-            </div>
-
-            <a href="https://www.google.com/maps/search/?api=1&query=THE+GATE+HOTEL+Fukuoka+by+HULIC" target="_blank" class="btn-nav-large" style="background: linear-gradient(135deg, #DB2777, #BE185D);">
-                <svg class="icon-mini" style="width:20px;height:20px;color:white;"><use href="#icon-nav-arrow"></use></svg>
-                啟動 Google 導航
-            </a>
-        </div>
-        
     </div>
 
     <!-- TAB 3: 交通資訊 -->
@@ -2449,8 +1991,8 @@
         <!-- [新增] Map Code 一覽表 -->
         <div class="card">
             <div class="card-header">
-                <div class="card-title">📍行程景點 Map Code 一覽</div>
-                <div class="tag tag-car">車機導航</div>
+                <div class="card-title">📍 導航必備：行程景點 Map Code 一覽</div>
+                <div class="tag tag-car">車機輸入用</div>
             </div>
             
             <div class="info-section" style="background-color: #F3F4F6; border-color: #9CA3AF;">
@@ -2941,75 +2483,7 @@
                 </p>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 4-6: 福岡美食 & 下午茶口袋名單</div>
-                <div class="tag tag-food">彈性推薦</div>
-            </div>
 
-            <div class="info-section" style="border-color: #F472B6; background-color: #FFF1F2;">
-                <h3 style="color: #DB2777; border-bottom-color: #F472B6;">🍰 下午茶 & 療癒甜點 (逛累專用)</h3>
-                
-                <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
-                    <span class="method-title" style="color: #BE185D;">Cafe del SOL (天神/西通)</span>
-                    <div class="method-detail">
-                        <p>福岡知名的<b>「蓬鬆系鬆餅 (Pancake)」</b>，口感像雲朵一樣軟綿，搭配新鮮水果與冰淇淋。店內氛圍溫馨，非常受女性與小孩歡迎。</p>
-                        <ul style="margin-top:5px; font-size:0.85rem; color:#666; padding-left:20px;">
-                            <li><b>推薦：</b>季節限定水果鬆餅、拿鐵拉花。</li>
-                        </ul>
-                        <a href="https://www.google.com/maps/search/Cafe+del+SOL+福岡" target="_blank" class="btn-map">導航至 Cafe del SOL</a>
-                    </div>
-                </div>
-
-                <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
-                    <span class="method-title" style="color: #BE185D;">Mutsukado むつか堂 (博多站)</span>
-                    <div class="method-detail">
-                        <p>知名吐司專賣店的咖啡廳，位於博多站 AMU PLAZA 5樓 (大鐘旁手扶梯上去)。必吃<b>「水果鮮奶油三明治」</b>，吐司極度柔軟，鮮奶油清爽不膩。</p>
-                        <p style="margin-top:5px; font-size:0.85rem; color:#666;">*位置極佳，適合等待回程列車或剛抵達時享用。</p>
-                        <a href="https://www.google.com/maps/search/むつか堂+アミュプラザ博多店" target="_blank" class="btn-map">導航至 AMU PLAZA 店</a>
-                    </div>
-                </div>
-
-                <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
-                    <span class="method-title" style="color: #BE185D;">il FORNO del Mignon (博多站)</span>
-                    <div class="method-detail">
-                        <p>位於博多站中央改札口旁的<b>「迷你可頌」</b>排隊名店。雖然不是內用店，但經過一定會聞到香味！</p>
-                        <p style="margin-top:5px; font-size:0.85rem; color:#666;">*按重量計價，有原味、巧克力、地瓜口味。非常適合買回飯店當宵夜或車上點心。</p>
-                        <a href="https://www.google.com/maps/search/il+FORNO+del+Mignon+博多" target="_blank" class="btn-map">導航至博多站可頌</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-section" style="border-color: #FBBF24; background-color: #FFFBEB;">
-                <h3 style="color: #B45309; border-bottom-color: #FBBF24;">🍜 晚餐與在地名物 (親子友善)</h3>
-
-                <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
-                    <span class="method-title" style="color: #B45309;">博多華味鳥 (水炊雞肉鍋)</span>
-                    <div class="method-detail">
-                        <p>如果不習慣重口味的拉麵或內臟鍋，<b>「博多水炊鍋 (Mizutaki)」</b>是親子首選。雞湯濃郁充滿膠原蛋白，雞肉軟嫩，口味清爽健康，最後的雜炊粥更是精華。</p>
-                        <p style="margin-top:5px; font-size:0.85rem; color:#666;">*博多站與天神都有多家分店，晚餐建議預約。</p>
-                        <a href="https://www.google.com/maps/search/博多華味鳥+博多駅前" target="_blank" class="btn-map">搜尋附近分店</a>
-                    </div>
-                </div>
-
-                <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
-                    <span class="method-title" style="color: #B45309;">Shin-Shin 拉麵 (博多/天神)</span>
-                    <div class="method-detail">
-                        <p>福岡在地人氣超高的拉麵店。相比一蘭，它的麵條極細，豚骨湯頭雖濃郁但較無腥味，且帶有甜味，<b>小朋友通常接受度很高</b>。</p>
-                        <a href="https://www.google.com/maps/search/博多らーめん+Shin-Shin" target="_blank" class="btn-map">搜尋 Shin-Shin 拉麵</a>
-                    </div>
-                </div>
-
-                <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
-                    <span class="method-title" style="color: #B45309;">極味屋 (KIWAMIYA) 漢堡排</span>
-                    <div class="method-detail">
-                        <p>超人氣排隊店！特色是<b>「DIY 鐵板漢堡排」</b>，店員會送上表面微熟的漢堡排，自己用筷子切下放在小鐵石上煎熟。雖然排隊隊伍通常很長，但用餐體驗非常有趣。</p>
-                        <p style="margin-top:5px; font-size:0.85rem; color:#DC2626;">*注意：鐵板極燙且有油煙，若孩子太小需注意安全。</p>
-                        <a href="https://www.google.com/maps/search/極味屋+博多" target="_blank" class="btn-map">導航至極味屋</a>
-                    </div>
-                </div>
-            </div>
-        </div>
         <!-- 伴手禮攻略 -->
         <div class="card">
             <div class="card-header">
@@ -3041,45 +2515,6 @@
                     </ul>
                 </div>
             </div>
-            
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">⚠️ 重要法規：退稅與飛安 (2026)</div>
-                <div class="tag tag-tip">必讀</div>
-            </div>
-
-            <div class="info-section" style="border-color: #FBBF24; background-color: #FFFBEB;">
-                <h3 style="color: #B45309; border-bottom-color: #FBBF24;">🇯🇵 日本退稅規定 (Tax Free)</h3>
-                <div class="method-detail">
-                    <p>2026年日本持續推動電子化退稅，建議事先於 <b>Visit Japan Web</b> 登錄護照資訊以產生免稅 QR Code。</p>
-                    <ul style="list-style-type: disc; margin-top: 10px; padding-left: 20px;">
-                        <li><b>免稅門檻：</b>同一天、同一店家消費滿 <b>5,000日圓 (未稅)</b> 以上。</li>
-                        <li><b>憑證要求：</b>結帳時需出示<b>護照正本</b> (或是 Visit Japan Web 的免稅 QR Code)。</li>
-                        <li><b>特殊包裝：</b>消耗品 (藥妝、零食、液體) 會被裝入<b>「紅色密封袋」</b>。在日本境內<b>嚴禁拆封</b>，若被海關查獲拆封，需補繳 10% 消費稅。</li>
-                        <li style="margin-top:5px; color:#DC2626; font-size:0.85rem;">*註：日本政府研擬未來改為「機場退稅制」(先含稅購買，機場再退稅)，若現場規定有變，請依店員指示為準。</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="info-section" style="margin-top: 15px; border-color: #EF4444; background-color: #FEF2F2;">
-                <h3 style="color: #B91C1C; border-bottom-color: #EF4444;">🔋 行動電源 & 電池攜帶規定</h3>
-                <div class="method-detail">
-                    <p style="font-weight: 700; color: #DC2626; margin-bottom: 8px;">嚴格禁止託運！請務必放在「手提行李」隨身登機。</p>
-                    <div style="background:white; padding:10px; border-radius:8px; border:1px solid #FECACA;">
-                        <div style="font-weight:600; color:#991B1B; margin-bottom:4px;">容量限制 (Wh)：</div>
-                        <ul style="list-style-type: circle; padding-left: 20px; font-size: 0.9rem;">
-                            <li><b>&lt; 100Wh：</b>可自由攜帶 (數量合理，通常限20顆內)。</li>
-                            <li><b>100Wh ~ 160Wh：</b>需經航空公司批准 (通常每人限帶 2 顆)。</li>
-                            <li><b>&gt; 160Wh：</b>禁止攜帶。</li>
-                        </ul>
-                        <div style="margin-top:8px; font-size:0.85rem; color:#666;">
-                            *常見 10000mAh 行動電源約為 37Wh (可攜帶)。<br>
-                            *若機身<b>「瓦數標示不清」</b>或磨損無法辨識，安檢有權沒收，請務必檢查機身標籤。
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -3094,7 +2529,10 @@
             </div>
           <div style="text-align: right; margin-bottom: 5px; padding-right: 5px;">
     <button onclick="resetAppPassword()" style="border: none; background: none; color: #EF4444; font-size: 0.85rem; cursor: pointer; text-decoration: underline; display: inline-flex; align-items: center;">
-        <svg style="width: 14px; height: 14px; margin-right: 4px; fill:none; stroke:currentColor; stroke-width:2;"><use href="#icon-reset"></use></svg>
+        <svg style="width: 14px; height: 14px; margin-right: 4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
         重設金鑰密碼
             </button>
         </div>
@@ -3141,25 +2579,20 @@
                         </label>
                     </div>
 
-                        <div class="ai-actions-row">
+                    <div class="ai-actions-row">
                         <button class="btn-mode consult" onclick="sendToGemini('consult')">
-                            <svg class="icon-sprite"><use href="#icon-consult"></use></svg>
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
                             行程諮詢
                         </button>
                         <button class="btn-mode trans" onclick="sendToGemini('translate')">
-                            <svg class="icon-sprite"><use href="#icon-trans"></use></svg>
+                            <svg viewBox="0 0 24 24"><path d="M7 10h14"></path><path d="M17 6l4 4-4 4"></path><path d="M17 14H3"></path><path d="M7 18l-4-4 4-4"></path></svg>
                             中/日翻譯
                         </button>
+                        <!-- Voice Button -->
                         <button class="btn-mode voice" id="btn-voice-ja">
-                            <svg class="icon-sprite"><use href="#icon-voice"></use></svg>
+                            <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                             語音輸入
                         </button>
-                        <button class="btn-mode camera" onclick="document.getElementById('img-upload-input').click()">
-                            <svg class="icon-sprite"><use href="#icon-camera"></use></svg>
-                            拍照辨識
-                        </button>
-                        <input type="file" id="img-upload-input" accept="image/*" onchange="handleImageSelect(event)" style="display: none;">
-                    
                     </div>
                 </div>
             </div>
@@ -3176,7 +2609,7 @@
             <div class="card-header">
                 <!-- 修正 1: 將 Emoji 🌍 換成簡約 SVG 地球圖示 -->
                 <div class="card-title" style="display: flex; align-items: center; gap: 6px;">
-                    <svg class="icon-mini" style="color: var(--primary);"><use href="#icon-earth"></use></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                     即時天氣查詢 & 穿衣建議
                 </div>
             </div>
@@ -3198,8 +2631,8 @@
                 <div class="weather-compare-row">
                     <div class="wc-mini-card" onclick="getLocalWeather()" style="cursor:pointer; background:#F9FAFB;">
                         <!-- 修正 1: 我的位置圖示 (Pin) -->
-                        <div id="wc-loc-box" class="wc-mini-title" style="display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="getLocalWeather()">
-    <svg class="icon-mini" style="color: #EF4444;"><use href="#icon-loc"></use></svg>
+                        <div id="wc-loc-box" class="wc-mini-title" style="display: flex; align-items: center; justify-content: center;">
+    <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
     <span>我的位置 (點擊更新)</span>
 </div>
                         <div class="wc-mini-temp" id="wc-my-temp">--°</div>
@@ -3207,7 +2640,7 @@
                     <div class="wc-mini-card">
                         <!-- 修正 2: 溫差對比圖示 (Thermometer) -->
                         <div class="wc-mini-title" style="display: flex; align-items: center; justify-content: center;">
-                            <svg class="icon-mini" style="color: #3B82F6;"><use href="#icon-temp"></use></svg>
+                            <svg class="icon-mini" style="color: #3B82F6;" viewBox="0 0 24 24"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg>
                             溫差對比
                         </div>
                         <div id="wc-diff-tag" class="wc-diff-tag" style="display:none;">--</div>
@@ -3219,7 +2652,7 @@
                 <div class="advice-box">
                     <!-- 修正 3: 穿衣建議圖示 (Shirt) -->
                     <strong style="display: flex; align-items: center; gap: 4px;">
-                        <svg class="icon-mini" style="color: #059669;"><use href="#icon-shirt"></use></svg>
+                        <svg class="icon-mini" style="color: #059669;" viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>
                         AI 穿衣建議：
                     </strong>
                     <div style="margin-top: 5px;" id="wc-advice">分析氣候數據中...</div>
@@ -3266,86 +2699,46 @@
             </div>
         </div>
     </div>
-    <div id="calc-modal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 300px;">
-            <div class="modal-title" style="color: #D97706; border-bottom: 1px solid #FDE68A; padding-bottom: 10px;">
-                💱 匯率試算 (JPY ↔ TWD)
-            </div>
-            
-            <div style="margin: 10px 0; font-size: 0.85rem; color: #666; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
-                <span id="rate-status" style="font-size: 0.75rem; color: #9CA3AF;">● 準備中...</span>
-                <label>匯率:</label>
-                <input type="number" id="calc-rate" step="0.0001" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; text-align: center;" oninput="calculateExchange()">
-            </div>
-
-            <div class="calc-row">
-                <span class="calc-label">日幣</span>
-                <input type="number" id="inp-jpy" class="calc-input" placeholder="¥" inputmode="decimal" oninput="calculateExchange('jpy')">
-            </div>
-
-            <div class="calc-row">
-                <span class="calc-label">台幣</span>
-                <input type="number" id="inp-twd" class="calc-input" placeholder="NT$" inputmode="decimal" oninput="calculateExchange('twd')">
-            </div>
-
-            <div class="modal-btns" style="margin-top: 20px;">
-                <button class="modal-btn btn-confirm" style="background: #F59E0B;" onclick="closeCalcModal()">關閉</button>
-            </div>
-        </div>
-    </div>
-    <div id="img-preview-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-title">確認圖片</div>
-            <div style="background:#F3F4F6; padding:10px; border-radius:8px; margin-bottom:15px; display:flex; justify-content:center;">
-                <img id="img-preview-content" style="max-width:100%; max-height:300px; border-radius:4px; object-fit:contain;">
-            </div>
-            <div class="modal-desc" style="font-size:0.85rem; color:#666; margin-bottom:15px;">
-                確認要傳送這張圖片給 AI 進行分析嗎？
-            </div>
-            <div class="modal-btns">
-                <button class="modal-btn btn-cancel" onclick="cancelImagePreview()">取消</button>
-                <button class="modal-btn btn-confirm" onclick="confirmImageAnalysis()">開始辨識</button>
-            </div>
-        </div>
-    </div>
     <!-- Bottom Navigation Bar (6 items now) -->
     
     <nav class="nav-bar">
         <div class="nav-item active" data-target="view-schedule" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg class="icon-sprite"><use href="#icon-schedule"></use></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             </span>
             行程表
         </div>
         <div class="nav-item" data-target="view-stay" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg class="icon-sprite"><use href="#icon-stay"></use></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"></path></svg>
             </span>
             住宿資訊
         </div>
         <div class="nav-item" data-target="view-car" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg class="icon-sprite"><use href="#icon-car"></use></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17h2"/><path d="M15 17h2"/></svg>
             </span>
             交通資訊
         </div>
         <div class="nav-item" data-target="view-info" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg class="icon-sprite"><use href="#icon-info"></use></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
             </span>
             旅遊資訊
         </div>
         
+        <!-- 調整順序: 先放天氣 -->
         <div class="nav-item" data-target="view-weather" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg class="icon-sprite"><use href="#icon-weather"></use></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
             </span>
             即時天氣
         </div>
 
+        <!-- 調整順序: AI 助手放到最後 -->
         <div class="nav-item" data-target="view-ai" onclick="switchTab(this)">
             <span class="nav-icon">
-                <svg class="icon-sprite"><use href="#icon-ai"></use></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
             </span>
             AI 助手
         </div>
@@ -3353,44 +2746,12 @@
     <button id="btn-quick-note" class="float-note-btn" onclick="openNoteModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
     </button>
-    <button id="btn-calc" class="float-calc-btn" onclick="openCalcModal()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="1" x2="12" y2="23"></line>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-        </svg>
-    </button>
     <button id="btn-share-loc" class="float-share-btn" onclick="shareCurrentLocation()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
         
     </button>
 
-
-    <div id="lightbox-modal" class="lightbox-overlay" onclick="closeLightbox()">
-        <span class="lightbox-close">&times;</span>
-        <img class="lightbox-content" id="lightbox-img">
-    </div>
-
     <script>
-    // [新增] 控制過場畫面消失的邏輯
-    window.addEventListener('load', () => {
-        const splash = document.getElementById('splash-screen');
-        
-        // 設定最短顯示時間 (例如 1.5 秒)，讓使用者看得到飛機，不會一閃而過
-        setTimeout(() => {
-            if (splash) {
-                splash.classList.add('hidden');
-                
-                // 動畫結束後，將元素從 DOM 移除，釋放記憶體
-                setTimeout(() => {
-                    splash.remove();
-                }, 600); // 配合 CSS transition 的 0.6s
-            }
-        }, 1500); // 1500毫秒 = 1.5秒，您可自行調整
-    });
-
-    // 原有的程式碼...
-    // const encryptedApiKey = ...
-
        // [修改] 原本的 const apiKey = ""; 替換成以下內容：
 
 // 1. 填入你剛剛產生的加密亂碼
@@ -3418,8 +2779,6 @@ let apiKey = "";
     2. 親切：語氣要像朋友一樣熱心。
     3. 準確：只能根據上述行程回答，不要編造不在行程內的景點。
     4. 語言：請使用繁體中文 (台灣)。
-    5. 導航支援：若使用者詢問地點位置或如何前往，請務必在回答中附上 Google Maps 連結，格式請嚴格遵守：
-       <br><a href='https://www.google.com/maps/search/?api=1&query=地點名稱' target='_blank' style='display:inline-block; margin-top:5px; color:#2563EB; font-weight:bold; text-decoration:none; border:1px solid #2563EB; padding:2px 8px; border-radius:12px;'>📍 導航至 [地點]</a>
     `;
 // 3. 解密函式 (會在需要 API 時自動呼叫)
 function getDecryptedKey() {
@@ -3466,13 +2825,13 @@ function getDecryptedKey() {
         backup: { temp: '10°C', range: '2°C ~ 11°C', desc: '晴時多雲', advice: '氣溫適中但早晚偏涼，長袖配外套。', icon: 'cloud-sun' }
     },
     'd2': {
-        dateStr: '2026-01-26',
+        dateStr: '2025-12-22',
         loc: '阿蘇/黑川',
         lat: 33.096, lon: 131.096, // 黑川溫泉附近座標
         backup: { temp: '5°C', range: '-3°C ~ 6°C', desc: '多雲/飄雪', advice: '山區極冷，務必穿著羽絨外套保暖。', icon: 'snow' }
     },
     'd3': {
-        dateStr: '2026-01-27',
+        dateStr: '2025-12-23',
         loc: '別府/由布院',
         lat: 33.265, lon: 131.360, // 由布院座標
         backup: { temp: '7°C', range: '0°C ~ 8°C', desc: '多雲', advice: '濕度較高體感寒冷，請穿防滑鞋。', icon: 'cloud' }
@@ -3500,59 +2859,34 @@ function getDecryptedKey() {
         // [修改 2] 讓 Widget 支援非同步讀取與 Loading 狀態
         // [新增] 通用快取抓取函式 (10分鐘快取機制)
 // [新增] 全域快取變數 (重新整理網頁後會自動清空，符合您的需求)
-        // [API 省流優化] 統一快取管理系統 (LocalStorage 版)
-        const CACHE_SYSTEM = {
-            // 存入資料 (預設 TTL 為 30 分鐘)
-            save: (key, data, ttlMinutes = 30) => { 
-                try {
-                    const record = {
-                        timestamp: Date.now(),
-                        expiry: ttlMinutes * 60 * 1000,
-                        data: data
-                    };
-                    localStorage.setItem(key, JSON.stringify(record));
-                } catch (e) {
-                    console.warn("LocalStorage 儲存失敗 (可能是容量已滿)", e);
-                }
-            },
-            // 讀取資料
-            get: (key) => {
-                const json = localStorage.getItem(key);
-                if (!json) return null;
-                
-                try {
-                    const record = JSON.parse(json);
-                    const now = Date.now();
-                    
-                    // 檢查是否過期
-                    if (now - record.timestamp > record.expiry) {
-                        console.log(`[快取過期] ${key} 已清除`);
-                        localStorage.removeItem(key);
-                        return null;
-                    }
-                    
-                    console.log(`[省流模式] 讀取 LocalStorage: ${key}`);
-                    return record.data;
-                } catch (e) {
-                    return null;
+        window.appCache = {}; 
+
+        // [修改] 通用快取抓取函式 (使用記憶體變數)
+        async function fetchWithCache(url, cacheKey) {
+            const CACHE_TIME = 10 * 60 * 1000; // 10分鐘 (毫秒)
+            const now = Date.now();
+            
+            // 1. 檢查 記憶體變數 中是否有資料
+            if (window.appCache[cacheKey]) {
+                const record = window.appCache[cacheKey];
+                // 2. 檢查是否在 10 分鐘內
+                if (now - record.timestamp < CACHE_TIME) {
+                    console.log(`[省流] 使用記憶體快取: ${cacheKey}`);
+                    return record.data; // 直接回傳舊資料
                 }
             }
-        };
 
-        // [修改] 支援 LocalStorage 的 Fetch 函式
-        async function fetchWithCache(url, cacheKey) {
-            // 1. 先查快取
-            const cachedData = CACHE_SYSTEM.get(cacheKey);
-            if (cachedData) return cachedData;
-
-            // 2. 無快取則呼叫 API
+            // 3. 若無資料或已過期，呼叫 API
             console.log(`[API消耗] 呼叫網路: ${url}`);
             try {
                 const res = await fetch(url);
                 const data = await res.json();
-                
-                // 3. 存入快取 (天氣資料存 20 分鐘)
-                CACHE_SYSTEM.save(cacheKey, data, 20); 
+
+                // 4. 存入記憶體變數
+                window.appCache[cacheKey] = {
+                    timestamp: now,
+                    data: data
+                };
                 return data;
             } catch (e) {
                 console.error("Fetch Error:", e);
@@ -3659,7 +2993,7 @@ async function getSmartWeatherData(config) {
                 range: `${Math.round(todayMin)}°C ~ ${Math.round(todayMax)}°C`,
                 desc: getWeatherDescText(current.weathercode),
                 icon: getWeatherIconClass(current.weathercode),
-                advice: `(行前參考) ${getSmartAdviceText(current.temperature, current.weathercode)}`
+                advice: `(當下參考) ${getSmartAdviceText(current.temperature, current.weathercode)}`
             };
         }
         
@@ -3744,61 +3078,32 @@ function getSmartAdviceText(temp, weatherCode) {
         };
 
         // 新增：獨立的 Gemini 呼叫函數，只回傳文字，不操作 UI
- // [修改] Gemini API 呼叫函式：升級支援圖片傳送 (Multimodal)
-// [修改] Gemini API 呼叫函式：升級為最新的 Gemini 3 Flash Preview
-        async function getGeminiResponse(promptText, imageBase64 = null) {
-            const currentKey = getDecryptedKey();
-            if (!currentKey) {
-                appendMessage('ai', '⚠️ 尚未輸入正確密碼，無法使用 AI 功能。');
-                throw new Error("API Key Missing");
-            }
+ async function getGeminiResponse(promptText) {
+    // [新增] 檢查並取得 Key
+    const currentKey = getDecryptedKey();
+    if (!currentKey) {
+        appendMessage('ai', '⚠️ 尚未輸入正確密碼，無法使用 AI 功能。');
+        throw new Error("API Key Missing");
+    }
 
-            try {
-                // 1. 建立基本的 parts 陣列，先放入文字
-                let parts = [
-                    { text: promptText }
-                ];
-
-                // 2. 如果有圖片，使用 unshift 將圖片「插隊」到最前面
-                if (imageBase64) {
-                    parts.unshift({
-                        inline_data: {
-                            mime_type: "image/jpeg",
-                            data: imageBase64
-                        }
-                    });
-                }
-
-                // 3. 組合請求內容
-                const requestBody = {
-                    contents: [{
-                        parts: parts
-                    }]
-                };
-
-                // ★ 關鍵修改：使用正確的 Gemini 3 Flash Preview 模型名稱
-                // Release Date: 2025-12-17
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${currentKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestBody)
-                });
+    try {
+        // [修改] 原本 URL 中的 ${apiKey} 改為 ${currentKey}
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${currentKey}`, {
+            // ... (原本的 method, headers, body 不需要動) ...
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: promptText }] }]
+            })
+        });
 
                 const data = await response.json();
-                
-                if (data.error) {
-                    console.error("API Error Detail:", data.error);
-                    throw new Error(data.error.message);
-                }
-                
-                if (!data.candidates || !data.candidates[0].content) {
-                    throw new Error("API 回傳無內容，請稍後再試。");
-                }
+                if (data.error) throw new Error(data.error.message);
                 
                 let text = data.candidates[0].content.parts[0].text.trim();
+                // 清理可能的回傳格式
                 text = text.replace(/```(html|json)?/g, '').replace(/```/g, '').trim();
                 return text;
-
             } catch (error) {
                 console.error("AI Fetch Error:", error);
                 throw error;
@@ -3835,42 +3140,27 @@ function getSmartAdviceText(temp, weatherCode) {
                 }
 
                 // 步驟 2: 如果對照表沒有，請求 AI 在背景翻譯 (您的新想法!)
-                // 步驟 2: AI 背景翻譯 (已加入永久快取)
                 if (!isTranslated) {
-                    // [新增] 先查快取 (金鑰: city_trans_中文名)
-                    const cacheKey = `city_trans_${rawInput}`;
-                    const cachedName = CACHE_SYSTEM.get(cacheKey);
-
-                    if (cachedName) {
-                        searchTerm = cachedName;
-                        isTranslated = true;
-                        console.log("使用快取地名:", searchTerm);
-                        document.getElementById('wc-desc').innerText = `搜尋: ${searchTerm} (快取)`;
-                    } else {
-                        // 無快取，才呼叫 AI
-                        document.getElementById('wc-desc').innerText = '🔍 AI 正在翻譯地名...';
-                        
-                        const translatePrompt = `
-                            Task: Translate the place name "${rawInput}" into its official English Romanization name for using in a Weather API.
-                            Target: Global locations (Focus on Taiwan/Japan).
-                            Rule: Output ONLY the English name. No explanations.
-                            Example: "台北" -> "Taipei", "由布院" -> "Yufuin", "新竹" -> "Hsinchu".
-                        `;
-                        
-                        try {
-                            const aiTranslation = await getGeminiResponse(translatePrompt);
-                            if (/^[a-zA-Z\s\-,]+$/.test(aiTranslation)) {
-                                searchTerm = aiTranslation;
-                                isTranslated = true;
-                                console.log("AI 翻譯結果:", searchTerm);
-                                document.getElementById('wc-desc').innerText = `搜尋: ${searchTerm}...`;
-                                
-                                // [新增] 翻譯成功後，存入快取 (保存 24 小時 = 1440 分鐘)
-                                CACHE_SYSTEM.save(cacheKey, searchTerm, 1440);
-                            }
-                        } catch (e) {
-                            console.warn("AI 翻譯失敗，嘗試使用原始中文搜尋");
+                    document.getElementById('wc-desc').innerText = '🔍 AI 正在翻譯地名...';
+                    
+                    const translatePrompt = `
+                        Task: Translate the place name "${rawInput}" into its official English Romanization name for using in a Weather API.
+                        Target: Japan locations.
+                        Rule: Output ONLY the English name. No explanations.
+                        Example: "黑川溫泉" -> "Minamioguni" (or Kurokawa Onsen), "由布院" -> "Yufuin".
+                    `;
+                    
+                    try {
+                        const aiTranslation = await getGeminiResponse(translatePrompt);
+                        // 簡單驗證回傳是否為英文
+                        if (/^[a-zA-Z\s\-,]+$/.test(aiTranslation)) {
+                            searchTerm = aiTranslation;
+                            isTranslated = true;
+                            console.log("AI 翻譯結果:", searchTerm);
+                            document.getElementById('wc-desc').innerText = `搜尋: ${searchTerm}...`;
                         }
+                    } catch (e) {
+                        console.warn("AI 翻譯失敗，嘗試使用原始中文搜尋");
                     }
                 }
 
@@ -3973,78 +3263,81 @@ function getSmartAdviceText(temp, weatherCode) {
 // [修改] 取得定位天氣 (同步更新 Header 與 分頁)
 // [修改] 取得定位天氣 (儲存天氣代碼供 AI 讀取)
         // [修改] 取得定位天氣 (防卡死穩定版)
-        // [修改] 智慧定位函式：手機用高精確度，電腦自動降級為一般模式
-        // [修改] 終極定位函式：支援 GPS (手機)、Wi-Fi (筆電) 與 有線網路 (桌機)
-        // [修正版] 混合雙軌定位：手機抓精確、電腦抓 IP，確保 100% 成功率
-        // [智慧定位函式] 完美解決方案：手機優先抓 GPS，電腦自動退回抓 IP
-        // [最終版] 裝置分流定位：電腦模擬舊版行為(IP)，手機啟用高精度(GPS)
         function getLocalWeather() {
-            // 定義 UI 
+            // 定義 UI 元件
             const els = {
                 headerLoc: document.getElementById('header-my-loc'),
                 headerTemp: document.getElementById('header-my-temp'),
                 tabTemp: document.getElementById('wc-my-temp'),
+                // ★ 改用剛剛新增的 ID，確保一定抓得到
                 titleBox: document.getElementById('wc-loc-box') 
             };
-
-            // 1. 檢查瀏覽器支援
+            
+            // 1. 檢查權限與支援度
             if (!navigator.geolocation) {
-                alert('您的瀏覽器不支援定位');
+                alert('您的瀏覽器不支援定位功能');
                 return;
             }
-
-            // UI 顯示
-            if(els.headerLoc) els.headerLoc.innerText = '定位中...';
-            if(els.titleBox) els.titleBox.innerHTML = '<span class="loading-dots">定位中</span>';
-
-            // 2. 判斷裝置類型：是手機嗎？
-            // 如果是 iPhone, Android 等行動裝置，isMobile 會是 true
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            // 策略：手機用 true (高精度)，電腦強制用 false (低精度，像 index_ai 一樣)
-            const useHighAccuracy = isMobile; 
-            
-            console.log(`裝置偵測: ${isMobile ? "手機 (啟用 GPS)" : "電腦 (使用 IP 定位)"}`);
+            // 2. 顯示讀取中狀態
+            if(els.headerLoc) els.headerLoc.innerText = '定位中..';
+            if(els.tabTemp) els.tabTemp.innerText = '...';
+            if(els.titleBox) els.titleBox.innerHTML = `
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span class="loading-dots">定位中</span>
+                </div>`;
 
-            // === 成功邏輯 ===
-            const handleSuccess = async (position) => {
+            // 設定 10 秒超時，避免無限空轉
+            const options = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
+
+            navigator.geolocation.getCurrentPosition(async (position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 
                 try {
-                    // A. 抓天氣 (加入 timezone=auto 以獲取精確時區)
-                    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
+                    // A. 抓天氣
+                    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
                     const weatherData = await weatherRes.json();
                     
                     currentMyTemp = weatherData.current_weather.temperature;
                     const tempStr = `${Math.round(currentMyTemp)}°C`;
-                    const code = weatherData.current_weather.weathercode;
+                    const code = weatherData.current_weather.weathercode; // 記住天氣代碼
                     
-                    // [新增] 取得 API 回傳的當地時區 (例如 "Asia/Tokyo")
-                    const localTimezone = weatherData.timezone;
-                    
-                    // B. AI 解析地名
+                    // B. 解析地名 (嘗試 AI，失敗則回退)
                     let displayZh = "我的位置";
                     try {
-                        // 提示詞
-                        const locationPrompt = `Task: Identify the specific district/township name for ${lat},${lon} (e.g., 竹北市, 新竹市東區, 博多區). Output ONLY the Traditional Chinese name.`;
-                        // 呼叫 AI (設定 10秒 超時)
+                        // 這裡若沒輸入密碼或 AI 失敗，會自動跳到 catch，不會卡住
+                        const locationPrompt = `Task: Identify city name for ${lat},${lon}. Output: "中文". Example: "台北"`;
+                        // 設定一個 3秒 的競賽，如果 AI 太慢就直接放棄，避免卡住
                         const aiPromise = getGeminiResponse(locationPrompt);
-                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000));
+                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000));
+                        
                         const aiCity = await Promise.race([aiPromise, timeoutPromise]);
                         if (aiCity) displayZh = aiCity.trim();
                     } catch (e) {
-                        console.warn("AI 解析略過");
+                        console.warn("AI 地名解析略過:", e);
                     }
 
-                    // C. 更新 UI
+                    // --- 更新存檔 (供 AI 情境感知使用) ---
+                    window.appCache = window.appCache || {};
+                    window.appCache['my_location_combined'] = {
+                        timestamp: Date.now(),
+                        data: { temp: currentMyTemp, city: displayZh, code: code }
+                    };
+
+                    // --- 更新 UI ---
+                    // 1. Header 左上角
                     if(els.headerLoc) els.headerLoc.innerText = displayZh;
                     if(els.headerTemp) els.headerTemp.innerText = tempStr;
+                    
+                    // 2. Tab 分頁大溫度
                     if(els.tabTemp) {
                         els.tabTemp.innerText = tempStr;
                         els.tabTemp.style.fontSize = '1.5rem';
                         els.tabTemp.style.color = '#1F2937';
                     }
+
+                    // 3. Tab 圖片旁地名 (使用 ID 更新)
                     if(els.titleBox) {
                         els.titleBox.innerHTML = `
                             <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
@@ -4053,57 +3346,23 @@ function getSmartAdviceText(temp, weatherCode) {
                             </div>`;
                     }
                     
-                    // 存檔與比對
-                    window.appCache = window.appCache || {};
-                    window.appCache['my_location_combined'] = {
-                        timestamp: Date.now(),
-                        data: { 
-                            temp: currentMyTemp, 
-                            city: displayZh, 
-                            code: code,
-                            timezone: localTimezone // [新增] 儲存時區
-                        }
-                    };
+                    // 4. 觸發溫差比對
                     const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
                     if (targetTempStr !== '--°') updateComparison(parseFloat(targetTempStr));
 
                 } catch (e) {
-                    console.error("處理失敗", e);
+                    console.error("天氣抓取錯誤", e);
                     if(els.headerLoc) els.headerLoc.innerText = '連線失敗';
+                    if(els.titleBox) els.titleBox.innerText = '無法取得資料';
                 }
-            };
-
-            // === 失敗處理 (只針對手機的高精度失敗進行降級) ===
-            const handleError = (err) => {
-                console.warn("定位失敗:", err.code, err.message);
-                
-                // 如果是手機嘗試高精度失敗了，再給它一次機會用低精度
-                if (useHighAccuracy) {
-                    console.log("手機 GPS 失敗，嘗試切換 IP 定位...");
-                    navigator.geolocation.getCurrentPosition(
-                        handleSuccess,
-                        (err2) => {
-                             alert("定位失敗，請確認手機定位服務已開啟。");
-                             if(els.headerLoc) els.headerLoc.innerText = '定位未開';
-                        },
-                        { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 }
-                    );
-                } else {
-                    // 電腦低精度如果也失敗，那就是真的被封鎖或沒網路了
-                    if(els.headerLoc) els.headerLoc.innerText = '無法定位';
-                    alert("電腦無法取得位置，請確認瀏覽器權限。");
-                }
-            };
-
-            // === 3. 開始執行 ===
-            // 這裡使用了變數 useHighAccuracy
-            // 電腦版：useHighAccuracy 為 false -> 行為等同 index_ai (不會報錯)
-            // 手機版：useHighAccuracy 為 true -> 行為等同 index (抓竹北)
-            navigator.geolocation.getCurrentPosition(
-                handleSuccess, 
-                handleError, 
-                { enableHighAccuracy: useHighAccuracy, timeout: 5000, maximumAge: 0 }
-            );
+            }, (err) => {
+                // 定位失敗的處理 (例如使用者拒絕權限)
+                console.warn('定位失敗:', err);
+                if(els.headerLoc) els.headerLoc.innerText = '定位未開';
+                if(els.titleBox) els.titleBox.innerText = '請開啟 GPS';
+                if(els.tabTemp) els.tabTemp.innerText = '--';
+                alert("無法取得您的位置，請確認瀏覽器是否有開啟 GPS 權限。");
+            }, options);
         }
 
         // --- Modal Functions (取代原生 alert/prompt) ---
@@ -4140,267 +3399,70 @@ function getSmartAdviceText(temp, weatherCode) {
         function closeNoteModal() {
             document.getElementById('note-modal').style.display = 'none';
         }
-/* --- 在 function closeNoteModal() { ... } 結束後插入 --- */
 
-        // [新增] 匯率計算機與 API 串接邏輯
-        function openCalcModal() {
-            document.getElementById('calc-modal').style.display = 'flex';
-            
-            // 1. 先嘗試讀取快取 (避免每次開都打 API)
-            const savedRateData = JSON.parse(localStorage.getItem('live_exchange_rate_cache') || '{}');
-            const now = Date.now();
-            const oneHour = 3600000; // 1小時毫秒數
-            
-            // 如果有快取且在 1 小時內，就用快取，否則抓新的
-            if (savedRateData.rate && (now - savedRateData.timestamp < oneHour)) {
-                updateRateUI(savedRateData.rate, '快取');
-            } else {
-                fetchLiveRate();
-            }
-            
-            document.getElementById('inp-jpy').focus();
-        }
-
-        function closeCalcModal() {
-            document.getElementById('calc-modal').style.display = 'none';
-        }
-
-        // 抓取即時匯率 (來源: 免費公開 API)
-        async function fetchLiveRate() {
-            const statusEl = document.getElementById('rate-status');
-            statusEl.innerText = '⟳ 更新中...';
-            statusEl.style.color = '#F59E0B';
-
-            try {
-                // 使用 ExchangeRate-API (以日幣 JPY 為基準)
-                const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
-                const data = await res.json();
-                
-                // 抓取對台幣 (TWD) 的匯率
-                const newRate = data.rates.TWD;
-                
-                if (newRate) {
-                    // 儲存到 LocalStorage
-                    localStorage.setItem('live_exchange_rate_cache', JSON.stringify({
-                        rate: newRate,
-                        timestamp: Date.now()
-                    }));
-                    updateRateUI(newRate, '即時');
-                    
-                    // 如果原本有輸入數字，自動重算
-                    if(document.getElementById('inp-jpy').value) calculateExchange('jpy');
-                }
-            } catch (e) {
-                console.error("匯率更新失敗", e);
-                statusEl.innerText = '⚠️ 連線失敗';
-                statusEl.style.color = '#EF4444';
-                // 失敗時若沒值，給個預設值
-                if(!document.getElementById('calc-rate').value) document.getElementById('calc-rate').value = 0.22;
-            }
-        }
-
-        function updateRateUI(rate, type) {
-            document.getElementById('calc-rate').value = rate;
-            const statusEl = document.getElementById('rate-status');
-            statusEl.innerText = `● ${type}匯率`;
-            statusEl.style.color = '#10B981'; // 綠色
-        }
-
-        function calculateExchange(source) {
-            const rateInput = document.getElementById('calc-rate');
-            const jpyInput = document.getElementById('inp-jpy');
-            const twdInput = document.getElementById('inp-twd');
-            
-            let rate = parseFloat(rateInput.value);
-            if (isNaN(rate) || rate <= 0) rate = 0.22; 
-
-            if (source === 'jpy') {
-                const jpy = parseFloat(jpyInput.value);
-                if (!isNaN(jpy)) {
-                    twdInput.value = Math.round(jpy * rate);
-                } else {
-                    twdInput.value = '';
-                }
-            } else if (source === 'twd') {
-                const twd = parseFloat(twdInput.value);
-                if (!isNaN(twd)) {
-                    jpyInput.value = Math.round(twd / rate);
-                } else {
-                    jpyInput.value = '';
-                }
-            } else {
-                // 修改匯率時 -> 更新台幣
-                const jpy = parseFloat(jpyInput.value);
-                if (!isNaN(jpy)) {
-                    twdInput.value = Math.round(jpy * rate);
-                }
-            }
-        }
-
-
-        // 點擊背景關閉視窗 (修改版)
+        // 點擊背景關閉視窗 (通用)
         window.onclick = function(event) {
             const nModal = document.getElementById('note-modal');
             const lModal = document.getElementById('location-modal');
-            const cModal = document.getElementById('calc-modal'); // [新增]
-            
             if (event.target == nModal) nModal.style.display = "none";
             if (event.target == lModal) lModal.style.display = "none";
-            if (event.target == cModal) cModal.style.display = "none"; // [新增]
         }
-// [修改] 兩段式分享功能 (解決瀏覽器阻擋視窗問題)
-        // 狀態標記：紀錄目前是否已經分析完成
-        let isLocReady = false;
-        let pendingShareData = null;
-
-// [修改] 智慧分享功能 (嘗試一鍵完成，遇阻擋則優雅變身)
+// [新增] 獲取 GPS 並透過 LINE/簡訊 分享 Google Maps 連結
         function shareCurrentLocation() {
-            const btn = document.getElementById('btn-share-loc');
-
-            // --- [階段二] 如果按鈕已經是「準備完成」狀態，直接發射 ---
-            if (btn.dataset.shareState === 'ready' && window.pendingShareData) {
-                navigator.share(window.pendingShareData)
-                    .then(() => {
-                        resetShareButton(btn); // 分享成功後復原
-                    })
-                    .catch((err) => {
-                        console.log("使用者取消分享", err);
-                        // 取消後保持綠色按鈕，讓使用者有機會反悔再按一次
-                    });
-                return; // 結束，不重複執行定位
-            }
-
-            // --- [階段一] 正常流程 (第一次點擊) ---
+            // 1. 檢查支援度
             if (!navigator.geolocation) {
                 alert("您的裝置不支援定位功能。");
                 return;
             }
 
-            // 防止重複點擊 (如果正在分析中)
-            if (btn.dataset.shareState === 'analyzing') return;
-
-            // 1. 鎖定並變更為「雷達分析中」動畫
-            if (!btn.dataset.originalHtml) {
-                btn.dataset.originalHtml = btn.innerHTML;
-            }
+            const btn = document.getElementById('btn-share-loc');
+            const originalContent = btn.innerHTML;
             
-            // 設定為分析中狀態
-            btn.dataset.shareState = 'analyzing';
-            btn.style.pointerEvents = "none"; // 暫時禁止點擊
-            
-            // 雷達動畫
-            btn.innerHTML = `
-                <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; color: #10B981;">
-                    <circle cx="12" cy="12" r="4" fill="currentColor"></circle>
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none">
-                        <animate attributeName="r" from="4" to="12" dur="1.5s" repeatCount="indefinite" />
-                        <animate attributeName="opacity" from="1" to="0" dur="1.5s" repeatCount="indefinite" />
-                    </circle>
-                </svg>
-            `;
-            btn.style.background = "#ECFDF5"; 
-            btn.style.borderColor = "#10B981"; 
-            btn.style.color = "#10B981";      
+            // 2. 顯示讀取中狀態
+            // 2. 顯示讀取中狀態 (只留 loading 圖示)
+            btn.innerHTML = `<svg class="icon-mini" viewBox="0 0 24 24" style="animation:rotate 1s linear infinite;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" fill="none" stroke="currentColor" stroke-width="2"></path></svg>`;
             btn.style.opacity = "0.8";
 
-            // 2. 執行定位
-            navigator.geolocation.getCurrentPosition(async position => {
+            // 3. 獲取高精確度位置
+            navigator.geolocation.getCurrentPosition(position => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 
-                // [修正] 確保網址格式正確 (移除之前的錯誤字元)
+                // 產生 Google Maps 連結
                 const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
-                
-                let locationContext = "";
-                try {
-                    // A. 取得真實地址
-                    const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=zh-TW`;
-                    const geoRes = await fetch(geoUrl);
-                    const geoData = await geoRes.json();
-                    const rawAddress = geoData.display_name || "未知地點";
+                const shareText = `【緊急/報平安】我目前的位置在這裡，請點擊連結查看：`;
 
-                    // B. AI 潤飾 (店家/地標優先邏輯)
-                    const prompt = `
-                        Task: Analyze this location data: "${rawAddress}" to describe the location for a friend.
-                        Logic:
-                        1. **Priority 1 (Store/Landmark)**: If a specific Store Name (e.g., 7-11, Starbucks), Building Name, or Landmark exists, output: "靠近 [Name]".
-                        2. **Priority 2 (Exact Address)**: If NO specific store is found, output the precise street and house number: "[Street Name] [Number]號".
-                        Output: A single concise phrase in Traditional Chinese.
-                    `;
-                    locationContext = await getGeminiResponse(prompt);
-                } catch (e) {
-                    console.error("分析失敗", e);
-                    locationContext = "我的位置";
+                // 4. 呼叫原生分享選單 (Web Share API)
+                if (navigator.share) {
+                    navigator.share({
+                        title: '我的即時位置',
+                        text: shareText,
+                        url: mapUrl
+                    }).then(() => {
+                        console.log('分享成功');
+                    }).catch((error) => {
+                        console.log('分享取消', error);
+                    });
+                } else {
+                    // 電腦版或不支援分享的瀏覽器 -> 改為複製連結
+                    prompt("請複製以下連結發送給朋友：", mapUrl);
                 }
 
-                // C. 準備全域資料
-                window.pendingShareData = {
-                    title: '我的即時位置',
-                    text: `【緊急/報平安】我目前位置：${locationContext} 附近`,
-                    url: mapUrl
-                };
-
-                // D. 嘗試觸發分享 (關鍵邏輯)
-                try {
-                    // 嘗試一鍵觸發
-                    await navigator.share(window.pendingShareData);
-                    // 若成功，重置按鈕
-                    resetShareButton(btn);
-                } catch (err) {
-                    // ⚠️ 如果進到這裡，代表被瀏覽器擋住了 (或使用者取消)
-                    // 我們不跳醜醜的視窗，而是將按鈕「進化」為發送鈕
-                    console.log("自動分享未觸發，切換為手動確認模式");
-                    
-                    // 解除鎖定
-                    btn.style.pointerEvents = "auto";
-                    
-                    // 變更為「紙飛機發送」樣式
-                    btn.innerHTML = `
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px; animation: popIn 0.3s;">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                        點擊發送
-                    `;
-                    // 變更為醒目的綠色實心按鈕
-                    btn.style.background = "#10B981"; 
-                    btn.style.borderColor = "#10B981";
-                    btn.style.color = "white";
-                    btn.style.opacity = "1";
-                    
-                    // 標記狀態為 ready，讓下次點擊走上面的快速通道
-                    btn.dataset.shareState = 'ready';
-                    
-                    // (選用) 震動提示使用者
-                    if(navigator.vibrate) navigator.vibrate(50);
-                }
+                // 復原按鈕
+                btn.innerHTML = originalContent;
+                btn.style.opacity = "1";
 
             }, error => {
                 console.error(error);
-                alert("無法取得位置，請確認 GPS 已開啟。");
-                resetShareButton(btn);
+                alert("無法取得位置，請確認 GPS 已開啟，並允許網頁存取位置。");
+                btn.innerHTML = originalContent;
+                btn.style.opacity = "1";
             }, { 
-                enableHighAccuracy: true,
+                enableHighAccuracy: true, // 要求高精確度 (重要!)
                 timeout: 10000, 
                 maximumAge: 0 
             });
         }
-        // 輔助函式：重置按鈕
-        // 請更新這個輔助函式 (通常在程式碼最下方)
-function resetShareButton(btn) {
-    if (btn.dataset.originalHtml) {
-        btn.innerHTML = btn.dataset.originalHtml;
-    }
-    btn.style.background = ""; 
-    btn.style.borderColor = ""; 
-    btn.style.color = "";
-    btn.style.opacity = "";
-    btn.style.pointerEvents = "auto"; // 恢復可點擊
-    
-    // 清除狀態標記與暫存資料
-    delete btn.dataset.shareState;
-    window.pendingShareData = null;
-}
         async function submitManualLocation() {
             const manualCity = document.getElementById('modal-city-input').value.trim();
             if (!manualCity) return;
@@ -4552,19 +3614,6 @@ function resetShareButton(btn) {
         }
 
         async function askAiWeatherAdvice(city, temp, condition) {
-            // [新增] 1. 產生快取金鑰 (地點 + 氣溫整數 + 天氣狀況)
-            // 這樣如果溫度只差 0.1 度，或是天氣一樣，就不用重新問 AI
-            const cacheKey = `ai_advice_${city}_${Math.round(temp)}_${condition}`;
-            
-            // [新增] 2. 先查快取
-            const cachedAdvice = CACHE_SYSTEM.get(cacheKey);
-            if (cachedAdvice) {
-                console.log("使用快取穿衣建議");
-                document.getElementById('wc-advice').innerText = cachedAdvice;
-                return;
-            }
-
-            // 無快取，才執行 AI 請求
             const prompt = `
                 現在${city}的即時氣溫是 ${temp}度，天氣狀況為${condition}。
                 請以「旅遊小秘書」的口吻，給予台灣旅客簡短的穿衣建議（約50字）。
@@ -4572,12 +3621,9 @@ function resetShareButton(btn) {
             `;
             
             try {
+                // 改用新的共用函數
                 const text = await getGeminiResponse(prompt);
                 document.getElementById('wc-advice').innerText = text;
-                
-                // [新增] 3. 存入快取 (保存 60 分鐘)
-                CACHE_SYSTEM.save(cacheKey, text, 30);
-                
             } catch (e) {
                 document.getElementById('wc-advice').innerText = 'AI 連線逾時，建議洋蔥式穿搭。';
             }
@@ -4585,23 +3631,12 @@ function resetShareButton(btn) {
         
         // --- END REAL-TIME WEATHER ---
 
-        // [修改] 切換分頁函式 - 加入左右滑動動畫判斷
         function switchTab(element) {
-            // 移除所有 active
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            document.querySelectorAll('.container').forEach(container => {
-                container.classList.remove('active');
-                // 清除殘留樣式
-                container.style.transform = '';
-                container.style.opacity = '';
-                container.style.filter = '';
-            });
-
-            // 設定 active
+            document.querySelectorAll('.container').forEach(container => container.classList.remove('active'));
             element.classList.add('active');
             const targetId = element.getAttribute('data-target');
             document.getElementById(targetId).classList.add('active');
-            
             window.scrollTo(0, 0);
         }
 
@@ -4634,35 +3669,12 @@ function resetShareButton(btn) {
         const btnBackTrans = document.getElementById('btn-back-trans');
 
         // Initial Greeting
-        // [修改] 初始化歡迎訊息 (加入對應按鈕的顏色與圖示)
         function initAiChat() {
             if (chatHistory.children.length === 0) {
-                // 定義樣式變數，讓程式碼較整潔
-                const iconStyle = 'width:16px; height:16px; vertical-align:text-bottom; margin-right:2px; display:inline-block;';
-                const spanStyle = 'font-weight:700; display:inline-flex; align-items:center; vertical-align:middle; margin:0 2px;';
-                
-                // 1. 行程諮詢 (藍色)
-                const iconConsult = `<svg style="${iconStyle}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>`;
-                const txtConsult = `<span style="${spanStyle} color:#2563EB;">${iconConsult}行程諮詢</span>`;
-
-                // 2. 中/日翻譯 (天空藍)
-                const iconTrans = `<svg style="${iconStyle}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10h14"></path><path d="M17 6l4 4-4 4"></path><path d="M17 14H3"></path><path d="M7 18l-4-4 4-4"></path></svg>`;
-                const txtTrans = `<span style="${spanStyle} color:#0EA5E9;">${iconTrans}中/日翻譯</span>`;
-
-                // 3. 語音輸入 (青色)
-                const iconVoice = `<svg style="${iconStyle}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>`;
-                const txtVoice = `<span style="${spanStyle} color:#06B6D4;">${iconVoice}語音輸入</span>`;
-
-                // 4. 拍照辨識 (紫色/粉色)
-                const iconCam = `<svg style="${iconStyle}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`;
-                const txtCam = `<span style="${spanStyle} color:#D946EF;">${iconCam}拍照辨識</span>`;
-
                 const welcomeHtml = `
                     你好！我是你的九州旅遊 AI 助手。
                     <br><br>
-                    你可以點選下方的 ${txtConsult} 詢問路線，或使用 ${txtTrans} 與當地人溝通。
-                    點選 ${txtVoice} 搭配語言切換還能用說的喔！
-                    更有 ${txtCam} 功能可以方便點餐及獲得商品資訊。
+                    你可以點選下方的 <b>「行程諮詢」</b> 詢問路線，或使用 <b>「中/日翻譯」</b> 與當地人溝通。
                 `;
                 appendMessage('ai', welcomeHtml);
             }
@@ -4787,116 +3799,82 @@ function resetShareButton(btn) {
              speechSynthesis.speak(utterance);
         }
 
-       // Voice Recognition Logic
-        // [修正] 將 recognition 移出函式，避免重複宣告
-        let recognition = null; 
-
+        // Voice Recognition Logic
         function setupVoiceButton() {
-            // [修正] 如果已經初始化過，就直接結束，防止重複綁定事件
-            if (recognition) return; 
-
             const voiceBtn = document.getElementById('btn-voice-ja');
             if (!voiceBtn) return;
             
-            // 防止長按跳出選單
-            voiceBtn.oncontextmenu = (e) => { e.preventDefault(); return false; };
+            voiceBtn.oncontextmenu = function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
+            };
 
-            // let recognition; <--- [修正] 這行刪除，改用上面的全域變數
+            let recognition;
             
-            // 檢查瀏覽器支援度
-            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                recognition = new SpeechRecognition();
-                
-                // 設定連續模式：讓 iOS 不會講一句話就自己斷線，而是由我們程式控制何時斷
-                recognition.continuous = true;
-                recognition.interimResults = true;
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+                // 關鍵修正：不再自動偵測，而是讀取使用者的選擇
+                recognition.continuous = false;
+                recognition.interimResults = false;
 
-                // --- [關鍵修正 1] 設定語言與 UI 狀態 (onstart) ---
                 recognition.onstart = function() {
-                    voiceBtn.classList.add('recording');
-                    
-                    // 取得當前選擇的語言名稱，更新按鈕文字
+                    // 在開始時動態設定語言
                     const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
-                    const langText = selectedLang === 'zh-TW' ? '中文' : '日文';
+                    recognition.lang = selectedLang;
                     
-                    voiceBtn.innerHTML = `<span style="animation: pulse 1s infinite;">🔴 聆聽${langText}...</span>`;
-                    document.getElementById('ai-user-input').placeholder = `正在聆聽${langText} (說完自動停止)...`;
+                    voiceBtn.classList.add('recording');
+                    const langText = selectedLang === 'zh-TW' ? '中文' : '日文';
+                    voiceBtn.innerHTML = `🔴 聽${langText}中...`;
+                    document.getElementById('ai-user-input').placeholder = `正在聆聽${langText}...`;
                 };
 
-                // --- [關鍵修正 2] 結束時重置按鈕 (onend) ---
                 recognition.onend = function() {
                     voiceBtn.classList.remove('recording');
                     voiceBtn.innerHTML = `
-                        <svg class="icon-sprite"><use href="#icon-voice"></use></svg>
+                        <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:2px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                         語音輸入
                     `;
                     updatePlaceholder();
                 };
 
-                // --- [關鍵修正 3] 錯誤處理 (onerror) ---
-                // 過濾掉 iPhone 常見的良性錯誤，不再跳出煩人的 Alert
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('ai-user-input').value = transcript;
+                    sendToGemini('voice_auto');
+                };
+                
+                // Error handling for "no-speech" or "language mismatch"
                 recognition.onerror = function(event) {
                     console.log('Voice Error:', event.error);
-                    
-                    // 忽略 "no-speech" (沒聽到聲音) 和 "aborted" (手動停止)
-                    if (event.error === 'no-speech' || event.error === 'aborted') {
-                        // 靜默失敗，只移除錄音狀態，不擾民
-                        voiceBtn.classList.remove('recording');
-                        return;
-                    }
-                    
-                    // 只有真正的錯誤才跳通知
                     voiceBtn.classList.remove('recording');
-                    alert("語音連線中斷，請重新點擊按鈕。");
+                    voiceBtn.innerHTML = `
+                        <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:2px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        重試
+                    `;
                 };
 
-                // --- [核心邏輯] 處理辨識結果 (onresult) ---
-                recognition.onresult = function(event) {
-                    let finalTranscript = '';
-                    
-                    // 組合所有已確認的片段
-                    for (let i = event.resultIndex; i < event.results.length; ++i) {
-                        if (event.results[i].isFinal) {
-                            finalTranscript += event.results[i][0].transcript;
-                        }
-                    }
-
-                    // 如果有偵測到完整的句子
-                    if (finalTranscript.trim().length > 0) {
-                        recognition.stop(); // 1. 聽到這句話就立刻停止錄音
-                        
-                        // 2. 填入輸入框顯示給使用者看
-                        document.getElementById('ai-user-input').value = finalTranscript;
-                        
-                        // 3. 直接發送給 AI 進行翻譯
-                        sendToGemini('voice_direct'); 
-                    }
-                };
-
-                // --- [關鍵修正 4] 按鈕點擊事件 ---
-                voiceBtn.onclick = (e) => {
+                // [修改] 改為「開關式」邏輯：錄音中點擊則停止，未錄音點擊則開始
+                const toggleRec = (e) => {
                     if (e && e.cancelable) e.preventDefault();
                     
+                    // 檢查按鈕是否有 'recording' 類別 (表示正在錄音)
                     if (voiceBtn.classList.contains('recording')) {
-                        // 如果正在錄音，按一下則停止
-                        recognition.stop();
+                        console.log('手動停止錄音');
+                        try { recognition.stop(); } catch(err) {}
+                        // 這裡不呼叫 start，讓它自然停止，麥克風權限就會釋放
                     } else {
-                        // ★★★ 修正重點：在 start() 之前設定語言！ ★★★
-                        const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
-                        recognition.lang = selectedLang; 
-                        
-                        try {
-                            recognition.start();
-                        } catch (err) {
-                            console.error("啟動失敗:", err);
-                        }
+                        console.log('手動開始錄音');
+                        try { recognition.start(); } catch(err) { console.log(err); }
                     }
                 };
                 
+                // 綁定新的開關函式
+                voiceBtn.onclick = toggleRec;
+                
             } else {
                 voiceBtn.style.display = 'none'; 
-                alert('您的瀏覽器不支援語音輸入功能');
+                console.log('Web Speech API not supported');
             }
         }
 
@@ -4939,60 +3917,65 @@ function resetShareButton(btn) {
             const text = aiInput.value.trim();
             if (!text) return;
 
-            // 顯示使用者的話
             appendMessage('user', text);
             aiInput.value = ''; 
 
             let finalPrompt = "";
-            
-            // 取得目前選擇的語言
-            const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
-            const isInputZh = selectedLang === 'zh-TW';
 
-            // --- 模式 A: 行程諮詢 ---
+            // --- 模式 A: 行程諮詢 (Consult) ---
             if (mode === 'consult' || mode === 'auto') {
-                 let liveContext = "";
+                
+                // 1. 讀取快取中的「我的位置與天氣」
+                let liveContext = "";
                 if (window.appCache && window.appCache['my_location_combined']) {
                     const d = window.appCache['my_location_combined'].data;
-                    liveContext = `目前位置：${d.city}, 天氣：${d.code}, 氣溫：${d.temp}°C`;
+                    const weatherDesc = typeof getWeatherDescText === 'function' ? getWeatherDescText(d.code) : '';
+                    
+                    liveContext = `
+                    【使用者當下情境】
+                    - 目前位置：${d.city}
+                    - 當地天氣：${weatherDesc} (氣溫 ${d.temp}°C)
+                    `;
                 }
-                const historyText = conversationHistory.join('\n');
-                
+
+                // 2. 組合歷史紀錄
+                const historyText = conversationHistory.length > 0 
+                    ? `【之前的對話紀錄】\n${conversationHistory.join('\n')}\n`
+                    : "";
+
                 finalPrompt = `
                     ${systemPrompt}
                     ${liveContext}
                     ${historyText}
-                    【使用者問題】： "${text}"
+                    
+                    【使用者目前的問題】： "${text}"
+                    (請根據行程記憶、當下情境以及對話紀錄，提供簡潔、像導遊般的建議。)
                 `;
             } 
-            // --- 模式 B: 手動按翻譯按鈕 ---
+            // --- 模式 B: 翻譯 (Translate) ---
             else if (mode === 'translate') {
                 finalPrompt = `
-                    Role: Professional JP/TW Translator.
-                    Input: "${text}"
-                    Rules:
-                    1. If input is Chinese -> Translate to Japanese (Polite). Add Pronunciation.
-                    2. If input is Japanese -> Translate to Traditional Chinese.
-                    Output: Translation result ONLY.
+                    你是一個中日雙向翻譯機。
+                    【使用者輸入】： "${text}"
+                    任務：
+                    1. 若輸入是中文 -> 請翻成日文 (禮貌形)。★務必在下方附上羅馬拼音 (Romaji)。
+                    2. 若輸入是日文 -> 請翻成繁體中文。★不需要羅馬拼音。
+                    
+                    注意：只輸出翻譯結果，不要解釋。
                 `;
             }
-            // --- 模式 C: 語音直達翻譯 (Voice Direct) ---
-            else if (mode === 'voice_direct') {
-                 if (isInputZh) {
-                     // 使用者說中文 -> 翻成日文給店員聽
-                     finalPrompt = `
-                        Task: Translate this Traditional Chinese text to Japanese (Polite form).
-                        Input: "${text}"
-                        Output: ONLY the Japanese translation text. NO Romaji. NO explanations.
-                     `;
-                 } else {
-                     // 使用者(或店員)說日文 -> 翻成中文給自己看
-                     finalPrompt = `
-                        Task: Translate this Japanese text to Traditional Chinese (Taiwan).
-                        Input: "${text}"
-                        Output: ONLY the Chinese translation. NO English. NO Romanization.
-                     `;
-                 }
+            // --- 模式 C: 語音 (Voice) ---
+            else if (mode === 'voice_auto') {
+                 const selectedLang = document.querySelector('input[name="voice_lang"]:checked').value;
+                 const isInputZh = selectedLang === 'zh-TW';
+                 
+                 finalPrompt = `
+                    你是一個口譯員。
+                    輸入語言：${isInputZh ? '中文' : '日文'}
+                    內容： "${text}"
+                    任務：${isInputZh ? '翻成日文(附Romaji)' : '翻成繁體中文(免拼音)'}。
+                    注意：只輸出翻譯結果。
+                 `;
             }
 
             showLoading();
@@ -5000,28 +3983,21 @@ function resetShareButton(btn) {
                 const responseText = await getGeminiResponse(finalPrompt);
                 removeLoading();
                 
-                // 決定是否顯示喇叭按鈕
-                let showAudioBtn = false;
-                
-                if (mode === 'voice_direct') {
-                    // 邏輯：如果你說中文(isInputZh)，代表你要翻成日文給別人聽 -> 顯示喇叭
-                    if (isInputZh) {
-                        showAudioBtn = true;
-                    }
-                    // 如果你錄的是日文，代表是翻譯成中文給自己看 -> 不顯示喇叭
-                } else {
-                    // 手動翻譯模式：只要結果有日文就顯示喇叭
-                    showAudioBtn = (mode === 'translate') && /[\u3040-\u309F\u30A0-\u30FF]/.test(responseText);
-                }
+                // ★ 關鍵修改：只有在「翻譯」或「語音」模式下，且含有日文時，才顯示朗讀按鈕
+                // 這樣「行程諮詢」就算回傳了日文單字，也不會被誤判為可朗讀的翻譯
+                const isTranslation = (mode === 'translate' || mode === 'voice_auto') && 
+                                      /[\u3040-\u309F\u30A0-\u30FF]/.test(responseText);
                 
                 const formattedText = responseText.replace(/\n/g, '<br>');
-                appendMessage('ai', formattedText, showAudioBtn);
+                appendMessage('ai', formattedText, isTranslation);
 
-                // 寫入歷史紀錄 (諮詢模式才需要)
+                // 3. 寫入歷史紀錄 (只針對諮詢模式)
                 if (mode === 'consult' || mode === 'auto') {
                     conversationHistory.push(`User: ${text}`);
                     conversationHistory.push(`Guide: ${responseText}`);
-                    if (conversationHistory.length > 20) conversationHistory = conversationHistory.slice(-20);
+                    if (conversationHistory.length > 20) {
+                        conversationHistory = conversationHistory.slice(conversationHistory.length - 20);
+                    }
                 }
 
             } catch (e) {
@@ -5060,255 +4036,64 @@ function resetShareButton(btn) {
             window.location.reload(); // 重新整理網頁
         }
     }
-    // [修改] 行前清單功能：支援動態新增、刪除與狀態儲存
-        const CHECKLIST_KEY = 'kyushu_trip_checklist_v2'; // 改用新 Key 避免舊資料衝突
-        
-        // 預設清單資料 (若使用者第一次開啟)
-        const defaultItems = [
-            { id: 'c1', text: '機場停車預約 (截圖備份)', checked: false },
-            { id: 'c2', text: '護照 & 機票 (截圖備份)', checked: false },
-            { id: 'c3', text: '旅遊保險單 (紙本/電子)', checked: false },
-            { id: 'c4', text: '日幣現金 & 信用卡 & 西瓜卡', checked: false },
-            { id: 'c5', text: 'eSIM / 漫遊開通', checked: false },
-            { id: 'c6', text: 'Visit Japan Web 填寫', checked: false },
-            { id: 'c7', text: '行動電源 & 充電線 & 車充', checked: false },
-            { id: 'c8', text: '國際駕照 (日文譯本)', checked: false },
-            { id: 'c9', text: '牙刷/常備藥品', checked: false },
-            { id: 'c10', text: '健保卡 / 大頭照', checked: false },
-            { id: 'c11', text: '小工具醫療箱 / 雪松', checked: false },
-            { id: 'c12', text: '耳溫槍 / 刮鬍刀', checked: false },
-            { id: 'c13', text: '相機 / 讀卡機 / 拍立得', checked: false },
-            { id: 'c14', text: '手套 / 脖圍', checked: false }
-        ];
-
-        let checklistData = [];
-
+    // [新增] 行前清單功能：自動儲存勾選狀態到手機
         function initChecklist() {
-            // 1. 讀取資料
-            const saved = localStorage.getItem(CHECKLIST_KEY);
-            if (saved) {
-                try {
-                    checklistData = JSON.parse(saved);
-                } catch(e) {
-                    checklistData = JSON.parse(JSON.stringify(defaultItems));
-                }
-            } else {
-                checklistData = JSON.parse(JSON.stringify(defaultItems)); // 深拷貝
-            }
-            renderChecklist();
-        }
-
-        // 渲染清單畫面 (包含計算進度)
-        function renderChecklist() {
-            const listArea = document.getElementById('checklist-list-area');
+            const checkboxes = document.querySelectorAll('.check-item input');
             const progressEl = document.getElementById('checklist-progress');
-            if (!listArea) return;
+            const STORAGE_KEY = 'kyushu_trip_checklist_2026'; // 本地儲存的專屬金鑰
 
-            listArea.innerHTML = ''; // 清空目前畫面
-            let checkedCount = 0;
-
-            checklistData.forEach((item, index) => {
-                if (item.checked) checkedCount++;
-
-                const label = document.createElement('label');
-                label.className = 'check-item';
-                // 點擊 label 本身切換 checkbox，防止點擊刪除按鈕時觸發
-                label.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:8px; flex:1; cursor:pointer;">
-                        <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleItemStatus(${index})">
-                        <span>${item.text}</span>
-                    </div>
-                    <button class="btn-del-item" onclick="deleteCheckItem(${index}, event)">×</button>
-                `;
-                listArea.appendChild(label);
-            });
-
-            // 更新進度文字
-            if (progressEl) {
-                progressEl.innerText = `${checkedCount}/${checklistData.length}`;
-                if (checkedCount === checklistData.length && checklistData.length > 0) {
+            function updateProgress() {
+                const checkedCount = document.querySelectorAll('.check-item input:checked').length;
+                const total = checkboxes.length;
+                
+                // 更新數字
+                if(progressEl) progressEl.innerText = `${checkedCount}/${total}`;
+                
+                // 視覺回饋：全選完變綠色
+                if(progressEl && checkedCount === total) {
                     progressEl.style.background = '#ECFDF5';
                     progressEl.style.color = '#059669';
                     progressEl.innerText = '準備完成！';
-                } else {
-                    progressEl.style.background = '#FFFBEB';
-                    progressEl.style.color = '#D97706';
                 }
+
+                // 儲存狀態
+                const states = {};
+                checkboxes.forEach(cb => states[cb.dataset.id] = cb.checked);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(states));
             }
+
+            // 1. 讀取舊紀錄
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
             
-            // 儲存到 LocalStorage
-            localStorage.setItem(CHECKLIST_KEY, JSON.stringify(checklistData));
-        }
-
-        // 切換勾選狀態
-        function toggleItemStatus(index) {
-            checklistData[index].checked = !checklistData[index].checked;
-            renderChecklist(); // 重新渲染 (會自動儲存)
-        }
-
-        // 新增項目
-        function addNewCheckItem() {
-            const input = document.getElementById('new-item-input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            checklistData.unshift({ // 加在最上面
-                id: 'new_' + Date.now(),
-                text: text,
-                checked: false
+            // 2. 恢復勾選狀態
+            checkboxes.forEach(cb => {
+                if(saved[cb.dataset.id]) cb.checked = true;
+                // 綁定點擊事件
+                cb.addEventListener('change', updateProgress);
             });
-            
-            input.value = '';
-            renderChecklist();
-        }
 
-        // 刪除項目
-        function deleteCheckItem(index, event) {
-            // 阻止事件冒泡，避免點擊刪除時觸發 label 的勾選
-            event.stopPropagation();
-            event.preventDefault();
-            
-            if (confirm('確定要刪除這個項目嗎？')) {
-                checklistData.splice(index, 1);
-                renderChecklist();
-            }
+            // 3. 初始更新一次 UI
+            updateProgress();
         }
-
-        // 折疊/展開控制
         function toggleChecklist(headerEl) {
-            const container = document.getElementById('checklist-container');
-            const icon = headerEl.querySelector('.toggle-icon');
-            
-            // 切換顯示容器 (加上或移除 .show 類別)
-            const isClosed = !container.classList.contains('show');
-            
-            if (isClosed) {
-                container.classList.add('show');
-                icon.style.transform = 'rotate(180deg)';
-                icon.style.color = '#2563EB'; 
-            } else {
-                container.classList.remove('show');
-                icon.style.transform = 'rotate(0deg)';
-                icon.style.color = '#6B7280';
-            }
-        }
-    // [新增] 圖片預覽全域變數
-    let pendingImageBase64 = null;
-
-    // [新增] 關閉圖片預覽
-    function cancelImagePreview() {
-        document.getElementById('img-preview-modal').style.display = 'none';
-        pendingImageBase64 = null;
-    }
-
-    // [新增] 確認發送圖片 (原本的邏輯移到這裡)
-    async function confirmImageAnalysis() {
-        if (!pendingImageBase64) return;
+        const container = document.getElementById('checklist-container');
+        const icon = headerEl.querySelector('.toggle-icon');
         
-        // [修正] 1. 移除這裡的 cancelImagePreview();
-        // 不要在一開始就清除資料！
+        // 切換顯示容器 (加上或移除 .show 類別)
+        const isClosed = !container.classList.contains('show');
         
-        // 2. 先把視窗隱藏起來就好 (視覺上關閉，但不要清空變數)
-        document.getElementById('img-preview-modal').style.display = 'none';
-
-        showLoading();
-
-        try {
-            // 3. 在聊天室顯示圖片
-            // [修改] 加入 onclick 事件與 cursor:zoom-in 樣式
-            const imgHtml = `<img src="data:image/jpeg;base64,${pendingImageBase64}" onclick="openLightbox(this.src)" style="max-width:100%; border-radius:10px; border:1px solid #ccc; margin-top:5px; cursor:zoom-in;">`;
-            appendMessage('user', imgHtml);
-
-            // 讀取位置
-            let curLoc = ""; 
-            if (window.appCache && window.appCache['my_location_combined']) {
-                curLoc = window.appCache['my_location_combined'].data.city;
-            }
-
-            // 設定 Prompt
-            const visionPrompt = `
-                ${systemPrompt}
-                【使用者傳送了一張圖片】
-                【使用者目前位置】：${curLoc}
-                任務：請擔任專業導遊與購物助手。
-                請判斷圖片內容並提供協助：
-                1. 若是商品/藥妝/零食：說明這是什麼 (名稱與功效)，並推薦在「${curLoc}」哪裡買得到。
-                2. 若是菜單：翻譯菜名並推薦必吃。
-                3. 若是景點/路牌：告訴我這在哪裡。
-                請用簡潔、像朋友般的口吻回答。
-            `;
-            
-            // 4. 發送 API (這時候 pendingImageBase64 還有值，所以會成功)
-            const responseText = await getGeminiResponse(visionPrompt, pendingImageBase64);
-            
-            removeLoading();
-            const formattedText = responseText.replace(/\n/g, '<br>');
-            appendMessage('ai', formattedText, false);
-
-        } catch (e) {
-            removeLoading();
-            appendMessage('ai', `<span style="color:red">圖片辨識失敗：${e.message}</span>`);
-        } finally {
-            // [修正] 5. 無論成功或失敗，最後才真正清空變數
-            pendingImageBase64 = null;
+        if (isClosed) {
+            container.classList.add('show');
+            icon.style.transform = 'rotate(180deg)';
+            icon.style.color = '#2563EB'; // 這行可以改成 #F59E0B (配合清單的主色黃)
+        } else {
+            container.classList.remove('show');
+            icon.style.transform = 'rotate(0deg)';
+            icon.style.color = '#6B7280';
         }
     }
-    async function handleImageSelect(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        // 1. 壓縮圖片 (但先不發送)
-        // 為了預覽流暢，這裡先做壓縮，如果檔案太大會在這裡處理掉
-        try {
-            pendingImageBase64 = await compressImage(file, 800, 0.7);
-            
-            // 2. 顯示預覽彈窗
-            const previewImg = document.getElementById('img-preview-content');
-            previewImg.src = `data:image/jpeg;base64,${pendingImageBase64}`;
-            
-            document.getElementById('img-preview-modal').style.display = 'flex';
-            
-        } catch (e) {
-            alert("圖片處理失敗，請重試");
-            console.error(e);
-        }
-        
-        // 3. 清空 input，確保下次選同一張圖也能觸發 change 事件
-        event.target.value = '';
-    }
-
-// 🟢 正確位置：壓縮函式也一起移出來
-function compressImage(file, maxWidth, quality) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (e) => {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = () => {
-                let w = img.width;
-                let h = img.height;
-                if (w > maxWidth) {
-                    h = Math.round(h * (maxWidth / w));
-                    w = maxWidth;
-                }
-                const canvas = document.createElement('canvas');
-                canvas.width = w;
-                canvas.height = h;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, w, h);
-                const dataUrl = canvas.toDataURL('image/jpeg', quality);
-                const base64 = dataUrl.split(',')[1];
-                resolve(base64);
-            };
-            img.onerror = (err) => reject(err);
-        };
-        reader.onerror = (err) => reject(err);
-    });
-}
         document.addEventListener('DOMContentLoaded', () => {
-        // [新增] 圖片處理與壓縮邏輯
-        
+            
             // --- 智慧自動展開邏輯開始 ---
             
             // 1. 定義日期與行程 ID 的對應表
@@ -5388,362 +4173,7 @@ function compressImage(file, maxWidth, quality) {
             setupVoiceButton(); // Init voice listener
             getLocalWeather(); // Fetch local weather on load
             initChecklist(); // Init checklist
-            // [修正] 1:1 指隨心動物理翻頁引擎 (Physics Page Flip)
-            let isDragging = false;
-            let startX = 0;
-            let startY = 0; // [新增] 垂直起點，用來判斷是否為捲動
-            let currentTranslate = 0;
-            let activeContainer = null;
-            let navItems = [];
-            let activeIndex = 0;
-
-            // 1. 手指按下：鎖定目標，準備拖曳
-            document.addEventListener('touchstart', (e) => {
-                const active = document.querySelector('.container.active');
-                if (!active || active.classList.contains('is-animating')) return;
-
-                // [修正] 改為「潛在拖曳中」，先不鎖死，等移動判斷方向後再決定
-                isDragging = true; 
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY; // [新增] 紀錄垂直位置
-                activeContainer = active;
-                
-                navItems = Array.from(document.querySelectorAll('.nav-item'));
-                const activeNavItem = document.querySelector('.nav-item.active');
-                activeIndex = navItems.indexOf(activeNavItem);
-            }, {passive: false});
-
-            // 2. 手指移動：計算物理量，即時更新畫面
-            document.addEventListener('touchmove', (e) => {
-                if (!isDragging || !activeContainer) return;
-
-                const currentX = e.touches[0].clientX;
-                const currentY = e.touches[0].clientY;
-                const diffX = currentX - startX;
-                const diffY = currentY - startY;
-
-                // 優先判斷捲動：如果垂直移動 > 水平移動，視為捲動網頁
-                if (Math.abs(diffY) > Math.abs(diffX)) {
-                    isDragging = false;
-                    activeContainer.classList.remove('is-dragging'); 
-                    return; 
-                }
-
-                // 確定是水平滑動
-                activeContainer.classList.add('is-dragging');
-                if (e.cancelable) e.preventDefault(); 
-
-                // ★ [修改] 核心物理公式：改為 2D 平移 (TranslateX)
-                // 使用 translate3d 確保啟用 GPU 加速
-                activeContainer.style.transform = `translate3d(${diffX}px, 0, 0)`;
-                
-                // 💡 [選用] 根據滑動距離微調透明度 (模擬您提供的 opacity: 0 效果)
-                // 滑動越遠，透明度越低 (最多降到 0.8，保留一點可見度以免使用者迷失)
-                const opacity = 1 - (Math.abs(diffX) / window.innerWidth) * 0.5;
-                activeContainer.style.opacity = opacity;
-                activeContainer.style.filter = ''; // 移除舊的亮度濾鏡，保持乾淨
-                
-                currentTranslate = diffX;
-            }, {passive: false});
-
-            
-            // 3. 手指放開：判斷是「翻過去」還是「彈回來」
-            document.addEventListener('touchend', (e) => {
-                if (!isDragging || !activeContainer) return;
-                isDragging = false;
-                
-                // 移除拖曳狀態，加入動畫狀態 (讓 CSS 接手剩下的動作)
-                activeContainer.classList.remove('is-dragging');
-                activeContainer.classList.add('is-animating');
-
-                const threshold = 80; // 滑動超過 80px 就視為要翻頁
-                
-                // A. 決定翻頁 (滑動距離足夠)
-               // A. 決定翻頁 (滑動距離足夠)
-                if (Math.abs(currentTranslate) > threshold) {
-                    const direction = currentTranslate > 0 ? 'prev' : 'next';
-                    let targetIndex;
-
-                    // [修正] 循環邏輯：使用餘數運算來實現無限循環
-                    if (direction === 'next') {
-                        // 往右翻 (下一頁): 如果是最後一頁，會回到 0
-                        targetIndex = (activeIndex + 1) % navItems.length;
-                    } else {
-                        // 往左翻 (上一頁): 如果是第 0 頁，會回到最後一頁
-                        targetIndex = (activeIndex - 1 + navItems.length) % navItems.length;
-                    }
-
-                    finishFlip(activeContainer, direction, navItems[targetIndex]);
-                }
-                // B. 取消翻頁 (滑動距離不夠，彈回來)
-                else {
-                    revertFlip(activeContainer);
-                }
-                
-                currentTranslate = 0;
-            });
-
-            // 輔助：彈回原位 (Revert)
-            function revertFlip(element) {
-                // 回到中心 (x: 0)
-                element.style.transform = 'translate3d(0, 0, 0)';
-                element.style.opacity = '1';
-                
-                setTimeout(() => {
-                    element.classList.remove('is-animating');
-                    element.style.transform = '';
-                    element.style.opacity = '';
-                }, 250); // 對應 CSS 的 0.25s
-            }
-
-            // 輔助：完成翻頁動作 (Slide Out & Slide In)
-            function finishFlip(oldElement, direction, nextNavItem) {
-                const screenW = window.innerWidth;
-                
-                // 1. 舊頁面滑出去 (Slide Exit)
-                // 往左滑(Next) -> 舊頁面去 -100%，往右滑(Prev) -> 舊頁面去 100%
-                const targetX = direction === 'next' ? -screenW : screenW;
-                
-                oldElement.style.transform = `translate3d(${targetX}px, 0, 0)`;
-                oldElement.style.opacity = '0'; // 滑出時淡出
-
-                // 2. 等舊頁面滑出去後，切換內容
-                setTimeout(() => {
-                    switchTab(nextNavItem); 
-                    
-                    const newTargetId = nextNavItem.getAttribute('data-target');
-                    const newContainer = document.getElementById(newTargetId);
-                    
-                    // 3. 新頁面準備進場 (Slide Enter)
-                    // 如果是 Next，新頁面從右邊(100%)進來；如果是 Prev，從左邊(-100%)進來
-                    const startX = direction === 'next' ? screenW : -screenW;
-                    
-                    newContainer.classList.add('is-dragging'); // 暫時移除 transition 以便瞬間定位
-                    newContainer.style.transform = `translate3d(${startX}px, 0, 0)`;
-                    newContainer.style.opacity = '0';
-                    
-                    // 強制瀏覽器重繪 (Reflow) 確保定位生效
-                    void newContainer.offsetWidth;
-
-                    // 4. 執行進場動畫 (Go to Center)
-                    newContainer.classList.remove('is-dragging');
-                    newContainer.classList.add('is-animating');
-                    newContainer.style.transform = 'translate3d(0, 0, 0)';
-                    newContainer.style.opacity = '1';
-
-                    // 清理舊元素
-                    oldElement.classList.remove('is-animating');
-                    oldElement.style.transform = '';
-                    oldElement.style.opacity = '';
-
-                    // 清理新元素
-                    setTimeout(() => {
-                        newContainer.classList.remove('is-animating');
-                        newContainer.style.transform = '';
-                    }, 250); // 對應 CSS 的 0.25s
-
-                }, 200); // 稍微提早一點切換，讓銜接更緊密
-            }
         });
-        // [升級版] 圖片放大燈箱控制函式 (含縮放與拖曳功能)
-            let lbState = {
-                scale: 1,
-                panning: false,
-                pointX: 0, pointY: 0, // 當前座標
-                startX: 0, startY: 0, // 拖曳起始點
-                lastX: 0, lastY: 0,   // 上一次結束點
-                initialDist: 0        // 雙指初始距離
-            };
-
-            const lbImg = document.getElementById('lightbox-img');
-            const lbModal = document.getElementById('lightbox-modal');
-
-            // 1. 開啟燈箱
-            window.openLightbox = function(src) {
-                if(!lbImg || !lbModal) return;
-                
-                lbImg.src = src;
-                lbModal.style.display = 'flex';
-                
-                // 重置狀態
-                resetLightbox();
-                
-                // 阻擋圖片點擊冒泡 (避免點圖片時關閉燈箱)
-                lbImg.onclick = (e) => e.stopPropagation();
-                
-                // 加入事件監聽
-                addLightboxListeners();
-            }
-
-            // 2. 關閉燈箱
-            window.closeLightbox = function(e) {
-                // 只有點擊背景(遮罩)或關閉按鈕時才關閉
-                // (因為 img 已經阻擋冒泡，這裡通常是點到 overlay)
-                if (e && e.target !== lbModal && !e.target.classList.contains('lightbox-close')) return;
-
-                lbModal.style.display = 'none';
-                removeLightboxListeners();
-            }
-
-            function resetLightbox() {
-                lbState = { scale: 1, panning: false, pointX: 0, pointY: 0, startX: 0, startY: 0, lastX: 0, lastY: 0, initialDist: 0 };
-                updateTransform();
-            }
-
-            function updateTransform() {
-                // 限制縮小不能小於 1 (原尺寸)
-                if (lbState.scale < 1) lbState.scale = 1;
-                lbImg.style.transform = `translate(${lbState.pointX}px, ${lbState.pointY}px) scale(${lbState.scale})`;
-            }
-
-            // --- 事件處理區 ---
-
-            function addLightboxListeners() {
-                // 電腦版：滾輪縮放
-                lbImg.addEventListener('wheel', handleWheel, { passive: false });
-                // 電腦版：拖曳
-                lbImg.addEventListener('mousedown', handleMouseDown);
-                
-                // 手機版：觸控
-                lbImg.addEventListener('touchstart', handleTouchStart, { passive: false });
-                lbImg.addEventListener('touchmove', handleTouchMove, { passive: false });
-                lbImg.addEventListener('touchend', handleTouchEnd);
-            }
-
-            function removeLightboxListeners() {
-                lbImg.removeEventListener('wheel', handleWheel);
-                lbImg.removeEventListener('mousedown', handleMouseDown);
-                window.removeEventListener('mousemove', handleMouseMove);
-                window.removeEventListener('mouseup', handleMouseUp);
-                lbImg.removeEventListener('touchstart', handleTouchStart);
-                lbImg.removeEventListener('touchmove', handleTouchMove);
-                lbImg.removeEventListener('touchend', handleTouchEnd);
-            }
-
-            // [電腦] 滾輪縮放
-            function handleWheel(e) {
-                e.preventDefault();
-                const delta = e.deltaY > 0 ? -0.2 : 0.2;
-                lbState.scale += delta;
-                updateTransform();
-            }
-
-            // [電腦] 滑鼠拖曳
-            function handleMouseDown(e) {
-                if (lbState.scale <= 1) return; // 沒放大時不給拖
-                e.preventDefault();
-                lbState.startX = e.clientX - lbState.pointX;
-                lbState.startY = e.clientY - lbState.pointY;
-                lbState.panning = true;
-                
-                window.addEventListener('mousemove', handleMouseMove);
-                window.addEventListener('mouseup', handleMouseUp);
-            }
-
-            function handleMouseMove(e) {
-                if (!lbState.panning) return;
-                e.preventDefault();
-                lbState.pointX = e.clientX - lbState.startX;
-                lbState.pointY = e.clientY - lbState.startY;
-                updateTransform();
-            }
-
-            function handleMouseUp() {
-                lbState.panning = false;
-                window.removeEventListener('mousemove', handleMouseMove);
-                window.removeEventListener('mouseup', handleMouseUp);
-            }
-
-            // [手機] 觸控處理 (單指拖曳 / 雙指縮放)
-            function handleTouchStart(e) {
-                if (e.touches.length === 2) {
-                    // 雙指：開始縮放
-                    e.preventDefault(); // 防止背景捲動
-                    const touch1 = e.touches[0];
-                    const touch2 = e.touches[1];
-                    lbState.initialDist = Math.hypot(touch1.pageX - touch2.pageX, touch1.pageY - touch2.pageY);
-                    lbState.lastScale = lbState.scale;
-                } else if (e.touches.length === 1 && lbState.scale > 1) {
-                    // 單指且已放大：開始拖曳
-                    const touch = e.touches[0];
-                    lbState.startX = touch.pageX - lbState.pointX;
-                    lbState.startY = touch.pageY - lbState.pointY;
-                    lbState.panning = true;
-                }
-            }
-
-            function handleTouchMove(e) {
-                if (e.touches.length === 2) {
-                    // 雙指縮放中
-                    e.preventDefault();
-                    const touch1 = e.touches[0];
-                    const touch2 = e.touches[1];
-                    const dist = Math.hypot(touch1.pageX - touch2.pageX, touch1.pageY - touch2.pageY);
-                    
-                    // 計算縮放比例
-                    const delta = dist / lbState.initialDist;
-                    lbState.scale = lbState.lastScale * delta;
-                    updateTransform();
-                } else if (e.touches.length === 1 && lbState.panning) {
-                    // 單指拖曳中
-                    e.preventDefault(); // 防止背景捲動
-                    const touch = e.touches[0];
-                    lbState.pointX = touch.pageX - lbState.startX;
-                    lbState.pointY = touch.pageY - lbState.startY;
-                    updateTransform();
-                }
-            }
-
-            function handleTouchEnd(e) {
-                lbState.panning = false;
-                if (e.touches.length < 2) {
-                    lbState.initialDist = 0;
-                }
-            }
-            // [新增] 複製文字功能 (含回饋動畫)
-    function copyText(btn, text) {
-        if (!navigator.clipboard) {
-            // 備案：若瀏覽器不支援 Clipboard API (較舊的安卓 Webview)
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand("Copy");
-            document.body.removeChild(textArea);
-            showCopyFeedback(btn);
-            return;
-        }
-
-        navigator.clipboard.writeText(text).then(() => {
-            showCopyFeedback(btn);
-        }).catch(err => {
-            console.error('複製失敗', err);
-            alert('複製失敗，請手動複製');
-        });
-    }
-
-    function showCopyFeedback(btn) {
-        const originalHtml = btn.innerHTML;
-        // 變更為綠色勾勾
-        btn.innerHTML = `<svg class="icon-mini" style="width:12px;height:12px;"><path d="M20 6L9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> 已複製`;
-        btn.classList.add('copied');
-        
-        // 2秒後復原
-        setTimeout(() => {
-            btn.innerHTML = originalHtml;
-            btn.classList.remove('copied');
-        }, 2000);
-    }
-    // --- PWA Service Worker Registration ---
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./service-worker.js')
-                        .then(reg => console.log('PWA Service Worker registered!', reg))
-                        .catch(err => console.log('PWA registration failed:', err));
-                });
-            }
-
     </script>
-    </div>
 </body>
 </html>
