@@ -4291,7 +4291,7 @@ function getSmartAdviceText(temp, weatherCode) {
 // [修改] 兩段式分享功能 (解決瀏覽器阻擋視窗問題)
         // 狀態標記：紀錄目前是否已經分析完成
         // --- [新增] Google Places API 救援函式 (三階段定位邏輯用) ---
-    const fetchGooglePlaces = async (lat, lng, radius = 500) => {
+    const fetchGooglePlaces = async (lat, lng, radius = 50) => {
     // [修改] 指定獲取 Google Places 的 Key
     const currentKey = getKey('places'); 
     if (!currentKey) return [];
