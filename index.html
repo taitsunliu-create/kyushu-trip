@@ -4291,7 +4291,7 @@ function getSmartAdviceText(temp, weatherCode) {
 // [修改] 兩段式分享功能 (解決瀏覽器阻擋視窗問題)
         // 狀態標記：紀錄目前是否已經分析完成
         // --- [新增] Google Places API 救援函式 (三階段定位邏輯用) ---
-    const fetchGooglePlaces = async (lat, lng, radius = 50) => {
+    const fetchGooglePlaces = async (lat, lng, radius = 500) => {
     // [修改] 指定獲取 Google Places 的 Key
     const currentKey = getKey('places'); 
     if (!currentKey) return [];
@@ -4301,7 +4301,8 @@ function getSmartAdviceText(temp, weatherCode) {
         
         // 定義要搜尋的地標類型 (排除太過籠統的類型)
         const validTypes = [
-            "restaurant", "cafe", "tourist_attraction", "park", 
+            "restaurant", "cafe", "tourist_attraction", "park", "office", 
+            "museum", "hospital", "pharmacy", "bank", "atm",
             "store", "lodging", "transit_station", "school", 
             "government_office", "convenience_store", "clothing_store", "shopping_mall"
         ];
