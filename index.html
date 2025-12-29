@@ -4325,7 +4325,7 @@ function getSmartAdviceText(temp, weatherCode) {
                 headers: {
                     "Content-Type": "application/json",
                     "X-Goog-Api-Key": currentKey,
-                    "X-Goog-FieldMask": "places.displayName,places.name", // 只抓取名稱以節省費用
+                    "X-Goog-FieldMask": "places.displayName,places.addressDescriptor", 
                 },
                 body: JSON.stringify(body),
             });
