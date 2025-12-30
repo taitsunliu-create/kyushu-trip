@@ -57,6 +57,8 @@
         }
         
         .header-content {
+            position: relative; /* 確保 z-index 生效 */
+            z-index: 10;        /* 關鍵修正！讓文字與按鈕在最上層 */
             display: flex;
             flex-direction: row; 
             justify-content: space-between;
@@ -295,63 +297,24 @@
         }
 
         /* 星星層 (預設隱藏) */
-        /* [修改] 背景特效層 (星星/雨/雪/雲) - 支援天氣動畫 */
         .header-bg-effect {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 0;
-            opacity: 0; /* 預設隱藏 */
-            transition: opacity 1s ease;
-        }
-
-        /* 1. 星空模式 (預設夜晚: is-night) */
-        /* 只有在沒有其他天氣干擾時，夜晚才顯示星星 */
-        header.is-night .header-bg-effect {
-            opacity: 0.8;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 確保不擋住按鈕點擊 */
+            z-index: 0; /* 在內容之下 */
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            
+            /* 利用 CSS 徑向漸層畫出星星 */
             background-image: 
                 radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
-                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px);
-            background-size: 550px 550px, 350px 350px;
-            background-position: 0 0, 40px 60px;
-        }
-
-        /* 2. 下雨模式 (Rain) - 優先權高於星星 */
-        header.weather-rain .header-bg-effect {
-            opacity: 0.7 !important; /* 強制顯示 */
-            background-image: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
-            background-size: 2px 40px; /* 雨滴拉長 */
-            animation: rain-fall 0.3s linear infinite; /* 快速落下 */
-        }
-        @keyframes rain-fall {
-            0% { background-position: 0 0; }
-            100% { background-position: 10px 40px; }
-        }
-
-        /* 3. 下雪模式 (Snow) */
-        header.weather-snow .header-bg-effect {
-            opacity: 0.9 !important;
-            background-image: 
-                radial-gradient(rgba(255,255,255,0.9) 2px, transparent 3px),
-                radial-gradient(rgba(255,255,255,0.6) 1px, transparent 2px);
-            background-size: 100px 100px, 150px 150px;
-            animation: snow-fall 8s linear infinite; /* 緩慢飄落 */
-        }
-        @keyframes snow-fall {
-            0% { background-position: 0 0, 0 0; }
-            100% { background-position: 20px 100px, -20px 150px; }
-        }
-
-        /* 4. 多雲/陰天模式 (Cloud) */
-        header.weather-cloud .header-bg-effect {
-            opacity: 0.5 !important;
-            /* 使用大柔焦圓形模擬雲層飄過 */
-            background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.4), transparent 70%);
-            background-size: 150% 100%; 
-            animation: cloud-move 15s ease-in-out infinite alternate;
-        }
-        @keyframes cloud-move {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
         }
 
         /* 晚上時顯示星星 */
@@ -1478,6 +1441,140 @@
     letter-spacing: 1px;
 }
 /* --- [新增] 住宿頁面優化樣式 End --- */
+  /* --- [新增] iOS 天氣動態特效 (仿 iPhone 天氣) --- */
+/* 1. Header 容器設定 */
+.weather-bg-layer {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;  /* 關鍵修正！讓它浮在背景色之上 */
+    pointer-events: none; /* 讓滑鼠點擊可以穿透特效，點到下面的按鈕 */
+}
+
+
+/* --- 天氣背景色 (參考您的截圖配色) --- */
+/* 晴天: 亮藍漸層 */
+header.w-sun { background: linear-gradient(180deg, #2980B9 0%, #6DD5FA 100%); }
+/* 多雲: 灰藍漸層 */
+header.w-cloud { background: linear-gradient(180deg, #536976 0%, #292E49 100%); }
+/* 雨天: 深灰藍 (參考截圖1) */
+header.w-rain { background: linear-gradient(180deg, #373B44 0%, #4286f4 100%); }
+/* 雪天: 冰霜淺藍 (參考截圖2) */
+header.w-snow { background: linear-gradient(180deg, #83a4d4 0%, #b6fbff 100%); }
+/* 霧/陰天: 迷霧灰 */
+header.w-fog { background: linear-gradient(180deg, #757F9A 0%, #D7DDE8 100%); }
+
+/* 晚上模式 (權重最高，覆蓋以上顏色，但保留粒子特效) */
+header.is-night {
+    background: linear-gradient(180deg, #0f2027 0%, #203a43 50%, #2c5364 100%) !important;
+}
+
+/* [星星特效] - 僅在晴朗夜晚出現 */
+.star-particle {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.8); /* 微微發光暈 */
+    animation: twinkle linear infinite;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); } /* 變亮變大 */
+    100% { opacity: 0.3; transform: scale(0.8); }
+}
+/* --- 粒子動畫定義 --- */
+/* [雨滴] */
+.rain-drop {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.3);
+    width: 1px; height: 60px;
+    top: -60px;
+    animation: rain-fall 0.7s linear infinite;
+}
+@keyframes rain-fall {
+    to { transform: translateY(400px); }
+}
+
+/* [雪花] */
+.snow-flake {
+    position: absolute;
+    background: #FFF;
+    border-radius: 50%;
+    opacity: 0.8;
+    top: -10px;
+    animation: snow-fall 5s linear infinite; /* 加上了 5s */
+}
+@keyframes snow-fall {
+    0% { transform: translateY(0) translateX(0); opacity: 0.8; }
+    100% { transform: translateY(300px) translateX(20px); opacity: 0; }
+}
+
+/* [雲朵飄動] */
+/* [雲朵飄動 - 新版] */
+/* [霧氣特效 - 補回遺失的設定] */
+.fog-layer {
+    position: absolute;
+    width: 100%; height: 100%;
+    top: 0; left: 0;
+    /* 使用漸層模擬地面升起的霧氣 */
+    background: linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 60%, transparent 100%);
+    filter: blur(15px); /* 強力模糊，製造朦朧感 */
+    animation: fog-pulse 8s infinite alternate;
+    z-index: 1;
+}
+
+@keyframes fog-pulse {
+    0% { opacity: 0.6; transform: translateY(0); }
+    100% { opacity: 1; transform: translateY(-10px); } /* 霧氣上下浮動 */
+}
+.cloud-shape {
+    position: absolute;
+    width: 100px; height: 40px;
+    background: rgba(255, 255, 255, 0.8); /* 提高白度，讓它更明顯 */
+    border-radius: 50px; /* 圓角膠囊狀 */
+    top: 20px;
+    filter: blur(5px); /* 輕微柔焦就好，不要太糊 */
+    animation: cloud-float linear infinite;
+    z-index: 2; /* 確保有一點層次 */
+}
+
+/* 利用偽元素製作雲的凸起造型 */
+.cloud-shape::after, .cloud-shape::before {
+    content: '';
+    position: absolute;
+    background: inherit;
+    border-radius: 50%;
+}
+.cloud-shape::after {
+    width: 45px; height: 45px;
+    top: -25px; left: 15px;
+}
+.cloud-shape::before {
+    width: 35px; height: 35px;
+    top: -15px; left: 45px;
+}
+
+/* 定義雲朵從左飄到右的動畫 */
+@keyframes cloud-float {
+    0% { left: -150px; opacity: 0; }
+    10% { opacity: 0.8; }
+    90% { opacity: 0.8; }
+    100% { left: 100%; opacity: 0; } /* 飄出螢幕右邊 */
+}
+/* [太陽光暈] */
+.sun-glow {
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(30px);
+    animation: sun-breath 4s infinite ease-in-out;
+}
+@keyframes sun-breath {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
   </style>
 </head>
 <body>
@@ -1572,7 +1669,7 @@
         </defs>
     </svg>
     <header>
-    <div class="header-bg-effect"></div>
+    <div id="weather-effect-layer" class="weather-bg-layer"></div>
 
     <div class="header-content">
         <div class="header-title-area">
@@ -3734,23 +3831,25 @@ function getKey(type) {
                 return null;
             }
         }
-// [修改] 更新天氣 Widget 並連動背景特效
 async function updateWeatherWidget(dayId) {
     const config = tripConfig[dayId];
     if (!config) return;
 
-    // UI Loading 狀態
+    // 1. 先顯示 Loading 狀態 (提升使用者體驗)
     document.getElementById('hw-loc').innerText = config.loc;
-    document.getElementById('hw-date').innerText = config.dateStr;
+    //document.getElementById('hw-date').innerText = config.dateStr.slice(5); // 只顯示 MM-DD
+    document.getElementById('hw-date').innerText = config.dateStr; // 只顯示 MM-DD
     document.getElementById('hw-temp').innerText = '--';
     document.getElementById('hw-desc').innerText = '讀取中...';
-    // 顯示 Loading Icon
+    document.getElementById('hw-range').innerText = '';
+    document.getElementById('hw-advice').innerText = '資料更新中...';
+    // 顯示一個簡單的載入圖示
     document.getElementById('hw-icon').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: rotate 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>`;
 
-    // 呼叫智慧判斷取得資料 (含行前/即時/預報)
+    // 2. 呼叫智慧判斷函數取得資料
     const data = await getSmartWeatherData(config);
 
-    // 更新文字資訊
+    // 3. 更新畫面
     document.getElementById('hw-temp').innerText = data.temp;
     document.getElementById('hw-desc').innerText = data.desc;
     document.getElementById('hw-range').innerText = data.range;
@@ -3758,38 +3857,12 @@ async function updateWeatherWidget(dayId) {
     
     // 處理 Icon
     const iconType = data.icon || 'cloud';
+    // 如果是 API 回傳的，我們只給代碼 (如 sun, cloud, rain)，如果沒對應到就給 cloud
     const validIcons = ['sun', 'cloud', 'cloud-sun', 'snow', 'rain', 'fog', 'lightning'];
     const finalIcon = validIcons.includes(iconType) ? iconType : 'cloud';
-    document.getElementById('hw-icon').innerHTML = `<div class="weather-icon ${finalIcon}"></div>`;
-
-    // -----------------------------------------------------------
-    // [新增] 背景特效連動邏輯
-    // -----------------------------------------------------------
-    const header = document.querySelector('header');
     
-    // 1. 清除舊的天氣特效 (但保留 is-night)
-    header.classList.remove('weather-rain', 'weather-snow', 'weather-cloud');
-
-    // 2. 根據 icon 決定特效
-    // 雨天或雷雨 -> 下雨特效
-    if (finalIcon === 'rain' || finalIcon === 'lightning') {
-        header.classList.add('weather-rain');
-        console.log(`[背景特效] 切換為：下雨 🌧️`);
-    } 
-    // 下雪 -> 下雪特效
-    else if (finalIcon === 'snow') {
-        header.classList.add('weather-snow');
-        console.log(`[背景特效] 切換為：下雪 ❄️`);
-    } 
-    // 多雲或霧 -> 雲霧特效
-    else if (finalIcon === 'cloud' || finalIcon === 'fog') {
-        header.classList.add('weather-cloud');
-        console.log(`[背景特效] 切換為：多雲 ☁️`);
-    } 
-    // 晴天 (sun/cloud-sun) -> 不加 class，顯示預設 (藍天或星空)
-    else {
-        console.log(`[背景特效] 切換為：晴朗 (預設) ☀️`);
-    }
+    document.getElementById('hw-icon').innerHTML = `<div class="weather-icon ${finalIcon}"></div>`;
+    setWeatherEffect(finalIcon);
 }
 // [修改] 智慧判斷函式：改用「真實溫度」生成動態建議
 // [修改] 智慧判斷函式：加入 10 分鐘快取機制
@@ -4179,105 +4252,133 @@ function getSmartAdviceText(temp, weatherCode) {
         // [修正版] 混合雙軌定位：手機抓精確、電腦抓 IP，確保 100% 成功率
         // [智慧定位函式] 完美解決方案：手機優先抓 GPS，電腦自動退回抓 IP
         // [最終版] 裝置分流定位：電腦模擬舊版行為(IP)，手機啟用高精度(GPS)
-        // [修改] 取得定位天氣 (含背景特效連動)
-function getLocalWeather() {
-    const els = {
-        headerLoc: document.getElementById('header-my-loc'),
-        headerTemp: document.getElementById('header-my-temp'),
-        tabTemp: document.getElementById('wc-my-temp'),
-        titleBox: document.getElementById('wc-loc-box') 
-    };
-
-    if (!navigator.geolocation) {
-        alert('您的瀏覽器不支援定位');
-        return;
-    }
-
-    if(els.headerLoc) els.headerLoc.innerText = '定位中...';
-    if(els.titleBox) els.titleBox.innerHTML = '<span class="loading-dots">定位中</span>';
-
-    // 裝置判斷
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const useHighAccuracy = isMobile; 
-
-    const handleSuccess = async (position) => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        
-        try {
-            // A. 抓天氣
-            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
-            const weatherData = await weatherRes.json();
-            
-            const temp = weatherData.current_weather.temperature;
-            const code = weatherData.current_weather.weathercode;
-            const tempStr = `${Math.round(temp)}°C`;
-            
-            // -----------------------------------------------------------
-            // [新增] 背景特效連動 (我的位置)
-            // -----------------------------------------------------------
-            const header = document.querySelector('header');
-            header.classList.remove('weather-rain', 'weather-snow', 'weather-cloud');
-            
-            // 根據 WMO Code 判斷
-            if (code >= 71 && code <= 77) {
-                header.classList.add('weather-snow'); // 雪
-            } else if ((code >= 51 && code <= 67) || code >= 80) {
-                header.classList.add('weather-rain'); // 雨
-            } else if (code >= 1 && code <= 48) {
-                header.classList.add('weather-cloud'); // 雲/霧
-            }
-            // Code 0 (晴) 則維持原樣
-            // -----------------------------------------------------------
-
-            // B. AI 解析地名 (簡易版)
-            let displayZh = "我的位置";
-            try {
-                // 這裡為了反應速度，先嘗試用快取或內建對照，若無則顯示座標附近
-                // (完整版可呼叫 Gemini，但為了體驗流暢，這裡先顯示 '我的位置' 並嘗試背景翻譯)
-                // 若您原本有 AI 翻譯邏輯可保留，這裡簡化處理
-            } catch (e) {}
-
-            // C. 更新 UI
-            if(els.headerLoc) els.headerLoc.innerText = displayZh;
-            if(els.headerTemp) els.headerTemp.innerText = tempStr;
-            if(els.tabTemp) {
-                els.tabTemp.innerText = tempStr;
-                els.tabTemp.style.fontSize = '1.5rem';
-                els.tabTemp.style.color = '#1F2937';
-            }
-            
-            // 儲存資料
-            window.appCache = window.appCache || {};
-            window.appCache['my_location_combined'] = {
-                timestamp: Date.now(),
-                data: { temp: temp, city: displayZh, code: code }
+        function getLocalWeather() {
+            // 定義 UI 
+            const els = {
+                headerLoc: document.getElementById('header-my-loc'),
+                headerTemp: document.getElementById('header-my-temp'),
+                tabTemp: document.getElementById('wc-my-temp'),
+                titleBox: document.getElementById('wc-loc-box') 
             };
 
-            const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
-            if (targetTempStr !== '--°') updateComparison(parseFloat(targetTempStr));
+            // 1. 檢查瀏覽器支援
+            if (!navigator.geolocation) {
+                alert('您的瀏覽器不支援定位');
+                return;
+            }
 
-        } catch (e) {
-            console.error("處理失敗", e);
-            if(els.headerLoc) els.headerLoc.innerText = '連線失敗';
+            // UI 顯示
+            if(els.headerLoc) els.headerLoc.innerText = '定位中...';
+            if(els.titleBox) els.titleBox.innerHTML = '<span class="loading-dots">定位中</span>';
+
+            // 2. 判斷裝置類型：是手機嗎？
+            // 如果是 iPhone, Android 等行動裝置，isMobile 會是 true
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            // 策略：手機用 true (高精度)，電腦強制用 false (低精度，像 index_ai 一樣)
+            const useHighAccuracy = isMobile; 
+            
+            console.log(`裝置偵測: ${isMobile ? "手機 (啟用 GPS)" : "電腦 (使用 IP 定位)"}`);
+
+            // === 成功邏輯 ===
+            const handleSuccess = async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                
+                try {
+                    // A. 抓天氣 (加入 timezone=auto 以獲取精確時區)
+                    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
+                    const weatherData = await weatherRes.json();
+                    
+                    currentMyTemp = weatherData.current_weather.temperature;
+                    const tempStr = `${Math.round(currentMyTemp)}°C`;
+                    const code = weatherData.current_weather.weathercode;
+                    
+                    // [新增] 取得 API 回傳的當地時區 (例如 "Asia/Tokyo")
+                    const localTimezone = weatherData.timezone;
+                    
+                    // B. AI 解析地名
+                    let displayZh = "我的位置";
+                    try {
+                        // 提示詞
+                        const locationPrompt = `Task: Identify the specific district/township name for ${lat},${lon} (e.g., 竹北市, 新竹市東區, 博多區). Output ONLY the Traditional Chinese name.`;
+                        // 呼叫 AI (設定 10秒 超時)
+                        const aiPromise = getGeminiResponse(locationPrompt);
+                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 10000));
+                        const aiCity = await Promise.race([aiPromise, timeoutPromise]);
+                        if (aiCity) displayZh = aiCity.trim();
+                    } catch (e) {
+                        console.warn("AI 解析略過");
+                    }
+
+                    // C. 更新 UI
+                    if(els.headerLoc) els.headerLoc.innerText = displayZh;
+                    if(els.headerTemp) els.headerTemp.innerText = tempStr;
+                    if(els.tabTemp) {
+                        els.tabTemp.innerText = tempStr;
+                        els.tabTemp.style.fontSize = '1.5rem';
+                        els.tabTemp.style.color = '#1F2937';
+                    }
+                    if(els.titleBox) {
+                        els.titleBox.innerHTML = `
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                <svg class="icon-mini" style="color: #EF4444;" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <span>${displayZh}</span>
+                            </div>`;
+                    }
+                    
+                    // 存檔與比對
+                    window.appCache = window.appCache || {};
+                    window.appCache['my_location_combined'] = {
+                        timestamp: Date.now(),
+                        data: { 
+                            temp: currentMyTemp, 
+                            city: displayZh, 
+                            code: code,
+                            timezone: localTimezone // [新增] 儲存時區
+                        }
+                    };
+                    const targetTempStr = document.getElementById('wc-temp') ? document.getElementById('wc-temp').innerText : '--°';
+                    if (targetTempStr !== '--°') updateComparison(parseFloat(targetTempStr));
+
+                } catch (e) {
+                    console.error("處理失敗", e);
+                    if(els.headerLoc) els.headerLoc.innerText = '連線失敗';
+                }
+            };
+
+            // === 失敗處理 (只針對手機的高精度失敗進行降級) ===
+            const handleError = (err) => {
+                console.warn("定位失敗:", err.code, err.message);
+                
+                // 如果是手機嘗試高精度失敗了，再給它一次機會用低精度
+                if (useHighAccuracy) {
+                    console.log("手機 GPS 失敗，嘗試切換 IP 定位...");
+                    navigator.geolocation.getCurrentPosition(
+                        handleSuccess,
+                        (err2) => {
+                             alert("定位失敗，請確認手機定位服務已開啟。");
+                             if(els.headerLoc) els.headerLoc.innerText = '定位未開';
+                        },
+                        { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 }
+                    );
+                } else {
+                    // 電腦低精度如果也失敗，那就是真的被封鎖或沒網路了
+                    if(els.headerLoc) els.headerLoc.innerText = '無法定位';
+                    alert("電腦無法取得位置，請確認瀏覽器權限。");
+                }
+            };
+
+            // === 3. 開始執行 ===
+            // 這裡使用了變數 useHighAccuracy
+            // 電腦版：useHighAccuracy 為 false -> 行為等同 index_ai (不會報錯)
+            // 手機版：useHighAccuracy 為 true -> 行為等同 index (抓竹北)
+            navigator.geolocation.getCurrentPosition(
+                handleSuccess, 
+                handleError, 
+                { enableHighAccuracy: useHighAccuracy, timeout: 5000, maximumAge: 0 }
+            );
         }
-    };
-
-    const handleError = (err) => {
-        console.warn("定位失敗", err);
-        if (useHighAccuracy) {
-            navigator.geolocation.getCurrentPosition(handleSuccess, null, { enableHighAccuracy: false });
-        } else {
-            if(els.headerLoc) els.headerLoc.innerText = '無法定位';
-        }
-    };
-
-    navigator.geolocation.getCurrentPosition(
-        handleSuccess, 
-        handleError, 
-        { enableHighAccuracy: useHighAccuracy, timeout: 5000, maximumAge: 0 }
-    );
-}
 
         // --- Modal Functions (取代原生 alert/prompt) ---
         function openModal(msg) {
@@ -5668,6 +5769,11 @@ function compressImage(file, maxWidth, quality) {
                     header.classList.remove('is-night');
                     console.log(`[主題] 位於 (${lat},${lon})，目前是白天 ☀️`);
                 }
+
+                // ★★★ [插入這段] 設定完日夜後，強制重繪特效 ★★★
+                if (window.setWeatherEffect && window.currentWeatherIcon) {
+                    setWeatherEffect(window.currentWeatherIcon);
+                }
             } catch (e) {
                 console.warn("主題 API 連線失敗，切換為系統時間備案");
                 fallbackTheme();
@@ -5682,6 +5788,11 @@ function compressImage(file, maxWidth, quality) {
                 header.classList.add('is-night');
             } else {
                 header.classList.remove('is-night');
+            }
+
+            // ★★★ [插入這段] 備案模式也要重繪特效 ★★★
+            if (window.setWeatherEffect && window.currentWeatherIcon) {
+                setWeatherEffect(window.currentWeatherIcon);
             }
         };
 
@@ -6132,6 +6243,128 @@ function compressImage(file, maxWidth, quality) {
             btn.classList.remove('copied');
         }, 2000);
     }
+   // [新增] 定義一個全域變數來記住現在是什麼圖示 (預設 cloud)
+window.currentWeatherIcon = 'cloud'; 
+
+// [修改] 原本的 setWeatherEffect 函式
+function setWeatherEffect(iconType) {
+    // ★★★ [插入這行] 記住現在的天氣圖示，以便日夜切換後重繪 ★★★
+    window.currentWeatherIcon = iconType;
+
+    const header = document.querySelector('header');
+    const layer = document.getElementById('weather-effect-layer');
+    if (!header || !layer) return;
+
+    // 1. 重置所有天氣 class (保留 is-night)
+    header.classList.remove('w-sun', 'w-cloud', 'w-rain', 'w-snow', 'w-fog');
+    layer.innerHTML = ''; // 清空舊粒子
+
+    // 2. 根據圖示類型套用對應特效
+    // 對應您的 validIcons: 'sun', 'cloud', 'cloud-sun', 'snow', 'rain', 'fog', 'lightning'
+    
+    if (iconType === 'sun') {
+        header.classList.add('w-sun');
+        
+        // [修改] 檢查 Header 是否有 'is-night' 類別 (由 initDynamicTheme 控制)
+        if (header.classList.contains('is-night')) {
+            // ★ 情境 A：晴朗的晚上 -> 顯示寫實星空
+            let stars = '';
+            // 生成 60 顆隨機分佈的星星
+            for(let i=0; i<60; i++) {
+                const left = Math.floor(Math.random() * 100);     // 水平隨機
+                const top = Math.floor(Math.random() * 70);       // 集中在中上空 (0%~70%)
+                const size = (Math.random() * 2 + 1).toFixed(1);  // 大小 1px ~ 3px
+                const dur = (Math.random() * 3 + 1.5).toFixed(1); // 閃爍速度 1.5s ~ 4.5s (讓星星不要閃得太整齊)
+                const delay = (Math.random() * 2).toFixed(1);     // 隨機延遲入場
+                
+                stars += `<div class="star-particle" style="left:${left}%; top:${top}%; width:${size}px; height:${size}px; animation-duration:${dur}s; animation-delay:${delay}s;"></div>`;
+            }
+            layer.innerHTML = stars;
+        } else {
+            // ★ 情境 B：晴朗的白天 -> 顯示太陽光暈 (原本的代碼)
+            layer.innerHTML = '<div class="sun-glow"></div>';
+        }
+    }
+    else if (iconType === 'cloud' || iconType === 'cloud-sun') {
+        header.classList.add('w-cloud');
+        
+        const isNight = header.classList.contains('is-night');
+        
+        // [關鍵修改] 設定日夜不同的透明度
+        // 白天：雲朵不透明度高 (0.85)，看起來白白胖胖
+        // 晚上：雲朵不透明度低 (0.4)，看起來像夜空中的陰影
+        const mainOp = isNight ? 0.4 : 0.85; 
+        const bgOp = isNight ? 0.1 : 0.3;    // 背景大雲更淡
+        
+        let content = '';
+
+        // [新增] 如果是「晚上多雲」，在雲層後方加一點稀疏的星星
+        if (isNight) {
+            // 生成 15 顆星星 (比晴天的 60 顆少，營造被雲遮擋的感覺)
+            for(let i=0; i<15; i++) {
+                const left = Math.floor(Math.random() * 100);
+                const top = Math.floor(Math.random() * 80);
+                const size = (Math.random() * 2).toFixed(1);
+                // 閃爍速度設慢一點，營造寧靜感
+                const dur = (Math.random() * 3 + 3).toFixed(1); 
+                content += `<div class="star-particle" style="left:${left}%; top:${top}%; width:${size}px; height:${size}px; animation-duration:${dur}s; opacity: 0.6;"></div>`;
+            }
+        }
+
+        // 雲朵層 (HTML 結構不變，但 style 裡的 opacity 換成了變數)
+        content += `
+            <div class="cloud-shape" style="top: 5%; transform: scale(3); animation-duration: 20s; opacity: ${bgOp}; z-index: 1;"></div>
+            <div class="cloud-shape" style="top: 25%; transform: scale(1.8); animation-duration: 35s; animation-delay: -5s; opacity: ${mainOp};"></div>
+            <div class="cloud-shape" style="top: 45%; width: 140px; transform: scale(1.6); animation-duration: 45s; animation-delay: -20s; opacity: ${mainOp * 0.8};"></div>
+            <div class="cloud-shape" style="top: 65%; transform: scale(2.0); animation-duration: 60s; animation-delay: -10s; opacity: ${bgOp};"></div>
+            <div class="cloud-shape" style="top: 10%; transform: scale(0.8); animation-duration: 80s; animation-delay: -40s; opacity: ${bgOp};"></div>
+        `;
+        
+        layer.innerHTML = content;
+    }
+    else if (iconType === 'rain' || iconType === 'lightning') {
+        header.classList.add('w-rain');
+        // 生成 20 滴雨
+        let html = '';
+        for(let i=0; i<20; i++) {
+            const left = Math.floor(Math.random() * 100);
+            const delay = (Math.random()).toFixed(2);
+            const dur = (0.5 + Math.random() * 0.3).toFixed(2);
+            html += `<div class="rain-drop" style="left:${left}%; animation-delay:${delay}s; animation-duration:${dur}s;"></div>`;
+        }
+        layer.innerHTML = html;
+    }
+    else if (iconType === 'snow') {
+        header.classList.add('w-snow');
+        // [修改] 增加雪花數量 (15 -> 30) 並調整樣式
+        let html = '';
+        for(let i=0; i<30; i++) { // 數量變多
+            const left = Math.floor(Math.random() * 100);
+            const delay = (Math.random() * 5).toFixed(2);
+            // 讓雪花大小差異大一點 (3px ~ 8px)
+            const size = 3 + Math.floor(Math.random() * 6); 
+            // [關鍵] 這裡增加了 opacity: 0.9 讓它在淺色背景更清楚
+            html += `<div class="snow-flake" style="left:${left}%; width:${size}px; height:${size}px; animation-delay:${delay}s; opacity: 0.9;"></div>`;
+        }
+        layer.innerHTML = html;
+    }
+    else if (iconType === 'fog') {
+        header.classList.add('w-fog');
+        
+        const isNight = header.classList.contains('is-night');
+        
+        // [修正] 設定日夜透明度
+        // 白天 (0.8): 霧很濃，下方白白的
+        // 晚上 (0.2): 霧很薄，像一層薄紗，才不會讓夜空變成全白
+        const fogOp = isNight ? 0.5 : 0.8;
+        
+        // 使用剛剛新增的 CSS class "fog-layer"
+        layer.innerHTML = `<div class="fog-layer" style="opacity:${fogOp};"></div>`;
+    }
+    else {
+        header.classList.add('w-cloud'); // 預設
+    }
+}
     // --- PWA Service Worker Registration ---
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
