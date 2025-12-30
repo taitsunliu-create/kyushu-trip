@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -4306,9 +4307,10 @@ function getSmartAdviceText(temp, weatherCode) {
     ];
 
         const url = `https://places.googleapis.com/v1/places:searchNearby`;
-        const body = {
+      const body = {
             includedTypes: validTypes,
-            maxResultCount: 1, // 我們只需要最接近的那一個
+            maxResultCount: 1, // [修改] 受歡迎度第一，所以取 1 筆即可
+            rankPreference: "POPULARITY", // [修改] 改回依「受歡迎度」排序
             locationRestriction: {
                 circle: {
                     center: { latitude: centerLat, longitude: centerLng },
@@ -4415,10 +4417,25 @@ function getSmartAdviceText(temp, weatherCode) {
                         // 呼叫我們剛剛新增的輔助函式
                         const googlePlaces = await fetchGooglePlaces(lat, lon, 100); 
                         
-                        if (googlePlaces.length > 0 && googlePlaces[0].displayName) {
-                            locationName = googlePlaces[0].displayName.text;
-                            locationSource = "(Google)";
+                        // [修改] 條件：取用受歡迎度第一(Index 0) 的結果，並優先讀取其 Landmark
+                    if (googlePlaces.length > 0) {
+                        const place = googlePlaces[0];
+                        
+                        // 1. 優先檢查是否有「地標 (landmarks)」資訊
+                        if (place.addressDescriptor && 
+                            place.addressDescriptor.landmarks && 
+                            place.addressDescriptor.landmarks.length > 0) {
+                            
+                            // 取出第一個地標名稱 (例如：盛群半導體)
+                            locationName = place.addressDescriptor.landmarks[0].displayName.text;
+                            locationSource = "(Google地標)";
+                        } 
+                        // 2. 如果沒有地標，才使用原本的名稱
+                        else if (place.displayName) {
+                            locationName = place.displayName.text;
+                            locationSource = "(Google熱點)";
                         }
+                    }
                     }
 
                     // --- 第三關：OSM 門牌地址 (Fallback) ---
