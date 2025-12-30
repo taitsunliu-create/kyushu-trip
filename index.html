@@ -727,8 +727,12 @@
 }
 
 .weather-icon.snow {
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 10H4a7 7 0 1 1 7-7v.5'%3E%3C/path%3E%3Cpath d='M10 14a6 6 0 0 0-6-6'%3E%3C/path%3E%3Cline x1='12' y1='16' x2='12' y2='22'%3E%3C/line%3E%3Cline x1='12' y1='22' x2='9' y2='19'%3E%3C/line%3E%3Cline x1='12' y1='22' x2='15' y2='19'%3E%3C/line%3E%3Cline x1='18.5' y1='12' x2='22' y2='12'%3E%3C/line%3E%3Cline x1='22' y1='12' x2='19.5' y2='9.5'%3E%3C/line%3E%3Cline x1='22' y1='12' x2='19.5' y2='14.5'%3E%3C/line%3E%3Cline x1='5' y1='18.5' x2='2' y2='18.5'%3E%3C/line%3E%3Cline x1='2' y1='18.5' x2='4.5' y2='21'%3E%3C/line%3E%3Cline x1='2' y1='18.5' x2='4.5' y2='16'%3E%3C/line%3E%3Cline x1='17.5' y1='18.5' x2='20.5' y2='21'%3E%3C/line%3E%3Cline x1='17.5' y1='18.5' x2='20.5' y2='16'%3E%3C/line%3E%3C/svg%3E");
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 10H4a7 7 0 1 1 7-7v.5'%3E%3C/path%3E%3Cpath d='M10 14a6 6 0 0 0-6-6'%3E%3C/path%3E%3Cline x1='12' y1='16' x2='12' y2='22'%3E%3C/line%3E%3Cline x1='12' y1='22' x2='9' y2='19'%3E%3C/line%3E%3Cline x1='12' y1='22' x2='15' y2='19'%3E%3C/line%3E%3Cline x1='18.5' y1='12' x2='22' y2='12'%3E%3C/line%3E%3Cline x1='22' y1='12' x2='19.5' y2='9.5'%3E%3C/line%3E%3Cline x1='22' y1='12' x2='19.5' y2='14.5'%3E%3C/line%3E%3Cline x1='5' y1='18.5' x2='2' y2='18.5'%3E%3C/line%3E%3Cline x1='2' y1='18.5' x2='4.5' y2='21'%3E%3C/line%3E%3Cline x1='2' y1='18.5' x2='4.5' y2='16'%3E%3C/line%3E%3Cline x1='17.5' y1='18.5' x2='20.5' y2='21'%3E%3C/line%3E%3Cline x1='17.5' y1='18.5' x2='20.5' y2='16'%3E%3C/line%3E%3C/svg%3E");
+    /* [V3 精修版] 
+       1. 骨架縮短，剛好接上 V 型尖端
+       2. V 型尖端指向中心，形成 Y 字分岔效果
+    */
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 1. 主骨架 (縮短至半徑9，預留空間給箭頭) --%3E%3Cpath d='M12 3v18'/%3E%3Cpath d='M4.2 16.5 L19.8 7.5'/%3E%3Cpath d='M4.2 7.5 L19.8 16.5'/%3E%3C!-- 2. 中央六角形 (不變) --%3E%3Cpath d='M12 7l4.33 2.5v5l-4.33 2.5-4.33-2.5v-5z'/%3E%3C!-- 3. V型箭頭 (尖端接在骨架末端，向外張開) --%3E%3Cpath d='M10 1 L12 3 L14 1'/%3E%3Cpath d='M20.5 4.8 L19.8 7.5 L22.5 8.2'/%3E%3Cpath d='M22.5 15.8 L19.8 16.5 L20.5 19.2'/%3E%3Cpath d='M14 23 L12 21 L10 23'/%3E%3Cpath d='M3.5 19.2 L4.2 16.5 L1.5 15.8'/%3E%3Cpath d='M1.5 8.2 L4.2 7.5 L3.5 4.8'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 1. 主骨架 (縮短至半徑9，預留空間給箭頭) --%3E%3Cpath d='M12 3v18'/%3E%3Cpath d='M4.2 16.5 L19.8 7.5'/%3E%3Cpath d='M4.2 7.5 L19.8 16.5'/%3E%3C!-- 2. 中央六角形 (不變) --%3E%3Cpath d='M12 7l4.33 2.5v5l-4.33 2.5-4.33-2.5v-5z'/%3E%3C!-- 3. V型箭頭 (尖端接在骨架末端，向外張開) --%3E%3Cpath d='M10 1 L12 3 L14 1'/%3E%3Cpath d='M20.5 4.8 L19.8 7.5 L22.5 8.2'/%3E%3Cpath d='M22.5 15.8 L19.8 16.5 L20.5 19.2'/%3E%3Cpath d='M14 23 L12 21 L10 23'/%3E%3Cpath d='M3.5 19.2 L4.2 16.5 L1.5 15.8'/%3E%3Cpath d='M1.5 8.2 L4.2 7.5 L3.5 4.8'/%3E%3C/svg%3E");
 }
 
 .weather-icon.rain {
@@ -1495,18 +1499,39 @@ header.is-night {
     to { transform: translateY(400px); }
 }
 
-/* [雪花] */
+/* [雪花 - SVG 精緻版] */
 .snow-flake {
     position: absolute;
-    background: #FFF;
-    border-radius: 50%;
-    opacity: 0.8;
-    top: -10px;
-    animation: snow-fall 5s linear infinite; /* 加上了 5s */
+    /* 1. 移除原本的白色背景與圓角 */
+    /* background: #FFF; */ 
+    /* border-radius: 50%; */
+    
+    /* 2. 改用 SVG 雪花圖案 (Base64編碼) */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 1. 主骨架 --%3E%3Cpath d='M12 3v18'/%3E%3Cpath d='M4.2 16.5 L19.8 7.5'/%3E%3Cpath d='M4.2 7.5 L19.8 16.5'/%3E%3C!-- 2. 六角形 --%3E%3Cpath d='M12 7l4.33 2.5v5l-4.33 2.5-4.33-2.5v-5z'/%3E%3C!-- 3. V型箭頭 (尖端對接，向外張開) --%3E%3Cpath d='M10 1 L12 3 L14 1'/%3E%3Cpath d='M20.5 4.8 L19.8 7.5 L22.5 8.2'/%3E%3Cpath d='M22.5 15.8 L19.8 16.5 L20.5 19.2'/%3E%3Cpath d='M14 23 L12 21 L10 23'/%3E%3Cpath d='M3.5 19.2 L4.2 16.5 L1.5 15.8'/%3E%3Cpath d='M1.5 8.2 L4.2 7.5 L3.5 4.8'/%3E%3C/svg%3E");
+    /* 3. 設定背景模式 */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent; /* 確保背景透明 */
+
+    opacity: 0.9;
+    top: -20px; /* 稍微往上移，避免一開始就露餡 */
+    
+    /* 4. 加入旋轉動畫 (讓雪花邊掉邊轉，更真實) */
+    animation: snow-fall-rotate 5s linear infinite; 
 }
-@keyframes snow-fall {
-    0% { transform: translateY(0) translateX(0); opacity: 0.8; }
-    100% { transform: translateY(300px) translateX(20px); opacity: 0; }
+
+/* [新增] 雪花飄落 + 自轉動畫 */
+@keyframes snow-fall-rotate {
+    0% { 
+        transform: translateY(0) translateX(0) rotate(0deg); 
+        opacity: 0.9; 
+    }
+    100% { 
+        /* 往下掉 300px + 往右飄 20px + 自轉 360度 */
+        transform: translateY(400px) translateX(30px) rotate(360deg); 
+        opacity: 0; 
+    }
 }
 
 /* [雲朵飄動] */
@@ -4227,7 +4252,7 @@ function getSmartAdviceText(temp, weatherCode) {
             sun: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>',
             cloud: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>',
             rain: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 13v8"></path><path d="M8 13v8"></path><path d="M12 15v8"></path><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path></svg>',
-            snow: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 10H4a7 7 0 1 1 7-7v.5"></path><path d="M10 14a6 6 0 0 0-6-6"></path><line x1="12" y1="16" x2="12" y2="22"></line><line x1="12" y1="22" x2="9" y2="19"></line><line x1="12" y1="22" x2="15" y2="19"></line><line x1="18.5" y1="12" x2="22" y2="12"></line><line x1="22" y1="12" x2="19.5" y2="9.5"></line><line x1="22" y1="12" x2="19.5" y2="14.5"></line><line x1="5" y1="18.5" x2="2" y2="18.5"></line><line x1="2" y1="18.5" x2="4.5" y2="21"></line><line x1="2" y1="18.5" x2="4.5" y2="16"></line><line x1="17.5" y1="18.5" x2="20.5" y2="21"></line><line x1="17.5" y1="18.5" x2="20.5" y2="16"></line></svg>',
+            snow: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M4.2 16.5 L19.8 7.5"/><path d="M4.2 7.5 L19.8 16.5"/><path d="M12 7l4.33 2.5v5l-4.33 2.5-4.33-2.5v-5z"/><path d="M10 1 L12 3 L14 1"/><path d="M20.5 4.8 L19.8 7.5 L22.5 8.2"/><path d="M22.5 15.8 L19.8 16.5 L20.5 19.2"/><path d="M14 23 L12 21 L10 23"/><path d="M3.5 19.2 L4.2 16.5 L1.5 15.8"/><path d="M1.5 8.2 L4.2 7.5 L3.5 4.8"/></svg>',
             fog: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6h14M4 10h16M6 14h12M4 18h16"></path></svg>',
             lightning: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"></path><polyline points="13 11 9 17 15 17 11 23"></polyline></svg>'
         };
