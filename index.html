@@ -243,6 +243,88 @@
         .calc-input:focus { border-color: #F59E0B; }
         .calc-label { font-weight: 600; color: #4B5563; }
 
+/* [新增] 筆記區升級 - 支援圖文混排與放大 */
+        .note-editable-box {
+            width: 100%;
+            height: 250px;
+            padding: 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 1rem;
+            overflow-y: auto;
+            background: #F9FAFB;
+            outline: none;
+            text-align: left;
+            white-space: pre-wrap; /* 保留換行 */
+        }
+        .note-editable-box:focus { border-color: var(--primary); background: white; }
+        
+        /* 筆記內的圖片樣式 */
+        .note-editable-box img {
+            max-width: 90%;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: block;
+            border: 2px solid #E5E7EB;
+            cursor: zoom-in; /* [關鍵] 讓滑鼠移過去變成放大鏡，提示可點擊 */
+        }
+
+        /* 筆記工具列 */
+        .note-toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .btn-note-tool {
+            background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE;
+            padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+            display: flex; align-items: center; gap: 4px;
+        }
+        /* [新增] 動態日夜背景特效 */
+        header {
+            /* 預設(白天): 原本的明亮藍色漸層 */
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            transition: background 1.5s ease; /* 顏色切換時有呼吸感 */
+            overflow: hidden; /* 防止星星超出範圍 */
+            position: relative; /* 確保特效層定位正確 */
+        }
+
+        /* 晚上的背景: 深邃的午夜藍 */
+        header.is-night {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+        }
+
+        /* 星星層 (預設隱藏) */
+        .header-bg-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 確保不擋住按鈕點擊 */
+            z-index: 0; /* 在內容之下 */
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            
+            /* 利用 CSS 徑向漸層畫出星星 */
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+        }
+
+        /* 晚上時顯示星星 */
+        header.is-night .header-bg-effect {
+            opacity: 0.8; 
+        }
+
+        /* 確保原本的標題內容浮在星星之上 */
+        .header-content {
+            position: relative;
+            z-index: 2; 
+        }
 /* --- 插入結束 --- */
 
         .float-note-btn:active { transform: scale(0.95); }
@@ -1451,9 +1533,11 @@
         </defs>
     </svg>
     <header>
-        <div class="header-content">
-            <div class="header-title-area">
-                <h1>九州親子自駕遊</h1>
+    <div class="header-bg-effect"></div>
+
+    <div class="header-content">
+        <div class="header-title-area">
+            <h1>九州親子自駕遊</h1>
                 <div class="subtitle">2026/01/25 - 01/30 (6天5夜)</div>
                 <div class="badge-trip">親子自由行 • 熊本進福岡出</div>
             </div>
@@ -1504,9 +1588,12 @@
                     行前準備 Check List
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <div class="tag tag-tip" id="checklist-progress" style="background:#FFFBEB; color:#D97706; font-weight:700;">計算中...</div>
-                    <div class="toggle-icon" style="font-size: 0.8rem; color: #6B7280; font-weight: 700; transition: transform 0.3s;">▼</div>
-                </div>
+                <button onclick="resetChecklist(event)" style="border:none; background:none; color:#9CA3AF; font-size:0.8rem; cursor:pointer; text-decoration:underline;">
+                    ↺ 重置
+                </button>
+                <div class="tag tag-tip" id="checklist-progress" style="background:#FFFBEB; color:#D97706; font-weight:700;">計算中...</div>
+                <div class="toggle-icon" style="font-size: 0.8rem; color: #6B7280; font-weight: 700; transition: transform 0.3s;">▼</div>
+            </div>
             </div>
             
             <div id="checklist-container" class="checklist-container">
@@ -3273,13 +3360,23 @@
             <div class="modal-title" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
                 <span style="display:flex; align-items:center; gap:6px;">
                     <svg class="icon-mini" style="color:#2563EB;" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                    隨身筆記
+                    隨身圖文筆記
                 </span>
                 <span id="note-status" style="font-size:0.75rem; color:#10B981; font-weight:normal;"></span>
             </div>
-            <textarea id="note-area" style="width:100%; height:200px; padding:12px; border:1px solid #E5E7EB; border-radius:8px; font-size:1rem; resize:none; outline:none; font-family:inherit; background:#F9FAFB;" placeholder="在這裡記下想記錄的事... (自動儲存)"></textarea>
+            
+            <div class="note-toolbar">
+                <button class="btn-note-tool" onclick="document.getElementById('note-img-input').click()">
+                    <svg class="icon-mini" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    插入照片
+                </button>
+                <input type="file" id="note-img-input" accept="image/*" style="display:none;" onchange="insertNoteImage(event)">
+            </div>
+
+            <div id="note-area" class="note-editable-box" contenteditable="true" placeholder="在這裡記下停車位號碼、照片..."></div>
+            
             <div class="modal-btns" style="margin-top:15px;">
-                <button class="modal-btn btn-confirm" onclick="closeNoteModal()">關閉</button>
+                <button class="modal-btn btn-confirm" onclick="closeNoteModal()">關閉 (自動儲存)</button>
             </div>
         </div>
     </div>
@@ -4157,6 +4254,7 @@ function getSmartAdviceText(temp, weatherCode) {
             document.getElementById('location-modal').style.display = 'none';
         }
         // [新增] 隨身筆記功能 (自動儲存)
+       // [修改] 隨身筆記功能 (支援圖文儲存 + 點擊放大)
         const NOTE_STORAGE_KEY = 'kyushu_trip_note_2026';
 
         function openNoteModal() {
@@ -4164,21 +4262,73 @@ function getSmartAdviceText(temp, weatherCode) {
             const area = document.getElementById('note-area');
             const status = document.getElementById('note-status');
             
-            // 1. 讀取舊筆記
-            area.value = localStorage.getItem(NOTE_STORAGE_KEY) || '';
+            // 1. 讀取舊筆記 (改用 innerHTML 讀取 HTML 格式)
+            area.innerHTML = localStorage.getItem(NOTE_STORAGE_KEY) || '';
             status.innerText = '';
             
             modal.style.display = 'flex';
             
-            // 2. 綁定輸入事件 (即時自動儲存)
+            // 2. 綁定輸入事件 (即時自動儲存 HTML)
             area.oninput = function() {
-                localStorage.setItem(NOTE_STORAGE_KEY, area.value);
-                status.innerText = '已自動儲存 ✓';
+                saveNoteContent();
             };
+
+            // [關鍵新增] 3. 綁定圖片點擊事件 (事件委派)
+            // 讓筆記內任何圖片被點擊時，都會觸發全螢幕燈箱
+            area.onclick = function(e) {
+                if (e.target.tagName === 'IMG') {
+                    openLightbox(e.target.src); // 呼叫原本已寫好的燈箱功能
+                }
+            };
+        }
+
+        function saveNoteContent() {
+            const area = document.getElementById('note-area');
+            const status = document.getElementById('note-status');
+            
+            // 儲存整個 HTML (含圖片 Base64)
+            localStorage.setItem(NOTE_STORAGE_KEY, area.innerHTML);
+            status.innerText = '已自動儲存 ✓';
         }
 
         function closeNoteModal() {
             document.getElementById('note-modal').style.display = 'none';
+        }
+
+        // [新增] 處理筆記插入圖片
+        async function insertNoteImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const area = document.getElementById('note-area');
+            const status = document.getElementById('note-status');
+            status.innerText = '圖片處理中...';
+
+            try {
+                // 1. 強力壓縮圖片 (寬度 600px, 品質 0.6)
+                // 使用您程式碼底部原本就有的 compressImage 函式
+                const base64 = await compressImage(file, 600, 0.6);
+                
+                // 2. 建立圖片元素
+                const img = document.createElement('img');
+                img.src = `data:image/jpeg;base64,${base64}`;
+                
+                // 3. 插入圖片
+                area.focus(); // 確保焦點
+                area.appendChild(document.createElement('br')); // 換行
+                area.appendChild(img);
+                area.appendChild(document.createElement('br')); // 換行
+                
+                // 4. 觸發儲存
+                saveNoteContent();
+                
+            } catch (e) {
+                alert("圖片插入失敗：" + e);
+                status.innerText = '失敗';
+            } finally {
+                // 清空 input，確保下一張同名圖片也能觸發
+                event.target.value = '';
+            }
         }
 /* --- 在 function closeNoteModal() { ... } 結束後插入 --- */
 
@@ -5291,7 +5441,33 @@ function resetShareButton(btn) {
                 renderChecklist();
             }
         }
+// [新增] 重置檢查清單 (恢復預設值)
+        function resetChecklist(event) {
+            event.stopPropagation(); // 阻止冒泡，避免觸發折疊
+            
+            if (!confirm("確定要重置清單嗎？\n\n這將會：\n1. 清除所有勾選狀態\n2. 刪除您自訂的新增項目\n3. 恢復為原始預設清單")) {
+                return;
+            }
 
+            // 恢復為預設項目 (使用深拷貝，避免汙染原始 defaultItems)
+            checklistData = JSON.parse(JSON.stringify(defaultItems));
+            
+            // 重新渲染並儲存
+            renderChecklist();
+            
+            // 如果清單目前是收合的，自動展開讓使用者看到結果
+            const container = document.getElementById('checklist-container');
+            const icon = document.querySelector('.checklist-card-header .toggle-icon');
+            if (container && !container.classList.contains('show')) {
+                container.classList.add('show');
+                if(icon) {
+                    icon.style.transform = 'rotate(180deg)';
+                    icon.style.color = '#2563EB';
+                }
+            }
+            
+            alert("清單已重置完成！");
+        }
         // 折疊/展開控制
         function toggleChecklist(headerEl) {
             const container = document.getElementById('checklist-container');
@@ -5425,6 +5601,74 @@ function compressImage(file, maxWidth, quality) {
     });
 }
         document.addEventListener('DOMContentLoaded', () => {
+            // [新增] 依據 GPS 位置自動判斷日夜 (支援跨時區)
+    function initDynamicTheme() {
+        const header = document.querySelector('header');
+        
+        // 定義成功時的邏輯
+        const applyTheme = async (lat, lon) => {
+            try {
+                // 呼叫 API，傳入當下座標，API 會根據經緯度與天文時間自動計算
+                // current_weather=true 包含 is_day (1=白天, 0=黑夜)
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+                
+                // 嘗試讀取快取以節省流量 (與天氣功能共用快取系統)
+                const cacheKey = `theme_status_${lat.toFixed(1)}_${lon.toFixed(1)}`;
+                let isDay = CACHE_SYSTEM.get(cacheKey);
+
+                if (isDay === null) {
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    isDay = data.current_weather.is_day;
+                    // 存入快取 30 分鐘
+                    CACHE_SYSTEM.save(cacheKey, isDay, 30);
+                }
+
+                // 切換樣式：0 代表黑夜，1 代表白天
+                if (isDay === 0) {
+                    header.classList.add('is-night');
+                    console.log(`[主題] 位於 (${lat},${lon})，目前是夜晚 🌙`);
+                } else {
+                    header.classList.remove('is-night');
+                    console.log(`[主題] 位於 (${lat},${lon})，目前是白天 ☀️`);
+                }
+            } catch (e) {
+                console.warn("主題 API 連線失敗，切換為系統時間備案");
+                fallbackTheme();
+            }
+        };
+
+        // 備案邏輯：如果沒開 GPS 或 API 失敗，改用手機系統時間
+        const fallbackTheme = () => {
+            const hour = new Date().getHours();
+            // 簡單判斷：晚上 6 點後或早上 6 點前為夜晚
+            if (hour >= 18 || hour < 6) {
+                header.classList.add('is-night');
+            } else {
+                header.classList.remove('is-night');
+            }
+        };
+
+        // 開始執行定位
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    // 成功取得位置，使用 API 精準判斷
+                    applyTheme(position.coords.latitude, position.coords.longitude);
+                },
+                (error) => {
+                    console.log("無法取得位置，使用時間備案");
+                    fallbackTheme();
+                },
+                { timeout: 5000 }
+            );
+        } else {
+            fallbackTheme();
+        }
+    }
+
+    // 啟動主題偵測
+    initDynamicTheme();
         // [新增] 圖片處理與壓縮邏輯
         
             // --- 智慧自動展開邏輯開始 ---
