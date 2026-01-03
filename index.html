@@ -244,8 +244,138 @@
         .calc-input { width: 60%; padding: 10px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1.2rem; text-align: right; outline: none; }
         .calc-input:focus { border-color: #F59E0B; }
         .calc-label { font-weight: 600; color: #4B5563; }
+/* [新增] 計算機專用樣式 (Calculator Style) */
+        .calc-display {
+            background: #F3F4F6;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: right;
+            margin-bottom: 15px;
+            border: 2px solid #E5E7EB;
+        }
+        .calc-expr {
+            font-size: 0.9rem;
+            color: #6B7280;
+            min-height: 1.2em;
+            margin-bottom: 5px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .calc-main {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1F2937;
+            line-height: 1.2;
+        }
+        .calc-sub {
+            font-size: 1rem;
+            color: #059669; 
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        
+        .calc-keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px; /* 稍微增加間距讓陰影更清楚 */
+        }
+        
+        /* 按鈕基礎樣式 - 優化陰影與質感 */
+        .calc-btn {
+            background: white;
+            border: 1px solid #F3F4F6; /* 極淡的邊框 */
+            border-radius: 14px;       /* 更圓潤 */
+            padding: 15px 0;
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            
+            /* [修改] 更自然的柔和浮起陰影 */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03), 0 2px 4px rgba(0,0,0,0.04);
+            transition: all 0.1s ease;
+            -webkit-user-select: none;
+               -moz-user-select: none;
+                    user-select: none;
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 按下時的凹陷感 */
+        .calc-btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            background: #F9FAFB;
+        }
 
-/* [新增] 筆記區升級 - 支援圖文混排與放大 */
+        /* 功能鍵顏色 */
+        .calc-btn.op { 
+            color: #2563EB; 
+            background: #EFF6FF; 
+            font-weight: 600;
+        }
+        .calc-btn.ac { 
+            color: #DC2626; 
+            background: #FEF2F2; 
+            font-weight: 600;
+        }
+
+        /* [修改] 等號按鍵 - 直式排列 (放在 + 號下方) */
+        .calc-btn.eq { 
+            background: #2563EB; 
+            color: white; 
+            grid-row: span 2;  /* 垂直跨兩行 */
+            grid-column: 4;    /* 固定在第4欄 */
+            border: none;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); /* 藍色光暈 */
+            font-size: 1.5rem;
+        }
+        .calc-btn.eq:active {
+            background: #1D4ED8;
+            transform: scale(0.96);
+        }
+
+        /* [修改] 0號按鍵 - 橫跨兩欄 */
+        .calc-btn.zero {
+            grid-column: span 2; /* 水平跨兩欄 */
+            text-align: left;
+            padding-left: 25px;  /* 數字稍微靠左一點比較像真計算機 */
+            justify-content: flex-start;
+        }
+
+        /* [修改] 右上角關閉 X 按鈕樣式 - 無底色並調整位置 */
+        .btn-modal-close-x {
+            position: absolute;
+            top: 5px;            /* [修改] 數值越小越往上 */
+            right: 5px;          /* [修改] 數值越小越往右 */
+            width: 32px;
+            height: 32px;
+            background: transparent; /* [修改] 變為透明背景 */
+            color: #9CA3AF;       /* [微調] 稍微調淡一點的灰色，比較不搶眼 */
+            border: none;
+            font-size: 1.8rem;    /* [微調] 加大字體，讓無底色的 X 更清晰 */
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        
+        /* [修改] 滑鼠移入和按下時給予輕微的回饋 */
+        .btn-modal-close-x:hover {
+            color: #4B5563; /* 滑入時變深灰色 */
+        }
+        .btn-modal-close-x:active {
+            background: rgba(0, 0, 0, 0.05); /* 按下時出現淡淡的圓形背景 */
+            border-radius: 50%;
+            transform: scale(0.9);
+            color: #1F2937;
+        }
+        /* [新增] 筆記區升級 - 支援圖文混排與放大 */
         .note-editable-box {
             width: 100%;
             height: 250px;
@@ -357,6 +487,25 @@
                  user-select: none;
         }
         .float-share-btn:active { transform: scale(0.95); }
+        /* --- 請在此處插入代碼 Start --- */
+        .share-cancel-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px; height: 24px;
+            background: #9CA3AF; color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 20;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .share-cancel-badge:active { transform: scale(0.9); background: #6B7280; }
+        /* --- 請在此處插入代碼 End --- */
         .float-share-btn svg { width: 20px; height: 20px; stroke-width: 2.5; }
         
 .header-title-area .badge-trip::before {
@@ -726,13 +875,10 @@
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2v2'%3E%3C/path%3E%3Cpath d='m4.93 4.93 1.41 1.41'%3E%3C/path%3E%3Cpath d='M20 12h2'%3E%3C/path%3E%3Cpath d='m19.07 4.93-1.41 1.41'%3E%3C/path%3E%3Cpath d='M15.947 12.65a4 4 0 0 0-5.925-4.128'%3E%3C/path%3E%3Cpath d='M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z'%3E%3C/path%3E%3C/svg%3E");
 }
 
+/* [修改] Header 天氣圖示：使用新的雙重平行 V 型雪花 */
 .weather-icon.snow {
-    /* [V3 精修版] 
-       1. 骨架縮短，剛好接上 V 型尖端
-       2. V 型尖端指向中心，形成 Y 字分岔效果
-    */
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 1. 主骨架 (縮短至半徑9，預留空間給箭頭) --%3E%3Cpath d='M12 3v18'/%3E%3Cpath d='M4.2 16.5 L19.8 7.5'/%3E%3Cpath d='M4.2 7.5 L19.8 16.5'/%3E%3C!-- 2. 中央六角形 (不變) --%3E%3Cpath d='M12 7l4.33 2.5v5l-4.33 2.5-4.33-2.5v-5z'/%3E%3C!-- 3. V型箭頭 (尖端接在骨架末端，向外張開) --%3E%3Cpath d='M10 1 L12 3 L14 1'/%3E%3Cpath d='M20.5 4.8 L19.8 7.5 L22.5 8.2'/%3E%3Cpath d='M22.5 15.8 L19.8 16.5 L20.5 19.2'/%3E%3Cpath d='M14 23 L12 21 L10 23'/%3E%3Cpath d='M3.5 19.2 L4.2 16.5 L1.5 15.8'/%3E%3Cpath d='M1.5 8.2 L4.2 7.5 L3.5 4.8'/%3E%3C/svg%3E");
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 1. 主骨架 (縮短至半徑9，預留空間給箭頭) --%3E%3Cpath d='M12 3v18'/%3E%3Cpath d='M4.2 16.5 L19.8 7.5'/%3E%3Cpath d='M4.2 7.5 L19.8 16.5'/%3E%3C!-- 2. 中央六角形 (不變) --%3E%3Cpath d='M12 7l4.33 2.5v5l-4.33 2.5-4.33-2.5v-5z'/%3E%3C!-- 3. V型箭頭 (尖端接在骨架末端，向外張開) --%3E%3Cpath d='M10 1 L12 3 L14 1'/%3E%3Cpath d='M20.5 4.8 L19.8 7.5 L22.5 8.2'/%3E%3Cpath d='M22.5 15.8 L19.8 16.5 L20.5 19.2'/%3E%3Cpath d='M14 23 L12 21 L10 23'/%3E%3Cpath d='M3.5 19.2 L4.2 16.5 L1.5 15.8'/%3E%3Cpath d='M1.5 8.2 L4.2 7.5 L3.5 4.8'/%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 六角冰核 --%3E%3Cpath d='M12 9 L14.6 10.5 L14.6 13.5 L12 15 L9.4 13.5 L9.4 10.5 Z'/%3E%3C!-- 主幹貫穿 --%3E%3Cpath d='M12 9 V1 M12 15 V23 M14.6 10.5 L21.5 6.5 M14.6 13.5 L21.5 17.5 M9.4 13.5 L2.5 17.5 M9.4 10.5 L2.5 6.5'/%3E%3C!-- 雙重 V 型 --%3E%3Cpath d='M9.5 5.5 L12 7.5 L14.5 5.5 M9.5 2 L12 4 L14.5 2'/%3E%3Cpath d='M9.5 18.5 L12 16.5 L14.5 18.5 M9.5 22 L12 20 L14.5 22'/%3E%3Cpath d='M16.4 6.6 L15.9 9.75 L18.9 10.9 M19.4 4.8 L18.9 8 L21.9 9.2'/%3E%3Cpath d='M18.9 13.1 L15.9 14.25 L16.4 17.4 M21.9 14.8 L18.9 16 L19.4 19.2'/%3E%3Cpath d='M7.6 17.4 L8.1 14.25 L5.1 13.1 M4.6 19.2 L5.1 16 L2.1 14.8'/%3E%3Cpath d='M5.1 10.9 L8.1 9.75 L7.6 6.6 M2.1 9.2 L5.1 8 L4.6 4.8'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 六角冰核 --%3E%3Cpath d='M12 9 L14.6 10.5 L14.6 13.5 L12 15 L9.4 13.5 L9.4 10.5 Z'/%3E%3C!-- 主幹貫穿 --%3E%3Cpath d='M12 9 V1 M12 15 V23 M14.6 10.5 L21.5 6.5 M14.6 13.5 L21.5 17.5 M9.4 13.5 L2.5 17.5 M9.4 10.5 L2.5 6.5'/%3E%3C!-- 雙重 V 型 --%3E%3Cpath d='M9.5 5.5 L12 7.5 L14.5 5.5 M9.5 2 L12 4 L14.5 2'/%3E%3Cpath d='M9.5 18.5 L12 16.5 L14.5 18.5 M9.5 22 L12 20 L14.5 22'/%3E%3Cpath d='M16.4 6.6 L15.9 9.75 L18.9 10.9 M19.4 4.8 L18.9 8 L21.9 9.2'/%3E%3Cpath d='M18.9 13.1 L15.9 14.25 L16.4 17.4 M21.9 14.8 L18.9 16 L19.4 19.2'/%3E%3Cpath d='M7.6 17.4 L8.1 14.25 L5.1 13.1 M4.6 19.2 L5.1 16 L2.1 14.8'/%3E%3Cpath d='M5.1 10.9 L8.1 9.75 L7.6 6.6 M2.1 9.2 L5.1 8 L4.6 4.8'/%3E%3C/svg%3E");
 }
 
 .weather-icon.rain {
@@ -895,11 +1041,18 @@
             display: none; justify-content: center; align-items: center;
             backdrop-filter: blur(3px);
             animation: fadeIn 0.2s;
+            cursor: pointer; /* [新增] 這行是關鍵！讓手機知道背景可點擊 */
         }
         .modal-box {
-            background: white; width: 90%; max-width: 320px;
+            /* [修改] 改為偏白毛玻璃質感 */
+            background: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); /* 支援 iOS Safari */
+            border: 1px solid rgba(255, 255, 255, 0.6); /* 玻璃邊緣反光感 */
+            
+            width: 90%; max-width: 320px;
             border-radius: 16px; padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15); /* 加深陰影增加層次 */
             text-align: center;
             transform: scale(0.95);
             animation: popIn 0.2s forwards;
@@ -1445,7 +1598,245 @@
     letter-spacing: 1px;
 }
 /* --- [新增] 住宿頁面優化樣式 End --- */
-  /* --- [新增] iOS 天氣動態特效 (仿 iPhone 天氣) --- */
+/* --- [新增] 詳細天氣 Modal 樣式 --- */
+/* 請確認並修改 .weather-detail-scroll 的內容 */
+.weather-detail-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding: 10px 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    
+    /* 👇 這是原本就有的，確保 iOS 滑動順暢 */
+    -webkit-overflow-scrolling: touch; 
+    
+    /* 👇 [新增] 限制捲動行為，防止連鎖反應帶動父層 */
+    overscroll-behavior-x: contain; 
+    
+    /* 👇 [新增] 讓滑鼠游標變更，提示可抓取 */
+    cursor: grab;
+}
+
+/* (同時建議在下方加入這行，隱藏醜醜的捲軸但保留功能) */
+.weather-detail-scroll::-webkit-scrollbar {
+    display: none; 
+}
+/* [修改] 小時預報排版：時間 -> Icon -> 狀態 -> 氣溫 */
+.wd-hour-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px; /* 稍微加寬以容納文字 */
+    font-size: 0.85rem;
+    color: #4B5563;
+    gap: 4px; /* 元素間距 */
+    padding: 5px 0;
+}
+.wd-hour-time { 
+    font-size: 0.85rem; 
+    opacity: 0.9; 
+    font-weight: 500;
+}
+.wd-hour-icon svg { 
+    width: 28px; /* Icon稍微放大 */
+    height: 28px; 
+}
+/* [新增] 天氣狀態文字 (如: 降雪, 多雲) */
+.wd-hour-desc {
+    font-size: 0.75rem;
+    color: #6B7280;
+    font-weight: 500;
+    white-space: nowrap; /* 不換行 */
+}
+.wd-hour-temp { 
+    font-weight: 700; 
+    color: #1F2937; 
+    font-size: 1.1rem; /* 氣溫放大 */
+}
+/* 隱藏原本的降雨機率 */
+.wd-hour-pop { display: none; }
+/* --- [修改] 未來預報列表優化 (垂直日期 + 固定圖示寬度) --- */
+.wd-daily-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0; /* 增加間距讓手指好點 */
+    border-bottom: 1px dashed #eee;
+    font-size: 0.95rem;
+}
+
+/* 1. 日期欄位：改為垂直排列 (今天在上，日期在下) */
+.wd-day-name { 
+    width: 60px; 
+    font-weight: 600; 
+    color: #374151;
+    display: flex;
+    flex-direction: column; /* 關鍵：讓文字換行排列 */
+    justify-content: center;
+    line-height: 1.2;
+}
+.wd-day-name span {
+    font-size: 0.75rem; 
+    color: #999; 
+    font-weight: 400;
+    margin-top: 2px;
+}
+
+/* 2. 圖示欄位：強制固定大小，防止被擠扁 */
+.wd-day-icon { 
+    width: 48px; 
+    height: 32px; 
+    text-align: center; 
+    flex-shrink: 0; /* [關鍵修正] 禁止瀏覽器壓縮此區塊 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.wd-day-icon svg {
+    width: 32px;
+    height: 32px;
+    /* 移除預設顏色，改由 SVG 內部的漸層控制 */
+}
+
+/* 3. 降雨機率：移除水滴圖示，只留數字，改為靠左 */
+.wd-day-pop { 
+    width: 45px; 
+    font-size: 0.8rem; 
+    color: #60A5FA; /* 淺藍色 */
+    font-weight: 600; 
+    text-align: left; 
+    margin-left: 6px;
+}
+
+/* 4. 氣溫：改為 Flex 佈局 + 固定寬度，解決對齊問題 */
+        .wd-day-temp { 
+            flex: 1; 
+            display: flex;             /* [修改] 啟用 Flexbox */
+            justify-content: flex-end; /* [修改] 整體靠右 */
+            gap: 10px;                 /* [修改] 低溫與高溫之間的固定間距 */
+            font-family: monospace; 
+            font-weight: 600; 
+        }
+        
+        /* [新增] 設定固定寬度讓數字垂直對齊成兩列 */
+        .wd-temp-low, .wd-temp-high {
+            display: inline-block;
+            width: 36px;       /* [關鍵] 強制固定寬度，創造隱形欄位 */
+            text-align: right; /* [關鍵] 數字在欄位內靠右對齊 */
+        }
+
+        .wd-temp-low { color: #9CA3AF; } /* 低溫維持淺灰 */
+        
+        /* [修改] 高溫 - 改用較柔和的深灰色 (#4B5563)，避免與低溫對比過強 */
+        .wd-temp-high { 
+            display: inline-block;
+            width: 36px;
+            text-align: right;
+            color: #4B5563; /* 原本是 #1F2937 (太深)，現在改淡一點 */
+        }
+        /* [新增] 即時天氣儀表板樣式 */
+        .cw-container {
+            margin-bottom: 20px;
+            text-align: left;
+            padding: 0 5px;
+        }
+
+        /* 上半部：大溫度與狀態 */
+        .cw-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .cw-temp-big {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #1F2937;
+            letter-spacing: -2px;
+        }
+        .cw-info-col {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .cw-condition {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 4px;
+        }
+        .cw-hl-temp {
+            font-size: 0.9rem;
+            color: #6B7280;
+            font-family: monospace;
+        }
+
+        /* 下半部：四格資訊卡 (仿 iOS 風格) */
+        .cw-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .cw-card {
+            background: rgba(0, 0, 0, 0.03); /* 極淡背景 */
+            border-radius: 12px;
+            padding: 10px 5px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70px;
+        }
+        .cw-icon {
+            width: 18px;
+            height: 18px;
+            color: #6B7280;
+            margin-bottom: 4px;
+        }
+        .cw-label {
+            font-size: 0.75rem;
+            color: #9CA3AF;
+            margin-bottom: 2px;
+        }
+        .cw-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #374151;
+        }
+/* [修改] 日出日落區塊 - 去除突兀邊框，改為極簡風格 */
+        .astro-box {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            /* 移除原本的漸層與橘色邊框，改用極淡的背景融入 */
+            background: rgba(0, 0, 0, 0.03); 
+            padding: 15px 0;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: none; /* 移除邊框 */
+        }
+/* [修改] 日出日落區塊佈局 */
+.astro-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+
+/* [新增] 日出日落 SVG 圖示樣式 */
+.astro-icon svg {
+    width: 32px; 
+    height: 32px;
+    stroke: #F59E0B; /* 太陽暖橘色 */
+    fill: none;
+    stroke-width: 1.5; /* 線條細緻一點，仿 iOS 風格 */
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    margin-bottom: 4px;
+    filter: drop-shadow(0 2px 3px rgba(245, 158, 11, 0.2)); /* 淡淡的光暈 */
+}
+.astro-label { font-size: 0.8rem; color: #666; }
+.astro-time { font-size: 1.1rem; font-weight: 700; color: #333; }
+/* --- [新增] iOS 天氣動態特效 (仿 iPhone 天氣) --- */
 /* 1. Header 容器設定 */
 .weather-bg-layer {
     position: absolute;
@@ -1585,25 +1976,17 @@ header.is-night {
     90% { opacity: 1; }
     100% { transform: translateY(600px); opacity: 0; } 
 }
-/* [雪花 - SVG 精緻版] */
+/* [修改] 全螢幕飄落特效：同步更新雪花造型 */
 .snow-flake {
     position: absolute;
-    /* 1. 移除原本的白色背景與圓角 */
-    /* background: #FFF; */ 
-    /* border-radius: 50%; */
-    
-    /* 2. 改用 SVG 雪花圖案 (Base64編碼) */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 1. 主骨架 --%3E%3Cpath d='M12 3v18'/%3E%3Cpath d='M4.2 16.5 L19.8 7.5'/%3E%3Cpath d='M4.2 7.5 L19.8 16.5'/%3E%3C!-- 2. 六角形 --%3E%3Cpath d='M12 7l4.33 2.5v5l-4.33 2.5-4.33-2.5v-5z'/%3E%3C!-- 3. V型箭頭 (尖端對接，向外張開) --%3E%3Cpath d='M10 1 L12 3 L14 1'/%3E%3Cpath d='M20.5 4.8 L19.8 7.5 L22.5 8.2'/%3E%3Cpath d='M22.5 15.8 L19.8 16.5 L20.5 19.2'/%3E%3Cpath d='M14 23 L12 21 L10 23'/%3E%3Cpath d='M3.5 19.2 L4.2 16.5 L1.5 15.8'/%3E%3Cpath d='M1.5 8.2 L4.2 7.5 L3.5 4.8'/%3E%3C/svg%3E");
-    /* 3. 設定背景模式 */
+    /* 改用 stroke='white' 的版本 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 9 L14.6 10.5 L14.6 13.5 L12 15 L9.4 13.5 L9.4 10.5 Z'/%3E%3Cpath d='M12 9 V1 M12 15 V23 M14.6 10.5 L21.5 6.5 M14.6 13.5 L21.5 17.5 M9.4 13.5 L2.5 17.5 M9.4 10.5 L2.5 6.5'/%3E%3Cpath d='M9.5 5.5 L12 7.5 L14.5 5.5 M9.5 2 L12 4 L14.5 2'/%3E%3Cpath d='M9.5 18.5 L12 16.5 L14.5 18.5 M9.5 22 L12 20 L14.5 22'/%3E%3Cpath d='M16.4 6.6 L15.9 9.75 L18.9 10.9 M19.4 4.8 L18.9 8 L21.9 9.2'/%3E%3Cpath d='M18.9 13.1 L15.9 14.25 L16.4 17.4 M21.9 14.8 L18.9 16 L19.4 19.2'/%3E%3Cpath d='M7.6 17.4 L8.1 14.25 L5.1 13.1 M4.6 19.2 L5.1 16 L2.1 14.8'/%3E%3Cpath d='M5.1 10.9 L8.1 9.75 L7.6 6.6 M2.1 9.2 L5.1 8 L4.6 4.8'/%3E%3C/svg%3E");
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    background-color: transparent; /* 確保背景透明 */
-
+    background-color: transparent;
     opacity: 0.9;
-    top: -20px; /* 稍微往上移，避免一開始就露餡 */
-    
-    /* 4. 加入旋轉動畫 (讓雪花邊掉邊轉，更真實) */
+    top: -20px;
     animation: snow-fall-rotate 5s linear infinite; 
 }
 
@@ -1847,10 +2230,13 @@ header.is-night {
                     </div>
                 </div>
 
-                <div class="hw-col-loc">
-                    <span class="hw-loc" id="hw-loc">定位中...</span>
-                    <span class="hw-date" id="hw-date">現在位置</span>
-                </div>
+                <div class="hw-col-loc" onclick="openDetailedWeatherModal()" style="cursor: pointer;">
+    <span class="hw-loc" id="hw-loc">定位中...</span>
+    <span class="hw-date" id="hw-date">現在位置</span>
+    <div style="font-size: 0.7rem; opacity: 0.7; margin-top: 2px;">
+        點擊查看詳情 ▼
+    </div>
+</div>
                 <div class="hw-col-main">
                     <div class="hw-icon" id="hw-icon">
                         <div class="weather-icon cloud"></div>
@@ -2053,35 +2439,59 @@ header.is-night {
                     </div>
                     <a href="https://www.google.com/maps/search/?api=1&query=Toyota+Rent+a+Car+阿蘇駅前店" target="_blank" class="btn-map">導航至租車行</a>
                     <div class="tags"><span class="tag tag-car">Toyota</span><span class="tag tag-move">租車開始</span></div>
+                </div><div style="text-align:center; margin: 20px 0 10px 0; color:#6B7280; font-size:0.9rem; font-weight:600; display:flex; align-items:center; justify-content:center; gap:10px;">
+                    <span>👇 下午行程二選一 (視天氣/體力決定) 👇</span>
                 </div>
-                <div class="event event-meal optimized">
-                    <div class="time">12:20</div>
-                    <div class="activity" style="color: var(--secondary);">午餐時段：阿蘇赤牛丼 (精簡)</div>
-                    <div class="desc">
-                        <ul style="list-style-type: disc;">
-                            <li>**赤牛丼：** 推薦前往 **いまきん食堂** (需自駕，約 15-20 分鐘)。因需控制時間，建議事先電話預約，或選擇人潮較少的同類型餐廳，**將用餐時間控制在 60 分鐘內**。</li>
-                        </ul>
+
+                <div style="border: 2px solid #D1FAE5; background: #ECFDF5; border-radius: 12px; padding: 15px; margin-bottom: 20px; position:relative;">
+                    <div style="position:absolute; top:-12px; left:15px; background:#059669; color:white; padding:2px 10px; border-radius:12px; font-size:0.8rem; font-weight:bold;">
+                        ☀️ 方案 A：經典阿蘇風光
                     </div>
-                    <a href="https://www.google.com/maps/search/?api=1&query=いまきん食堂+阿蘇" target="_blank" class="btn-map">導航至 いまきん食堂</a>
-                     <div class="tags"><span class="tag tag-food">時間緊湊</span><span class="tag tag-car">需自駕</span></div>
+
+                    <div class="event event-meal optimized" style="margin-top:10px;">
+                        <div class="time">12:20</div>
+                        <div class="activity">午餐：阿蘇赤牛丼 (いまきん)</div>
+                        <div class="desc">若排隊過長，建議改吃附近其他餐廳以節省時間。</div>
+                        <a href="https://www.google.com/maps/search/?api=1&query=いまきん食堂+阿蘇" target="_blank" class="btn-map">導航</a>
+                    </div>
+                    <div class="event optimized">
+                        <div class="time">13:40</div>
+                        <div class="activity">阿蘇神社 (參拜)</div>
+                        <div class="desc">參觀樓門與商店街，祈求旅途平安。</div>
+                    </div>
+                    <div class="event optimized" style="margin-bottom:0;">
+                        <div class="time">14:45</div>
+                        <div class="activity">草千里 (火山博物館)</div>
+                        <div class="desc">欣賞阿蘇火山群與放牧美景。</div>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Kusasenri+Coffee+Roastery" target="_blank" class="btn-map">導航</a>
+                    </div>
                 </div>
-                 <div class="event optimized">
-                    <div class="time">13:40</div>
-                    <div class="activity" style="color: var(--secondary);">阿蘇神社 (Aso Shrine)</div>
-                    <div class="desc">
-                        抵達神社並參觀門前町，**建議停留時間約 45 分鐘**。
+
+                <div style="border: 2px solid #BAE6FD; background: #F0F9FF; border-radius: 12px; padding: 15px; margin-bottom: 20px; position:relative;">
+                    <div style="position:absolute; top:-12px; left:15px; background:#0284C7; color:white; padding:2px 10px; border-radius:12px; font-size:0.8rem; font-weight:bold;">
+                        ❄️ 方案 B：九重玩雪趣
                     </div>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Aso+Shine" target="_blank" class="btn-map">導航</a>
-                    <div class="tags"><span class="tag tag-shrine">停留 45分</span></div>
-                </div>
-                <div class="event optimized">
-                    <div class="time">14:45</div>
-                    <div class="activity" style="color: var(--secondary);">草千里咖啡烘焙坊 (Kusasenri)</div>
-                    <div class="desc">
-                        欣賞阿蘇火山群與草千里放牧美景，並享用咖啡。**建議停留時間約 60 分鐘**，避免逗留過久。
+
+                    <div class="event event-meal" style="margin-top:10px;">
+                        <div class="time">12:15</div>
+                        <div class="activity">午餐：阿蘇道之驛 (便當)</div>
+                        <div class="desc">購買熊本熊便當或輕食，在車上或休息區快速解決，爭取玩雪時間。</div>
                     </div>
-                    <a href="https://www.google.com/maps/search/?api=1&query=Kusasenri+Coffee+Roastery" target="_blank" class="btn-map">導航</a>
-                    <div class="tags"><span class="tag tag-spot">停留 60分</span></div>
+                    <div class="event" style="margin-bottom:0;">
+                        <div class="time">13:30 - 15:30</div>
+                        <div class="activity">九重森林公園滑雪場</div>
+                        <div class="desc">
+                            租個雪盆 (Sled) 讓孩子放電！
+                            <ul style="margin-top:5px; padding-left:20px; font-size:0.85rem; color:#555;">
+                                <li><b>距離：</b>從阿蘇站開車約 50 分鐘。</li>
+                                <li><b>裝備：</b>現場可租雪衣手套，人到就好。</li>
+                            </ul>
+                        </div>
+                        <button class="btn-ai-guide" onclick="askGeminiGuide('九重滑雪場', '用興奮的語氣邀請孩子去滑雪，並說明玩雪盆有多刺激安全。')">
+                            ✨ AI 介紹滑雪場
+                        </button>
+                        <a href="http://googleusercontent.com/maps.google.com/search?q=Kuju+Forest+Park+Skiing+Ground" target="_blank" class="btn-map">導航至滑雪場</a>
+                    </div>
                 </div>
                 <div class="event optimized">
                     <div class="time">16:00</div>
@@ -3235,7 +3645,47 @@ header.is-night {
                     **費用總計：** 若選擇「入園 + 叢林巴士」，每位成人約 ¥4,000。
                 </p>
             </div>
-            
+            <div class="info-section" style="border-color: #F59E0B; background-color: #FFFBEB; margin-top: 15px;">
+                <h3 style="color: var(--secondary); border-bottom-color: var(--secondary);">⏰ 開園時間與搶票攻略</h3>
+                
+                <div class="method-detail">
+                    <div style="margin-bottom: 12px;">
+                        <span style="font-weight: 700; color: #1F2937; display: block; margin-bottom: 4px;">❄️ 冬季 (11月1日 ～ 2月底)</span>
+                        <ul style="padding-left: 20px; margin: 0; font-size: 0.9rem; line-height: 1.6;">
+                            <li><b>售票開始：</b>09:30</li>
+                            <li><b>正式開園：</b>10:00</li>
+                            <li><b>閉園時間：</b>15:30 (最後入園 15:00)</li>
+                        </ul>
+                    </div>
+
+                    <div style="margin-bottom: 12px;">
+                        <span style="font-weight: 700; color: #1F2937; display: block; margin-bottom: 4px;">☀️ 夏季 (3月1日 ～ 10月31日)</span>
+                        <ul style="padding-left: 20px; margin: 0; font-size: 0.9rem; line-height: 1.6;">
+                            <li><b>售票開始：</b>09:00</li>
+                            <li><b>正式開園：</b>09:30</li>
+                            <li><b>閉園時間：</b>16:30 (最後入園 16:00)</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px dashed #D97706; margin-top: 10px;">
+                        <span style="color: #D97706; font-weight: 700; display: flex; align-items: center; gap: 5px; margin-bottom: 5px;">
+                            <svg class="icon-mini" style="color:#D97706"><use href="#icon-time"></use></svg>
+                            Jungle Bus 搶票建議
+                        </span>
+                        <p style="font-size: 0.9rem; line-height: 1.5; margin-bottom: 8px; font-weight: 500;">
+                            因巴士座位有限且需當日現場排隊購票，強烈建議：
+                        </p>
+                        <ul style="padding-left: 20px; margin: 0; font-size: 0.9rem; line-height: 1.6;">
+                            <li><b>平日：</b>建議 <b style="color: #DC2626;">09:00 前</b> (開園前 30 分鐘) 抵達。</li>
+                            <li><b>假日/連假：</b>建議 <b style="color: #DC2626;">08:30 前</b> (開園前 1 小時) 抵達。</li>
+                        </ul>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 8px; border-top: 1px solid #eee; padding-top: 6px;">
+                            💡 <b>為什麼要這麼早？</b><br>
+                            旺季時開園前門口常有自駕車陣排隊。早點到是為了確保能買到<b>「上午時段」</b>的巴士票，以免行程被拖到下午，影響後續前往由布院的時間。
+                        </p>
+                    </div>
+                </div>
+            </div>
             <!-- 叢林巴士預約教學 -->
             <div class="info-section">
                 <h3>🚌 叢林巴士 (Jungle Bus) 預約教學</h3>
@@ -3667,30 +4117,55 @@ header.is-night {
         </div>
     </div>
     <div id="calc-modal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 300px;">
-            <div class="modal-title" style="color: #D97706; border-bottom: 1px solid #FDE68A; padding-bottom: 10px;">
-                💱 匯率試算 (JPY ↔ TWD)
-            </div>
+        <div class="modal-box" style="max-width: 340px; padding: 25px 20px 20px 20px; position: relative;">
             
-            <div style="margin: 10px 0; font-size: 0.85rem; color: #666; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
-                <span id="rate-status" style="font-size: 0.75rem; color: #9CA3AF;">● 準備中...</span>
-                <label>匯率:</label>
-                <input type="number" id="calc-rate" step="0.0001" style="width: 70px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; text-align: center;" oninput="calculateExchange()">
+            <button class="btn-modal-close-x" onclick="closeCalcModal()">×</button>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom:10px; border-bottom:1px solid #eee; margin-right: 30px;">
+                <button id="btn-swap-cur" onclick="toggleCurrency()" style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:20px; padding:5px 12px; font-size:0.85rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px;">
+                    <span id="cur-label-main" style="color:#2563EB">JPY</span> 
+                    <svg style="width:16px;height:16px; color:#6B7280;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17H4M4 17L8 13M4 17L8 21M4 7H20M20 7L16 3M20 7L16 11"/></svg>
+                    <span id="cur-label-sub" style="color:#059669">TWD</span>
+                </button>
+
+                <div style="display: flex; align-items: center; gap: 5px; font-size: 0.85rem; color: #666;">
+                    <label>匯率:</label>
+                    <input type="number" id="calc-rate" step="0.0001" style="width: 65px; padding: 4px; border: 1px solid #ccc; border-radius: 4px; text-align: center; font-weight:bold; color:#D97706;" oninput="reCalcTotal()">
+                </div>
             </div>
 
-            <div class="calc-row">
-                <span class="calc-label">日幣</span>
-                <input type="number" id="inp-jpy" class="calc-input" placeholder="¥" inputmode="decimal" oninput="calculateExchange('jpy')">
+            <div class="calc-display">
+                <div class="calc-expr" id="calc-expr-display"></div> 
+                <div class="calc-main" id="calc-main-display">¥0</div> 
+                <div class="calc-sub" id="calc-sub-display">≈ NT$0</div> 
             </div>
 
-            <div class="calc-row">
-                <span class="calc-label">台幣</span>
-                <input type="number" id="inp-twd" class="calc-input" placeholder="NT$" inputmode="decimal" oninput="calculateExchange('twd')">
-            </div>
+            <div class="calc-keypad">
+                <button class="calc-btn ac" onclick="calcInput('AC')">AC</button>
+                <button class="calc-btn op" onclick="calcInput('DEL')">⌫</button>
+                <button class="calc-btn op" onclick="calcInput('/')">÷</button>
+                <button class="calc-btn op" onclick="calcInput('*')">×</button>
 
-            <div class="modal-btns" style="margin-top: 20px;">
-                <button class="modal-btn btn-confirm" style="background: #F59E0B;" onclick="closeCalcModal()">關閉</button>
-            </div>
+                <button class="calc-btn" onclick="calcInput('7')">7</button>
+                <button class="calc-btn" onclick="calcInput('8')">8</button>
+                <button class="calc-btn" onclick="calcInput('9')">9</button>
+                <button class="calc-btn op" onclick="calcInput('-')">-</button>
+
+                <button class="calc-btn" onclick="calcInput('4')">4</button>
+                <button class="calc-btn" onclick="calcInput('5')">5</button>
+                <button class="calc-btn" onclick="calcInput('6')">6</button>
+                <button class="calc-btn op" onclick="calcInput('+')">+</button>
+
+                <button class="calc-btn" onclick="calcInput('1')">1</button>
+                <button class="calc-btn" onclick="calcInput('2')">2</button>
+                <button class="calc-btn" onclick="calcInput('3')">3</button>
+                
+                <button class="calc-btn eq" onclick="calcInput('=')">=</button> 
+                
+                <button class="calc-btn zero" onclick="calcInput('0')">0</button>
+                <button class="calc-btn" onclick="calcInput('.')">.</button>
+                
+                </div>
         </div>
     </div>
     <div id="img-preview-modal" class="modal-overlay">
@@ -3764,7 +4239,107 @@ header.is-night {
         
     </button>
 
+<div id="weather-detail-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 400px; padding: 20px; max-height: 85vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+           <div class="modal-title" id="wd-title" style="margin:0; font-size:1.3rem;">--</div>
+           
+           <div style="display: flex; align-items: center; gap: 8px;">
+               <button id="wd-btn-refresh" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; color:#9CA3AF;">
+                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                       <path d="M23 4v6h-6"></path>
+                       <path d="M1 20v-6h6"></path>
+                       <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                   </svg>
+               </button>
+               
+               <button class="btn-modal-close-x" onclick="document.getElementById('weather-detail-modal').style.display='none'" style="position: static; margin:0;">×</button>
+           </div>
+        </div>
 
+        <div class="cw-container">
+            <div class="cw-header">
+                <div class="cw-temp-big" id="wd-cur-temp">--°</div>
+                <div class="cw-info-col">
+                    <div class="cw-condition" id="wd-cur-desc">--</div>
+                    <div class="cw-hl-temp" id="wd-cur-hl">高:-- 低:--</div>
+                </div>
+            </div>
+            <div class="cw-grid">
+                <div class="cw-card">
+                    <div class="cw-label">體感</div>
+                    <div class="cw-value" id="wd-feel">--°</div>
+                </div>
+                <div class="cw-card">
+                    <div class="cw-label">降雨率</div>
+                    <div class="cw-value" id="wd-pop">--%</div>
+                </div>
+                <div class="cw-card">
+                    <div class="cw-label">紫外線</div>
+                    <div class="cw-value" id="wd-uv">--</div>
+                </div>
+                <div class="cw-card">
+                    <div class="cw-label">風速</div>
+                    <div class="cw-value" id="wd-wind">--</div>
+                </div>
+            </div>
+        </div>
+        <div class="astro-box">
+            <div class="astro-item">
+                <div class="astro-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <g stroke="#CBD5E1">
+                            <line x1="2" y1="20" x2="22" y2="20" stroke-width="2.5"></line> <line x1="12" y1="7" x2="12" y2="2"></line>
+                            <polyline points="9 5 12 2 15 5"></polyline>
+                        </g>
+                        <g stroke="#F59E0B">
+                            <path d="M7 20 A 5 5 0 0 1 17 20"></path> 
+                            <line x1="12" y1="12" x2="12" y2="9"></line> 
+                            <line x1="6.3" y1="14.3" x2="4.2" y2="12.2"></line>
+                            <line x1="17.7" y1="14.3" x2="19.8" y2="12.2"></line>
+                            <line x1="4" y1="20" x2="1" y2="20"></line>
+                            <line x1="20" y1="20" x2="23" y2="20"></line>
+                        </g>
+                    </svg>
+                </div>
+                <span class="astro-label">日出</span>
+                <span class="astro-time" id="wd-sunrise">--:--</span>
+            </div>
+            
+            <div style="width: 1px; height: 40px; background: #CBD5E1; opacity: 0.5;"></div>
+
+            <div class="astro-item">
+                <div class="astro-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                         <g stroke="#CBD5E1">
+                            <line x1="2" y1="20" x2="22" y2="20" stroke-width="2.5"></line> <line x1="12" y1="2" x2="12" y2="7"></line>
+                            <polyline points="9 4 12 7 15 4"></polyline>
+                        </g>
+                        <g stroke="#F59E0B">
+                            <path d="M7 20 A 5 5 0 0 1 17 20"></path>
+                            <line x1="12" y1="12" x2="12" y2="9"></line>
+                            <line x1="6.3" y1="14.3" x2="4.2" y2="12.2"></line>
+                            <line x1="17.7" y1="14.3" x2="19.8" y2="12.2"></line>
+                            <line x1="4" y1="20" x2="1" y2="20"></line>
+                            <line x1="20" y1="20" x2="23" y2="20"></line>
+                        </g>
+                    </svg>
+                </div>
+                <span class="astro-label">日落</span>
+                <span class="astro-time" id="wd-sunset">--:--</span>
+            </div>
+        </div>
+
+        <div style="font-size: 0.9rem; font-weight: 700; margin-bottom: 5px; color: #4B5563;">未來 24 小時預報</div>
+        <div class="weather-detail-scroll" id="wd-hourly-list">
+            <div style="padding:10px; color:#999;">載入中...</div>
+        </div>
+
+        <div style="font-size: 0.9rem; font-weight: 700; margin-top: 10px; margin-bottom: 5px; color: #4B5563;">未來 7 天預報</div>
+        <div id="wd-daily-list"></div>
+        
+        </div>
+</div>
     <div id="lightbox-modal" class="lightbox-overlay" onclick="closeLightbox()">
         <span class="lightbox-close">&times;</span>
         <img class="lightbox-content" id="lightbox-img">
@@ -4003,9 +4578,13 @@ function getKey(type) {
                 return null;
             }
         }
+window.currentActiveConfig = null; 
+
 async function updateWeatherWidget(dayId) {
     const config = tripConfig[dayId];
     if (!config) return;
+    
+    window.currentActiveConfig = config; // ★ 加入這一行！紀錄目前的設定
 
     // 1. 先顯示 Loading 狀態 (提升使用者體驗)
     document.getElementById('hw-loc').innerText = config.loc;
@@ -4175,13 +4754,18 @@ async function getSmartWeatherData(config) {
 // 輔助函式：將 WMO Code 轉成中文描述
 function getWeatherDescText(code) {
     if (code === 0) return '晴朗';
-    if (code <= 3) return '多雲';
-    if (code <= 48) return '有霧';
-    if (code <= 67) return '有雨';
-    if (code <= 77) return '有雪';
-    if (code <= 82) return '陣雨';
-    if (code <= 99) return '雷雨';
+    if (code >= 1 && code <= 3) return '多雲';
+    if (code >= 45 && code <= 48) return '有霧'; // [優化] 增加霧的判斷
+    if (code >= 51 && code <= 67) return '有雨';
+    if (code >= 71 && code <= 77) return '有雪';
+    if (code >= 80 && code <= 82) return '陣雨';
+    if (code >= 95) return '雷雨';
     return '多雲';
+}
+// [新增] 補上遺失的天氣狀態文字轉換函式 (用於詳細天氣 Modal)
+function getWeatherStatusText(code) {
+    // 直接沿用 getWeatherDescText 的邏輯，或者可以寫得更簡短
+    return getWeatherDescText(code);
 }
 
 // 輔助函式：將 WMO Code 轉成你的 CSS Icon Class
@@ -4452,13 +5036,16 @@ function getSmartAdviceText(temp, weatherCode) {
 
         // 修正 2: 定義簡約天氣 SVG 圖示 (白色線條)
         const simpleIcons = {
-            sun: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>',
-            cloud: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>',
-            rain: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 13v8"></path><path d="M8 13v8"></path><path d="M12 15v8"></path><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path></svg>',
-            snow: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M4.2 16.5 L19.8 7.5"/><path d="M4.2 7.5 L19.8 16.5"/><path d="M12 7l4.33 2.5v5l-4.33 2.5-4.33-2.5v-5z"/><path d="M10 1 L12 3 L14 1"/><path d="M20.5 4.8 L19.8 7.5 L22.5 8.2"/><path d="M22.5 15.8 L19.8 16.5 L20.5 19.2"/><path d="M14 23 L12 21 L10 23"/><path d="M3.5 19.2 L4.2 16.5 L1.5 15.8"/><path d="M1.5 8.2 L4.2 7.5 L3.5 4.8"/></svg>',
-            fog: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6h14M4 10h16M6 14h12M4 18h16"></path></svg>',
-            lightning: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"></path><polyline points="13 11 9 17 15 17 11 23"></polyline></svg>'
-        };
+    sun: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>',
+    cloud: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>',
+    rain: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 13v8"></path><path d="M8 13v8"></path><path d="M12 15v8"></path><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path></svg>',
+    
+    // [修改] 雪：更新為最新的雙重平行 V 型 + 六角冰核
+    snow: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9 L14.6 10.5 L14.6 13.5 L12 15 L9.4 13.5 L9.4 10.5 Z"/><path d="M12 9 V1 M12 15 V23 M14.6 10.5 L21.5 6.5 M14.6 13.5 L21.5 17.5 M9.4 13.5 L2.5 17.5 M9.4 10.5 L2.5 6.5"/><path d="M9.5 5.5 L12 7.5 L14.5 5.5 M9.5 2 L12 4 L14.5 2"/><path d="M9.5 18.5 L12 16.5 L14.5 18.5 M9.5 22 L12 20 L14.5 22"/><path d="M16.4 6.6 L15.9 9.75 L18.9 10.9 M19.4 4.8 L18.9 8 L21.9 9.2"/><path d="M18.9 13.1 L15.9 14.25 L16.4 17.4 M21.9 14.8 L18.9 16 L19.4 19.2"/><path d="M7.6 17.4 L8.1 14.25 L5.1 13.1 M4.6 19.2 L5.1 16 L2.1 14.8"/><path d="M5.1 10.9 L8.1 9.75 L7.6 6.6 M2.1 9.2 L5.1 8 L4.6 4.8"/></svg>',
+    
+    fog: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6h14M4 10h16M6 14h12M4 18h16"></path></svg>',
+    lightning: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9"></path><polyline points="13 11 9 17 15 17 11 23"></polyline></svg>'
+};
 
         function getWeatherDesc(code) {
             // Updated to return HTML with Simple SVG
@@ -4720,19 +5307,34 @@ function getSmartAdviceText(temp, weatherCode) {
         function openCalcModal() {
             document.getElementById('calc-modal').style.display = 'flex';
             
-            // 1. 先嘗試讀取快取 (避免每次開都打 API)
+            // 1. 先嘗試讀取快取
             const savedRateData = JSON.parse(localStorage.getItem('live_exchange_rate_cache') || '{}');
             const now = Date.now();
-            const oneHour = 3600000; // 1小時毫秒數
+            const oneHour = 3600000; 
             
-            // 如果有快取且在 1 小時內，就用快取，否則抓新的
             if (savedRateData.rate && (now - savedRateData.timestamp < oneHour)) {
                 updateRateUI(savedRateData.rate, '快取');
             } else {
                 fetchLiveRate();
             }
             
-            document.getElementById('inp-jpy').focus();
+            // [新增] 每次開啟預設為 JPY -> TWD 模式
+            if (typeof isJpyToTwd !== 'undefined') {
+                isJpyToTwd = true; 
+                const mainLabel = document.getElementById('cur-label-main');
+                const subLabel = document.getElementById('cur-label-sub');
+                if(mainLabel && subLabel) {
+                    mainLabel.innerText = "JPY";
+                    subLabel.innerText = "TWD";
+                    mainLabel.style.color = "#2563EB"; // JPY 藍色
+                    subLabel.style.color = "#059669"; // [新增] TWD 綠色
+                }
+            }
+
+            // 重置計算機畫面
+            if (typeof calcInput === 'function') {
+                calcInput('AC');
+            }
         }
 
         function closeCalcModal() {
@@ -4740,88 +5342,205 @@ function getSmartAdviceText(temp, weatherCode) {
         }
 
         // 抓取即時匯率 (來源: 免費公開 API)
+        // 抓取即時匯率 (來源: 免費公開 API)
         async function fetchLiveRate() {
+            // [修正] 加入檢查
             const statusEl = document.getElementById('rate-status');
-            statusEl.innerText = '⟳ 更新中...';
-            statusEl.style.color = '#F59E0B';
+            if (statusEl) {
+                statusEl.innerText = '⟳ 更新中...';
+                statusEl.style.color = '#F59E0B';
+            }
 
             try {
-                // 使用 ExchangeRate-API (以日幣 JPY 為基準)
                 const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
                 const data = await res.json();
-                
-                // 抓取對台幣 (TWD) 的匯率
                 const newRate = data.rates.TWD;
                 
                 if (newRate) {
-                    // 儲存到 LocalStorage
                     localStorage.setItem('live_exchange_rate_cache', JSON.stringify({
                         rate: newRate,
                         timestamp: Date.now()
                     }));
                     updateRateUI(newRate, '即時');
                     
-                    // 如果原本有輸入數字，自動重算
-                    if(document.getElementById('inp-jpy').value) calculateExchange('jpy');
+                    // [修正] 改呼叫新的重算函式
+                    if (typeof reCalcTotal === 'function') reCalcTotal(); 
                 }
             } catch (e) {
                 console.error("匯率更新失敗", e);
-                statusEl.innerText = '⚠️ 連線失敗';
-                statusEl.style.color = '#EF4444';
+                // [修正] 加入檢查
+                if (statusEl) {
+                    statusEl.innerText = '⚠️ 連線失敗';
+                    statusEl.style.color = '#EF4444';
+                }
                 // 失敗時若沒值，給個預設值
-                if(!document.getElementById('calc-rate').value) document.getElementById('calc-rate').value = 0.22;
+                const rateInput = document.getElementById('calc-rate');
+                if(rateInput && !rateInput.value) rateInput.value = 0.22;
             }
         }
 
         function updateRateUI(rate, type) {
-            document.getElementById('calc-rate').value = rate;
-            const statusEl = document.getElementById('rate-status');
-            statusEl.innerText = `● ${type}匯率`;
-            statusEl.style.color = '#10B981'; // 綠色
-        }
-
-        function calculateExchange(source) {
             const rateInput = document.getElementById('calc-rate');
-            const jpyInput = document.getElementById('inp-jpy');
-            const twdInput = document.getElementById('inp-twd');
-            
-            let rate = parseFloat(rateInput.value);
-            if (isNaN(rate) || rate <= 0) rate = 0.22; 
+            if (rateInput) rateInput.value = rate;
 
-            if (source === 'jpy') {
-                const jpy = parseFloat(jpyInput.value);
-                if (!isNaN(jpy)) {
-                    twdInput.value = Math.round(jpy * rate);
-                } else {
-                    twdInput.value = '';
-                }
-            } else if (source === 'twd') {
-                const twd = parseFloat(twdInput.value);
-                if (!isNaN(twd)) {
-                    jpyInput.value = Math.round(twd / rate);
-                } else {
-                    jpyInput.value = '';
-                }
-            } else {
-                // 修改匯率時 -> 更新台幣
-                const jpy = parseFloat(jpyInput.value);
-                if (!isNaN(jpy)) {
-                    twdInput.value = Math.round(jpy * rate);
-                }
+            // [修正] 加入檢查：確認 statusEl 存在才更新，避免報錯
+            const statusEl = document.getElementById('rate-status');
+            if (statusEl) {
+                statusEl.innerText = `● ${type}匯率`;
+                statusEl.style.color = '#10B981'; // 綠色
             }
         }
 
+        // [新增] 計算機變數與邏輯
+        let calcExpression = ""; // 儲存算式字串
+        let isJpyToTwd = true;   // [新增] 預設為 日幣 -> 台幣
 
-        // 點擊背景關閉視窗 (修改版)
-        window.onclick = function(event) {
-            const nModal = document.getElementById('note-modal');
-            const lModal = document.getElementById('location-modal');
-            const cModal = document.getElementById('calc-modal'); // [新增]
+        // [新增] 切換幣別模式
+        function toggleCurrency() {
+            isJpyToTwd = !isJpyToTwd; // 切換狀態
             
-            if (event.target == nModal) nModal.style.display = "none";
-            if (event.target == lModal) lModal.style.display = "none";
-            if (event.target == cModal) cModal.style.display = "none"; // [新增]
+            // 更新按鈕文字與顏色
+            const mainLabel = document.getElementById('cur-label-main');
+            const subLabel = document.getElementById('cur-label-sub');
+            
+            if (isJpyToTwd) {
+                // 模式：日 -> 台
+                mainLabel.innerText = "JPY";
+                mainLabel.style.color = "#2563EB"; // 主顯示 JPY (藍)
+                subLabel.innerText = "TWD";
+                subLabel.style.color = "#059669";  // 副顯示 TWD (綠)
+            } else {
+                // 模式：台 -> 日
+                mainLabel.innerText = "TWD";
+                mainLabel.style.color = "#059669"; // 主顯示 TWD (綠)
+                subLabel.innerText = "JPY";
+                subLabel.style.color = "#2563EB";  // 副顯示 JPY (藍)
+            }
+
+            // 更新畫面上的符號並重新計算
+            updateCalcDisplaySymbol();
+            reCalcTotal();
         }
+
+        // [新增] 更新畫面上的幣別符號
+        function updateCalcDisplaySymbol() {
+            const mainDisplay = document.getElementById('calc-main-display');
+            // 讀取目前的數字 (去掉非數字字元)
+            let currentVal = mainDisplay.innerText.replace(/[^\d.-]/g, '');
+            if (!currentVal) currentVal = "0";
+
+            // 根據模式加上對應符號
+            const symbol = isJpyToTwd ? "¥" : "NT$";
+            mainDisplay.innerText = symbol + currentVal;
+        }
+
+        // [修改] 計算機核心處理
+        function calcInput(val) {
+            const exprDisplay = document.getElementById('calc-expr-display');
+            const mainDisplay = document.getElementById('calc-main-display');
+            const symbol = isJpyToTwd ? "¥" : "NT$"; // 根據模式決定主符號
+
+            if (val === 'AC') {
+                calcExpression = "";
+                exprDisplay.innerText = "";
+                mainDisplay.innerText = symbol + "0";
+                reCalcTotal(0);
+                return;
+            }
+
+            if (val === 'DEL') {
+                calcExpression = calcExpression.toString().slice(0, -1);
+            } else if (val === '=') {
+                try {
+                    const safeExpr = calcExpression.replace(/×/g, '*').replace(/÷/g, '/');
+                    if(!safeExpr) return;
+                    
+                    const result = eval(safeExpr);
+                    
+                    // 顯示結果 (加上符號)
+                    mainDisplay.innerText = symbol + parseFloat(result.toFixed(2));
+                    calcExpression = result.toString();
+                    exprDisplay.innerText = ""; 
+                    reCalcTotal(result);
+                    return;
+                } catch (e) {
+                    mainDisplay.innerText = "Error";
+                    calcExpression = "";
+                }
+            } else {
+                const lastChar = calcExpression.slice(-1);
+                const ops = ['+', '-', '*', '/', '.'];
+                let displayVal = val;
+                if(val === '*') displayVal = '×';
+                if(val === '/') displayVal = '÷';
+
+                if (ops.includes(val) && ops.includes(lastChar)) {
+                    calcExpression = calcExpression.slice(0, -1) + val;
+                } else {
+                    calcExpression += val;
+                }
+            }
+
+            exprDisplay.innerText = calcExpression.replace(/\*/g, '×').replace(/\//g, '÷');
+            
+            try {
+                const safeExpr = calcExpression.replace(/×/g, '*').replace(/÷/g, '/');
+                if (safeExpr && !['+', '-', '*', '/'].includes(safeExpr.slice(-1))) {
+                    const previewRes = eval(safeExpr);
+                    reCalcTotal(previewRes);
+                }
+            } catch(e) {}
+        }
+
+        // [修改] 雙向匯率換算邏輯
+        function reCalcTotal(amount = null) {
+            const rate = parseFloat(document.getElementById('calc-rate').value) || 0;
+            const subDisplay = document.getElementById('calc-sub-display');
+            const mainDisplay = document.getElementById('calc-main-display');
+
+            if (amount === null) {
+                // 從畫面讀取數字 (移除 ¥ 或 NT$)
+                amount = parseFloat(mainDisplay.innerText.replace(/[^\d.-]/g, '')) || 0;
+            }
+
+            let resultVal = 0;
+            let resultSymbol = "";
+
+            if (isJpyToTwd) {
+                // 模式：日幣轉台幣 (乘法)
+                // 邏輯：日幣金額 × 匯率(0.22) = 台幣
+                resultVal = Math.round(amount * rate);
+                resultSymbol = "NT$";
+            } else {
+                // 模式：台幣轉日幣 (除法)
+                // 邏輯：台幣金額 ÷ 匯率(0.22) = 日幣
+                if (rate !== 0) {
+                    resultVal = Math.round(amount / rate);
+                }
+                resultSymbol = "¥";
+            }
+
+            subDisplay.innerText = `≈ ${resultSymbol}${resultVal.toLocaleString()}`;
+        }
+
+
+        // [修正版] 點擊背景關閉視窗 (改用直接綁定，解決手機觸控無效問題)
+        // 自動抓取所有 class 為 modal-overlay 的遮罩層
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                // 判斷關鍵：只有當點擊的目標是「背景本人」時才關閉
+                // 如果點到內部的白色視窗 (modal-box)，e.target 會是 box 而不是 overlay，就不會觸發
+                if (e.target === this) {
+                    
+                    // 特殊處理：如果是圖片預覽視窗，需要清空暫存
+                    if (this.id === 'img-preview-modal' && typeof cancelImagePreview === 'function') {
+                        cancelImagePreview();
+                    } else {
+                        this.style.display = 'none';
+                    }
+                }
+            });
+        });
         
 // [修改] 兩段式分享功能 (解決瀏覽器阻擋視窗問題)
         // 狀態標記：紀錄目前是否已經分析完成
@@ -5009,17 +5728,22 @@ function getSmartAdviceText(temp, weatherCode) {
                     await navigator.share(window.pendingShareData);
                     resetShareButton(btn);
                 } catch (err) {
-                    // 被阻擋時，切換為手動發送按鈕
+                   // 被阻擋時，切換為手動發送按鈕
                     console.log("自動分享未觸發，切換為手動模式");
                     btn.style.pointerEvents = "auto";
+                    
+                    /* --- [修改] 加入右上角取消按鈕 (X) --- */
                     btn.innerHTML = `
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px; animation: popIn 0.3s;">
                             <line x1="22" y1="2" x2="11" y2="13"></line>
                             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                         </svg>
                         點擊發送
+                        <div class="share-cancel-badge" onclick="event.stopPropagation(); resetShareButton(this.parentElement);">✕</div>
                     `;
-                    btn.style.background = "#10B981"; 
+                    /* --- [修改結束] --- */
+
+                    btn.style.background = "#10B981";
                     btn.style.borderColor = "#10B981";
                     btn.style.color = "white";
                     btn.style.opacity = "1";
@@ -5987,10 +6711,47 @@ function compressImage(file, maxWidth, quality) {
             };
             img.onerror = (err) => reject(err);
         };
-        reader.onerror = (err) => reject(err);
+       reader.onerror = (err) => reject(err);
     });
 }
-        document.addEventListener('DOMContentLoaded', () => {
+
+// --- 👇 請在此處插入修正衝突的程式碼 👇 ---
+
+// [修正] 防止天氣橫向捲動區與全域換頁手勢衝突
+// [修正] 防止天氣橫向捲動區與全域換頁手勢衝突
+// [修正] 防止天氣視窗滑動時誤觸底層換頁
+function preventSwipeConflict() {
+    // 定義一個阻擋訊號往上傳的函式
+    const stopPropagation = (e) => { 
+        e.stopPropagation(); 
+    };
+
+    // 1. 針對「橫向」捲動的小時預報 (維持原有功能)
+    const hourlyScroll = document.getElementById('wd-hourly-list');
+    if (hourlyScroll) {
+        hourlyScroll.addEventListener('touchstart', stopPropagation, { passive: true });
+        hourlyScroll.addEventListener('touchmove', stopPropagation, { passive: true });
+        hourlyScroll.addEventListener('touchend', stopPropagation, { passive: true });
+        hourlyScroll.addEventListener('wheel', stopPropagation, { passive: true });
+    }
+
+    // 2. [新增] 針對「垂直」捲動的天氣視窗白色區塊 (.modal-box)
+    // 這行是解決「上下滑動誤控」的關鍵
+    const weatherModalBox = document.querySelector('#weather-detail-modal .modal-box');
+    if (weatherModalBox) {
+        weatherModalBox.addEventListener('touchstart', stopPropagation, { passive: true });
+        weatherModalBox.addEventListener('touchmove', stopPropagation, { passive: true });
+        weatherModalBox.addEventListener('touchend', stopPropagation, { passive: true });
+        weatherModalBox.addEventListener('wheel', stopPropagation, { passive: true });
+    }
+}
+
+// 確保頁面載入完成後執行綁定
+window.addEventListener('load', preventSwipeConflict);
+
+// --- 👆 插入結束 👆 ---
+
+document.addEventListener('DOMContentLoaded', () => {
             // [新增] 依據 GPS 位置自動判斷日夜 (支援跨時區)
     function initDynamicTheme() {
         const header = document.querySelector('header');
@@ -6747,7 +7508,307 @@ function setWeatherEffect(iconType) {
                         .catch(err => console.log('PWA registration failed:', err));
                 });
             }
+// [新增] 開啟詳細天氣 Modal 的邏輯
+async function openDetailedWeatherModal() {
+    // 1. 取得目前 Header 顯示的地點資料
+    // 優先使用行程表切換的設定，如果沒有(例如剛開啟App)，則使用「我的位置」
+    let config = window.currentActiveConfig;
+    
+    // 特判：如果使用者剛點了「我的位置」，我們需要抓取我的位置的經緯度
+    // 這裡我們利用之前 getLocalWeather 存入的 appCache
+    if (!config && window.appCache && window.appCache['my_location_combined']) {
+        const myData = window.appCache['my_location_combined'].data;
+        // 由於我們沒存經緯度在 cache (只存了氣溫)，這裡簡化處理：
+        // 如果是「我的位置」狀態，重新觸發一次 getLocalWeather 來獲取經緯度並呼叫 API
+        // 為了不讓程式碼太複雜，這裡建議使用者先選擇一天行程，或是我們直接顯示提示
+        if(!navigator.geolocation) { alert("無法取得詳細資訊"); return; }
+        
+        navigator.geolocation.getCurrentPosition(pos => {
+            fetchAndShowDetail(pos.coords.latitude, pos.coords.longitude, myData.city);
+        });
+        return;
+    }
 
+    if (!config) {
+        alert("請先選擇一天行程，或等待定位完成。");
+        return;
+    }
+
+    // 2. 呼叫 API 並顯示
+    fetchAndShowDetail(config.lat, config.lon, config.loc);
+}
+
+// [修改] 抓取詳細天氣資料 (加入漸層圖示邏輯)
+// [修改] 抓取詳細天氣資料 (修正：現在標籤、日夜判斷、標準圖示)
+async function fetchAndShowDetail(lat, lon, locName) {
+    // 顯示 Loading
+    document.getElementById('weather-detail-modal').style.display = 'flex';
+    document.getElementById('wd-title').innerText = locName;
+    // [新增] 設定重整按鈕的功能 (點擊後重新執行此函式)
+    document.getElementById('wd-btn-refresh').onclick = function() {
+        // 加入簡單的旋轉動畫效果，讓使用者知道有在跑
+        const icon = this.querySelector('svg');
+        if(icon) { 
+            icon.style.transition = 'transform 0.5s'; 
+            icon.style.transform = 'rotate(360deg)';
+            setTimeout(() => { icon.style.transform = 'none'; }, 500);
+        }
+        // 重新抓取資料
+        fetchAndShowDetail(lat, lon, locName);
+    };
+    // 初始化儀表板數值
+    document.getElementById('wd-cur-temp').innerText = '--°';
+    document.getElementById('wd-cur-desc').innerText = '載入中...';
+    document.getElementById('wd-feel').innerText = '--';
+    document.getElementById('wd-pop').innerText = '--';
+    document.getElementById('wd-uv').innerText = '--';
+    document.getElementById('wd-wind').innerText = '--';
+
+    document.getElementById('wd-hourly-list').innerHTML = '<div style="padding:10px;">資料載入中...</div>';
+    document.getElementById('wd-daily-list').innerHTML = '';
+    
+    try {
+        // [關鍵修改] URL 新增 hourly 參數: apparent_temperature (體感), uv_index (紫外線), wind_speed_10m (風速)
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,weathercode,precipitation_probability,apparent_temperature,uv_index,wind_speed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max&current_weather=true&timezone=auto`;
+        
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        // --- 0. 處理時間索引 (找到目前這小時的資料) ---
+        const currentHour = new Date().getHours();
+        let startIdx = 0;
+        const dataDate = data.hourly.time[0].split('T')[0];
+        const todayDate = new Date().toISOString().split('T')[0];
+        
+        // 如果 API 回傳的第一天是今天，就從目前小時開始抓
+        if (dataDate === todayDate) {
+            startIdx = currentHour;
+        }
+
+        // --- 1. 更新上方儀表板 (Dashboard) ---
+        // 使用目前這小時的詳細數據
+        const curTemp = Math.round(data.current_weather.temperature);
+        const curCode = data.current_weather.weathercode;
+        const curFeel = Math.round(data.hourly.apparent_temperature[startIdx]);
+        const curPop = data.hourly.precipitation_probability[startIdx];
+        const curUv = data.hourly.uv_index[startIdx];
+        const curWind = Math.round(data.hourly.wind_speed_10m[startIdx]);
+        
+        const todayMax = Math.round(data.daily.temperature_2m_max[0]);
+        const todayMin = Math.round(data.daily.temperature_2m_min[0]);
+
+        document.getElementById('wd-cur-temp').innerText = `${curTemp}°`;
+        document.getElementById('wd-cur-desc').innerText = getWeatherDescText(curCode); // 使用既有的文字轉換函式
+        document.getElementById('wd-cur-hl').innerText = `高:${todayMax}° 低:${todayMin}°`;
+        
+        document.getElementById('wd-feel').innerText = `${curFeel}°`;
+        document.getElementById('wd-pop').innerText = `${curPop}%`;
+        document.getElementById('wd-uv').innerText = curUv;
+        document.getElementById('wd-wind').innerText = `${curWind} km/h`;
+
+
+        // --- 2. 更新日出日落 ---
+        const todayIndex = 0;
+        const sunriseStr = data.daily.sunrise[todayIndex].split('T')[1];
+        const sunsetStr = data.daily.sunset[todayIndex].split('T')[1];
+        const sunriseHour = parseInt(sunriseStr.split(':')[0]);
+        const sunsetHour = parseInt(sunsetStr.split(':')[0]);
+
+        document.getElementById('wd-sunrise').innerText = sunriseStr;
+        document.getElementById('wd-sunset').innerText = sunsetStr;
+
+        // --- 3. 渲染 24小時預報 (維持不變) ---
+        const hourlyContainer = document.getElementById('wd-hourly-list');
+        hourlyContainer.innerHTML = '';
+
+        for (let i = startIdx; i < startIdx + 24; i++) {
+            if (!data.hourly.time[i]) break;
+            
+            let hourRaw = parseInt(data.hourly.time[i].split('T')[1].split(':')[0]);
+            let timeStr = (i === startIdx) ? "現在" : `${hourRaw}時`;
+            let isNight = (hourRaw < sunriseHour || hourRaw >= sunsetHour);
+            const temp = Math.round(data.hourly.temperature_2m[i]);
+            const code = data.hourly.weathercode[i];
+            
+            const iconSvg = getSimpleIconSvg(code, 0, `h${i}`, isNight); 
+            const statusText = getWeatherStatusText(code);
+
+            const item = document.createElement('div');
+            item.className = 'wd-hour-item';
+            
+            item.innerHTML = `
+                <div class="wd-hour-time" style="${i === startIdx ? 'font-weight:bold; color:#2563EB;' : ''}">${timeStr}</div>
+                <div class="wd-hour-icon">${iconSvg}</div>
+                <div class="wd-hour-desc">${statusText}</div>
+                <div class="wd-hour-temp">${temp}°</div>
+            `;
+            hourlyContainer.appendChild(item);
+        }
+
+        // --- 4. 渲染未來 7 天預報 (維持不變) ---
+        const dailyContainer = document.getElementById('wd-daily-list');
+        dailyContainer.innerHTML = '';
+        
+        for (let i = 0; i < 7; i++) {
+            const dateStr = data.daily.time[i].slice(5).replace('-', '/');
+            const max = Math.round(data.daily.temperature_2m_max[i]);
+            const min = Math.round(data.daily.temperature_2m_min[i]);
+            const code = data.daily.weathercode[i];
+            const popMax = data.daily.precipitation_probability_max[i];
+            
+            const iconSvg = getSimpleIconSvg(code, popMax, `d${i}`, false);
+            const dateObj = new Date(data.daily.time[i]);
+            const dayNames = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
+            const dayName = dayNames[dateObj.getDay()];
+
+            const row = document.createElement('div');
+            row.className = 'wd-daily-row';
+            row.innerHTML = `
+                <div class="wd-day-name">
+                    <div>${i===0 ? '今天' : dayName}</div>
+                    <span>${dateStr}</span>
+                </div>
+                <div class="wd-day-icon">${iconSvg}</div>
+                <div class="wd-day-pop">${popMax > 0 ? popMax + '%' : ''}</div>
+                <div class="wd-day-temp">
+                    <span class="wd-temp-low">${min}°</span>
+                    <span class="wd-temp-high">${max}°</span>
+                </div>
+            `;
+            dailyContainer.appendChild(row);
+        }
+
+    } catch (e) {
+        console.error(e);
+        document.getElementById('wd-hourly-list').innerHTML = '無法取得詳細資料';
+        alert('獲取天氣詳情失敗，請檢查網路。');
+    }
+}
+
+// [修改] 取得標準天氣 SVG 圖示
+// pop: 降雨機率 (決定水位，若為0則純線條)
+// isNight: 是否為晚上 (決定顯示太陽還是月亮)
+// [修改] 最終完整版：整合太陽光芒切換、藍色雨滴、雷雨雙閃電
+// [修正] 最終除錯版：修復雷雨被誤判為雨天(Code 80+)的問題
+// [修改] 最終版：加入「霧」的水位計支援 + 所有修復
+// [修改] 最終美化版：加入精緻「六角雪花」造型 + 完整功能
+// [修改] 最終完成版：嚴格幾何對稱雪花 + 全局水位計 (由下而上平整填滿)
+function getSimpleIconSvg(code, pop, uid, isNight = false) {
+    const originalColor = "#374151"; 
+    const waterColor = "#60A5FA";    
+    const percentage = pop || 0;
+    
+    // 1. 定義漸層 (修改為 userSpaceOnUse 模式)
+    let defs = '';
+    let strokeAttr = `stroke="${originalColor}"`; 
+
+    if (percentage > 0) {
+        defs = `
+        <defs>
+            <linearGradient id="grad-${uid}" x1="0" y1="24" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="${percentage}%" stop-color="${waterColor}" />
+                <stop offset="${percentage}%" stop-color="${originalColor}" />
+            </linearGradient>
+        </defs>`;
+        strokeAttr = `stroke="url(#grad-${uid})"`;
+    }
+    
+    const commonAttr = `viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${strokeAttr}`;
+
+    let path = '';
+
+    // 2. 圖示繪製邏輯
+    if (code === 0 || code === 1) { 
+        // === 晴朗 ===
+        if (isNight) {
+            path = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+        } else {
+            // 太陽
+            if (percentage > 0) {
+                path = `<circle cx="12" cy="12" r="5"></circle>`;
+                // 太陽光芒維持純色，不參與水位漸層
+                const rayStyle = `stroke="${originalColor}"`; 
+                path += `
+                    <line x1="12" y1="1" x2="12" y2="4" ${rayStyle}></line>
+                    <line x1="12" y1="1" x2="12" y2="4" transform="rotate(60 12 12)" ${rayStyle}></line>
+                    <line x1="12" y1="1" x2="12" y2="4" transform="rotate(120 12 12)" ${rayStyle}></line>
+                    <line x1="12" y1="1" x2="12" y2="4" transform="rotate(180 12 12)" ${rayStyle}></line>
+                    <line x1="12" y1="1" x2="12" y2="4" transform="rotate(240 12 12)" ${rayStyle}></line>
+                    <line x1="12" y1="1" x2="12" y2="4" transform="rotate(300 12 12)" ${rayStyle}></line>
+                `;
+            } else {
+                path = `
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                `;
+            }
+        }
+    } else if (code === 2 || code === 3) {
+        // === 多雲 ===
+        path = `<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>`;
+    } else if (code >= 45 && code <= 48) {
+        // === 霧 ===
+        path = `<path d="M4 10h16 M4 14h16 M4 18h16"></path>`;
+    } else if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
+        // === 雨 ===
+        path = `
+            <line x1="16" y1="13" x2="16" y2="21" stroke="${waterColor}"></line>
+            <line x1="8" y1="13" x2="8" y2="21" stroke="${waterColor}"></line>
+            <line x1="12" y1="15" x2="12" y2="23" stroke="${waterColor}"></line>
+            <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path>
+        `;
+    } else if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) {
+        // === 雪：嚴格幾何對稱版 + 全局水位計 ===
+        
+        // 1. 中央六角冰核 (R=3)
+        path = `<path d="M12 9 L14.6 10.5 L14.6 13.5 L12 15 L9.4 13.5 L9.4 10.5 Z"></path>`;
+
+        // 2. 六條直線主幹 (R=3 到 R=11)
+        path += `
+            <path d="M12 9 V1 M12 15 V23"></path> <path d="M14.6 10.5 L21.5 6.5 M14.6 13.5 L21.5 17.5"></path> <path d="M9.4 13.5 L2.5 17.5 M9.4 10.5 L2.5 6.5"></path>     `;
+
+        // 3. V 型結構 (幾何對稱複製)
+        // --- 上 (0度) ---
+        path += `<path d="M9.5 5.5 L12 7.5 L14.5 5.5"></path>`;
+        path += `<path d="M9.5 2 L12 4 L14.5 2"></path>`;
+
+        // --- 下 (180度) ---
+        path += `<path d="M9.5 18.5 L12 16.5 L14.5 18.5"></path>`;
+        path += `<path d="M9.5 22 L12 20 L14.5 22"></path>`;
+        
+        // --- 右上 (60度) ---
+        path += `<path d="M16.4 6.6 L15.9 9.75 L18.9 10.9"></path>`;
+        path += `<path d="M19.4 4.8 L18.9 8 L21.9 9.2"></path>`;
+
+        // --- 右下 (120度) ---
+        path += `<path d="M18.9 13.1 L15.9 14.25 L16.4 17.4"></path>`;
+        path += `<path d="M21.9 14.8 L18.9 16 L19.4 19.2"></path>`;
+        
+        // --- 左下 (240度) ---
+        path += `<path d="M7.6 17.4 L8.1 14.25 L5.1 13.1"></path>`;
+        path += `<path d="M4.6 19.2 L5.1 16 L2.1 14.8"></path>`;
+
+        // --- 左上 (300度) ---
+        path += `<path d="M5.1 10.9 L8.1 9.75 L7.6 6.6"></path>`;
+        path += `<path d="M2.1 9.2 L5.1 8 L4.6 4.8"></path>`;
+
+    } else if (code >= 95) {
+        // === 雷雨 ===
+        path = `<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>`;
+        /*path += `<polygon points="19 2 16 7 18 7 17 11 22 5 20 5 19 2"></polygon>`;*/
+    } else {
+        path = `<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>`;
+    }
+
+    return `<svg ${commonAttr}>${defs}${path}</svg>`;
+}
     </script>
     </div>
 </body>
