@@ -1617,6 +1617,62 @@
     /* 👇 [新增] 讓滑鼠游標變更，提示可抓取 */
     cursor: grab;
 }
+/* --- [修改] Modal 頭部按鈕群組樣式 (對齊與防衝突) --- */
+.modal-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 按鈕之間的間距 */
+}
+
+/* 統一定義重整與關閉按鈕的大小與外觀 */
+/* 統一定義重整與關閉按鈕 (透明背景版) */
+.btn-header-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    
+    background-color: transparent; /* 背景透明 */
+    
+    border: none;
+    color: #4B5563;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    
+    /* 強制設定 */
+    position: static !important; 
+    margin: 0 !important;
+}
+
+.btn-header-icon svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
+}
+/* --- [修改] Modal 頭部按鈕群組樣式 (對齊與防衝突) --- */
+.modal-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 按鈕之間的間距 */
+}
+
+
+.btn-header-icon:active {
+    background-color: #E5E7EB;
+    transform: scale(0.92);
+}
+
+.btn-header-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
+}
+
+/* 確保 Modal 內部捲動時不觸發底層翻頁 (CSS 輔助) */
+#weather-detail-modal .modal-box {
+    overscroll-behavior: contain; /* 防止捲動鍊溢出 */
+}
 
 /* (同時建議在下方加入這行，隱藏醜醜的捲軸但保留功能) */
 .weather-detail-scroll::-webkit-scrollbar {
@@ -1781,7 +1837,7 @@
             gap: 8px;
         }
         .cw-card {
-            background: rgba(0, 0, 0, 0.03); /* 極淡背景 */
+            background: rgba(0, 0, 0, 0.03); /* [還原] 背景改回極淡灰色，配合灰色文字 */
             border-radius: 12px;
             padding: 10px 5px;
             text-align: center;
@@ -1794,48 +1850,118 @@
         .cw-icon {
             width: 18px;
             height: 18px;
-            color: #6B7280;
+            color: #666; /* [修改] 圖示顏色改為 #666 (與日出標籤一致) */
             margin-bottom: 4px;
         }
         .cw-label {
             font-size: 0.75rem;
-            color: #9CA3AF;
+            color: #666; /* [關鍵修改] 標籤顏色改為 #666 (與「日出」文字顏色完全一致) */
             margin-bottom: 2px;
         }
         .cw-value {
             font-size: 0.95rem;
             font-weight: 700;
-            color: #374151;
+            color: #333; /* [修改] 數值顏色改為 #333 (與日出「時間」顏色一致) */
         }
-/* [修改] 日出日落區塊 - 去除突兀邊框，改為極簡風格 */
+        /* [修改] 詳細天氣資訊卡 (優化配色與水平佈局) */
+        /* [修改] 詳細天氣資訊卡 (優化配色與水平佈局) */
         .astro-box {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            /* 移除原本的漸層與橘色邊框，改用極淡的背景融入 */
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 20px;
+            /* [修改] 背景改為極淡灰色 (與上方體感資訊欄一致)，移除偏白的突兀感 */
             background: rgba(0, 0, 0, 0.03); 
-            padding: 15px 0;
-            border-radius: 16px;
+            padding: 15px 20px;
+            border-radius: 20px;
             margin-bottom: 20px;
-            border: none; /* 移除邊框 */
+            border: none;
+            align-items: center;
         }
-/* [修改] 日出日落區塊佈局 */
-.astro-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 
-/* [新增] 日出日落 SVG 圖示樣式 */
-.astro-icon svg {
-    width: 32px; 
-    height: 32px;
-    stroke: #F59E0B; /* 太陽暖橘色 */
-    fill: none;
-    stroke-width: 1.5; /* 線條細緻一點，仿 iOS 風格 */
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    margin-bottom: 4px;
-    filter: drop-shadow(0 2px 3px rgba(245, 158, 11, 0.2)); /* 淡淡的光暈 */
-}
-.astro-label { font-size: 0.8rem; color: #666; }
-.astro-time { font-size: 1.1rem; font-weight: 700; color: #333; }
+        /* 左側：日出日落區 (改為水平排列) */
+        .astro-left-col {
+            display: flex;
+            flex-direction: row; /* [修改] 水平排列 */
+            gap: 25px;           /* 增加間距 */
+            border-right: 1px dashed #CBD5E1; 
+            padding-right: 25px;
+            align-items: center;
+        }
+
+        .astro-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 5px; 
+        }
+
+        /* 圖示設定 */
+        .astro-icon svg {
+            width: 36px;  /* 稍微再大一點點 */
+            height: 36px;
+            fill: none;
+            stroke-width: 2.5; /* 線條加粗一點，解決變形感 */
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.05));
+        }
+
+        .icon-sunrise { stroke: #cf8402; }
+        .icon-sunset { stroke: #5759cf; }
+
+        .astro-time { 
+            font-size: 0.9rem; 
+            font-weight: 700; 
+            color: #334155; 
+            font-family: monospace;
+        }
+
+        /* 右側：維持不變 */
+        .astro-right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        /* [修改] 溫差標籤 - 透明背景、縮小字體、不換行 */
+        .diff-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.75rem;  /* [修改] 字體縮小 (原 0.8rem) */
+            font-weight: 700;
+            padding: 2px 8px;    /* [修改] 內距縮小，讓標籤更精緻 */
+            border-radius: 20px;
+            width: -moz-fit-content;
+            width: fit-content;
+            white-space: nowrap; /* [新增] 強制文字不換行 */
+        }
+        
+        /* [修改] 背景改為 transparent (透明)，只保留有顏色的邊框 */
+        .diff-hot { 
+            background: transparent; 
+            color: #DC2626; 
+            border: 1px solid #FECACA; 
+        }
+        .diff-cold { 
+            background: transparent; 
+            color: #2563EB; 
+            border: 1px solid #BFDBFE; /* 保留您想要的藍色邊框 */
+        }
+        .diff-same { 
+            background: transparent; 
+            color: #64748B; 
+            border: 1px solid #E2E8F0; 
+        }
+
+        /* 穿衣建議文字 */
+        .advice-text-small {
+            font-size: 0.85rem;
+            color: #334155;
+            line-height: 1.5;
+            text-align: left;
+        }
+
 /* --- [新增] iOS 天氣動態特效 (仿 iPhone 天氣) --- */
 /* 1. Header 容器設定 */
 .weather-bg-layer {
@@ -4241,19 +4367,24 @@ header.is-night {
 
 <div id="weather-detail-modal" class="modal-overlay">
     <div class="modal-box" style="max-width: 400px; padding: 20px; max-height: 85vh; overflow-y: auto;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-           <div class="modal-title" id="wd-title" style="margin:0; font-size:1.3rem;">--</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+           <div class="modal-title" id="wd-title" style="margin:0; font-size:1.3rem; color: #1F2937;">--</div>
            
-           <div style="display: flex; align-items: center; gap: 8px;">
-               <button id="wd-btn-refresh" style="background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; color:#9CA3AF;">
-                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+           <div class="modal-header-actions">
+               <button id="wd-btn-refresh" class="btn-header-icon" title="重新整理">
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                        <path d="M23 4v6h-6"></path>
                        <path d="M1 20v-6h6"></path>
                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
                    </svg>
                </button>
                
-               <button class="btn-modal-close-x" onclick="document.getElementById('weather-detail-modal').style.display='none'" style="position: static; margin:0;">×</button>
+               <button class="btn-header-icon" onclick="document.getElementById('weather-detail-modal').style.display='none'" title="關閉">
+                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                       <line x1="18" y1="6" x2="6" y2="18"></line>
+                       <line x1="6" y1="6" x2="18" y2="18"></line>
+                   </svg>
+               </button>
            </div>
         </div>
 
@@ -4285,48 +4416,50 @@ header.is-night {
             </div>
         </div>
         <div class="astro-box">
-            <div class="astro-item">
-                <div class="astro-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <g stroke="#CBD5E1">
-                            <line x1="2" y1="20" x2="22" y2="20" stroke-width="2.5"></line> <line x1="12" y1="7" x2="12" y2="2"></line>
-                            <polyline points="9 5 12 2 15 5"></polyline>
-                        </g>
-                        <g stroke="#F59E0B">
-                            <path d="M7 20 A 5 5 0 0 1 17 20"></path> 
-                            <line x1="12" y1="12" x2="12" y2="9"></line> 
-                            <line x1="6.3" y1="14.3" x2="4.2" y2="12.2"></line>
-                            <line x1="17.7" y1="14.3" x2="19.8" y2="12.2"></line>
-                            <line x1="4" y1="20" x2="1" y2="20"></line>
-                            <line x1="20" y1="20" x2="23" y2="20"></line>
-                        </g>
-                    </svg>
+            <div class="astro-left-col">
+                <div class="astro-item">
+                    <div class="astro-icon">
+                        <svg class="icon-sunrise" viewBox="0 0 24 24">
+                            <path d="M17 18a5 5 0 0 0-10 0"></path>
+                            <line x1="12" y1="2" x2="12" y2="9"></line>
+                            <polyline points="8 6 12 2 16 6"></polyline> 
+                            
+                            <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line>
+                            <line x1="1" y1="18" x2="3" y2="18"></line>
+                            <line x1="21" y1="18" x2="23" y2="18"></line>
+                            <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line>
+                            <line x1="23" y1="22" x2="1" y2="22"></line>
+                            <polyline points="8 6 12 2 16 6"></polyline>
+                        </svg>
+                    </div>
+                    <span class="astro-time" id="wd-sunrise">--:--</span>
                 </div>
-                <span class="astro-label">日出</span>
-                <span class="astro-time" id="wd-sunrise">--:--</span>
+                
+                <div class="astro-item">
+                    <div class="astro-icon">
+                        <svg class="icon-sunset" viewBox="0 0 24 24">
+                            <path d="M17 18a5 5 0 0 0-10 0"></path>
+                            <line x1="12" y1="9" x2="12" y2="2"></line>
+                            <path d="M8 5 L12 9 L16 5"></path>
+                            
+                            <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line>
+                            <line x1="1" y1="18" x2="3" y2="18"></line>
+                            <line x1="21" y1="18" x2="23" y2="18"></line>
+                            <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line>
+                            <line x1="23" y1="22" x2="1" y2="22"></line>
+                        </svg>
+                    </div>
+                    <span class="astro-time" id="wd-sunset">--:--</span>
+                </div>
             </div>
-            
-            <div style="width: 1px; height: 40px; background: #CBD5E1; opacity: 0.5;"></div>
 
-            <div class="astro-item">
-                <div class="astro-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                         <g stroke="#CBD5E1">
-                            <line x1="2" y1="20" x2="22" y2="20" stroke-width="2.5"></line> <line x1="12" y1="2" x2="12" y2="7"></line>
-                            <polyline points="9 4 12 7 15 4"></polyline>
-                        </g>
-                        <g stroke="#F59E0B">
-                            <path d="M7 20 A 5 5 0 0 1 17 20"></path>
-                            <line x1="12" y1="12" x2="12" y2="9"></line>
-                            <line x1="6.3" y1="14.3" x2="4.2" y2="12.2"></line>
-                            <line x1="17.7" y1="14.3" x2="19.8" y2="12.2"></line>
-                            <line x1="4" y1="20" x2="1" y2="20"></line>
-                            <line x1="20" y1="20" x2="23" y2="20"></line>
-                        </g>
-                    </svg>
+            <div class="astro-right-col">
+                <div id="wd-diff-badge" class="diff-badge diff-same" style="display:none;">
+                    計算中...
                 </div>
-                <span class="astro-label">日落</span>
-                <span class="astro-time" id="wd-sunset">--:--</span>
+                <div id="wd-advice-text" class="advice-text-small">
+                    正在分析當地穿著建議...
+                </div>
             </div>
         </div>
 
@@ -4635,6 +4768,11 @@ async function updateWeatherWidget(dayId) {
 }
 // ★★★ [新增函式] 當行程摺頁全關閉時，還原回「我的位置」天氣與特效
 function resetHeaderToLocal() {
+    /* --- 請在此處插入代碼 Start --- */
+    // [修正] 強制清空目前選中的行程設定，讓 Modal 知道現在是「我的位置」模式
+    window.currentActiveConfig = null;
+    /* --- 請在此處插入代碼 End --- */
+
     // 1. 檢查是否有快取的定位資料
     if (!window.appCache || !window.appCache['my_location_combined']) {
         return; // 還沒定位過就不動作
@@ -7574,16 +7712,21 @@ async function fetchAndShowDetail(lat, lon, locName) {
         const res = await fetch(url);
         const data = await res.json();
         
-        // --- 0. 處理時間索引 (找到目前這小時的資料) ---
-        const currentHour = new Date().getHours();
-        let startIdx = 0;
-        const dataDate = data.hourly.time[0].split('T')[0];
-        const todayDate = new Date().toISOString().split('T')[0];
+        // --- 0. 處理時間索引 (修正：使用當地的 current_weather 時間) ---
+        // Open-Meteo 的 current_weather.time 回傳的是當地的 ISO 時間 (例如 "2026-01-27T11:00")
+        const localTimeStr = data.current_weather.time;
         
-        // 如果 API 回傳的第一天是今天，就從目前小時開始抓
-        if (dataDate === todayDate) {
-            startIdx = currentHour;
+        // 直接在 hourly 列表中尋找這個時間字串，就能精準對應到當地的「現在」
+        let startIdx = data.hourly.time.indexOf(localTimeStr);
+        
+        // 防呆：如果剛好沒對到 (極少見)，則預設從 0 開始
+        if (startIdx === -1) {
+            // 嘗試只比對 "YYYY-MM-DDTHH" (前13碼)，忽略分鐘差異
+            const hourStr = localTimeStr.substring(0, 13);
+            startIdx = data.hourly.time.findIndex(t => t.startsWith(hourStr));
         }
+        
+        if (startIdx === -1) startIdx = 0;
 
         // --- 1. 更新上方儀表板 (Dashboard) ---
         // 使用目前這小時的詳細數據
@@ -7616,6 +7759,33 @@ async function fetchAndShowDetail(lat, lon, locName) {
 
         document.getElementById('wd-sunrise').innerText = sunriseStr;
         document.getElementById('wd-sunset').innerText = sunsetStr;
+// --- [新增] 2.5 更新右側：溫差比對與穿衣建議 ---
+        
+        // A. 溫差比對
+        const diffBadge = document.getElementById('wd-diff-badge');
+        // currentMyTemp 是全域變數，若有定位成功會有數值
+        if (typeof currentMyTemp !== 'undefined' && currentMyTemp !== null) {
+            const diff = curTemp - currentMyTemp;
+            diffBadge.style.display = 'inline-flex';
+            
+            if (Math.abs(diff) < 2) {
+                // 溫差小於 2 度，不顯示差異，或顯示差不多
+                diffBadge.style.display = 'none'; 
+            } else if (diff > 0) {
+                diffBadge.className = 'diff-badge diff-hot';
+                diffBadge.innerHTML = `氣溫比目前高 ${diff.toFixed(1)}°C`;
+            } else {
+                diffBadge.className = 'diff-badge diff-cold';
+                diffBadge.innerHTML = `氣溫比目前低 ${Math.abs(diff).toFixed(1)}°C`;
+            }
+        } else {
+            diffBadge.style.display = 'none'; // 無定位資料時隱藏
+        }
+
+        // B. 穿衣建議 (重複利用您既有的智慧建議函式)
+        // getSmartAdviceText(溫度, 天氣代碼) 是您程式碼中已經存在的函式
+        const smartAdvice = getSmartAdviceText(curTemp, curCode);
+        document.getElementById('wd-advice-text').innerText = smartAdvice;
 
         // --- 3. 渲染 24小時預報 (維持不變) ---
         const hourlyContainer = document.getElementById('wd-hourly-list');
