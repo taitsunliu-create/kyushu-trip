@@ -47,6 +47,35 @@
         }
 
         /* Header - Modified for Side-by-Side Layout */
+        /* [新增] 右上角重新整理按鈕樣式 */
+        .btn-app-refresh {
+            position: absolute;
+            top: -5px;   /* 距離頂部 */
+            right: -5px; /* 距離右側 */
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5); /* 預設半透明白 */
+            padding: 10px; /* 增加點擊範圍 */
+            cursor: pointer;
+            z-index: 50; /* 確保在最上層可點擊 */
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-app-refresh:active, .btn-app-refresh:hover {
+            color: white; /* 點擊時變全白 */
+            transform: rotate(180deg); /* 點擊時旋轉特效 */
+            background: rgba(255, 255, 255, 0.1); /* 微微的背景回饋 */
+            border-radius: 50%;
+        }
+        .btn-app-refresh svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2.5;
+        }
+
         header {
             background: linear-gradient(135deg, #1e40af, #3b82f6);
             color: var(--white);
@@ -2336,6 +2365,14 @@ header.is-night {
     <div id="weather-effect-layer" class="weather-bg-layer"></div>
 
     <div class="header-content">
+        <button class="btn-app-refresh" onclick="window.location.reload()" title="重新整理 App">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 4v6h-6"></path>
+                <path d="M1 20v-6h6"></path>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+        </button>
+
         <div class="header-title-area">
             <h1>九州親子自駕遊</h1>
                 <div class="subtitle">2026/01/25 - 01/30 (6天5夜)</div>
@@ -3594,7 +3631,662 @@ header.is-night {
 
     <!-- TAB 4: 旅遊資訊 -->
     <div id="view-info" class="container">
-        
+        <div class="card" style="background: transparent; box-shadow: none; padding: 0; border: none; margin-bottom: 10px;">
+            <div class="card-header" style="background: #fff; border-radius: 16px; padding: 15px; border: 1px solid rgba(0,0,0,0.03); box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-bottom: 15px;">
+                <div class="card-title">美食備案口袋名單</div>
+                <div class="tag tag-food">彈性選擇</div>
+            </div>
+
+            <div class="day-wrapper">
+                <div class="day-toggle" id="toggle-food-k" onclick="toggleTimeline('food-k', this)">
+                    <div class="day-info">
+                        <h3>熊本區備案</h3>
+                        <span>勝烈亭、拉麵、馬肉料理</span>
+                    </div>
+                    <div class="toggle-icon">▼</div>
+                </div>
+                <div id="food-k" class="timeline">
+                    <div class="info-section" style="border-color: #34D399; background-color: #ECFDF5; margin-bottom: 15px;">
+                        <h3 style="color: #059669; border-bottom-color: #34D399;">☀️ 午餐口袋名單 (炸豬排/拉麵/太平燕)</h3>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🐷 勝烈亭 (Katsuretsu Tei) 新市街本店</span>
+                            <div class="method-detail">
+                                <p>熊本必吃！米其林推薦的炸豬排。外皮酥脆不油膩，肉質鮮嫩，醬汁與磨碎的芝麻香氣極佳。<b>兒童餐</b>也非常豐盛。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Katsuretsu+Tei+Shinshigai" target="_blank" class="btn-map">導航至勝烈亭</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🍜 黑亭拉麵 (Kokutei) 下通店</span>
+                            <div class="method-detail">
+                                <p>熊本拉麵代表，特色是香濃的<b>焦蒜油豚骨湯頭</b>。下通店位置方便，適合逛街中途用餐。雖然口味較重，但也有不加蒜油的選項。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Kokutei+Shimotori" target="_blank" class="btn-map">導航至黑亭拉麵</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🦐 紅蘭亭 (Kourantei) 下通本店</span>
+                            <div class="method-detail">
+                                <p>熊本鄉土料理<b>「太平燕」</b>的名店。類似口感清爽的粉絲湯，搭配滿滿的海鮮與蔬菜，健康無負擔，非常適合給小孩吃。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Kourantei+Shimotori" target="_blank" class="btn-map">導航至紅蘭亭</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🥩 菅乃屋 (Suganoya) 上通店</span>
+                            <div class="method-detail">
+                                <p>知名的馬肉料理專門店。午間套餐價格親民，可以嘗試馬肉刺身或馬肉漢堡排，不敢吃生食也有熟食定食可選。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Suganoya+Kamitori" target="_blank" class="btn-map">導航至菅乃屋</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🍣 壽司 Zanmai (すしざんまい) 下通店</span>
+                            <div class="method-detail">
+                                <p>位於下通商店街內，24小時營業的知名壽司連鎖。雖然是連鎖店，但食材穩定新鮮，想吃壽司時最保險的選擇，對兒童也很友善。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Sushi+Zanmai+Kumamoto" target="_blank" class="btn-map">導航至壽司 Zanmai</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" style="border-color: #FBBF24; background-color: #FFFBEB; margin-bottom: 15px;">
+                        <h3 style="color: #B45309; border-bottom-color: #FBBF24;">🌙 晚餐口袋名單 (居酒屋/燒肉/馬肉)</h3>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🐎 馬櫻 (Uma Sakura) 下通店</span>
+                            <div class="method-detail">
+                                <p>如果晚餐想認真吃馬肉料理，這裡提供燒肉、涮涮鍋等多種吃法。店內氣氛較時尚，設有包廂，帶小孩用餐也比較自在。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Umasakura+Shimotori" target="_blank" class="btn-map">導航至馬櫻</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🏮 橫馬場 (Yokobachi)</span>
+                            <div class="method-detail">
+                                <p>位於上乃裏通的古民家風居酒屋。有戶外庭院座位，氛圍極佳。提供餃子、串燒等豐富料理，是熊本在地人氣店。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Yokobachi+Kumamoto" target="_blank" class="btn-map">導航至橫馬場</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🔥 孫三郎 (Mago Saburo) 燒肉</span>
+                            <div class="method-detail">
+                                <p>主打熊本產的「黑樺牛」燒肉。肉質鮮美，價格合理。位於熱鬧的下通附近，是肉食愛好者的好選擇。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Magosaburo+Kagomachi" target="_blank" class="btn-map">導航至孫三郎</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🐓 天草水產研究所</span>
+                            <div class="method-detail">
+                                <p>主打天草直送的新鮮海鮮居酒屋。生魚片拼盤非常壯觀，如果想吃海鮮大餐，這裡是首選。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Amakusa+Suisan+Kenkyujo" target="_blank" class="btn-map">導航至天草水產</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🍜 味千拉麵 本店</span>
+                            <div class="method-detail">
+                                <p>熊本拉麵的世界級連鎖本店。口味穩定，且每個月22號有感謝日優惠。對於家庭旅客來說，是絕對不會踩雷的安全牌。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Ajisen+Ramen+Honten" target="_blank" class="btn-map">導航至味千本店</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" style="border-color: #F472B6; background-color: #FFF1F2; margin-bottom: 15px;">
+                        <h3 style="color: #DB2777; border-bottom-color: #F472B6;">🍰 熊本午茶 & 咖啡</h3>
+                        
+                        <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
+                            <span class="method-title" style="color: #BE185D;">Swiss Konditorei (スイス)</span>
+                            <div class="method-detail">
+                                <p>熊本老字號洋菓子店，隨處可見綠色招牌。推薦<b>「酒心巧克力 (Liqueur Bonbon)」</b>是經典伴手禮，店內蛋糕也非常美味。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Swiss+Konditorei+Shimotori" target="_blank" class="btn-map">導航至 Swiss</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
+                            <span class="method-title" style="color: #BE185D;">岡田咖啡 (Okada Coffee)</span>
+                            <div class="method-detail">
+                                <p>上通商店街的優雅咖啡館，沈穩的昭和風格。逛累了來這裡喝杯手沖咖啡配栗子蛋糕，非常愜意。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Okada+Coffee+Kamitori" target="_blank" class="btn-map">導航至岡田咖啡</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" style="border-color: #F87171; background-color: #FEF2F2; margin-bottom: 15px;">
+                        <h3 style="color: #DC2626; border-bottom-color: #F87171;">🍠 必吃！熊本名物「いきなり団子」</h3>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">1. 長壽庵 (長寿庵)</span>
+                            <div class="method-detail">
+                                <p>熊本最有名的いきなり団子專賣店。熱騰騰的番薯與紅豆內餡，外皮Q彈微鹹，絕妙的鹹甜平衡。熊本站內也有分店。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Chojuan+Kumamoto" target="_blank" class="btn-map">搜尋長壽庵</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">2. 華丸堂 (Hanamarudo)</span>
+                            <div class="method-detail">
+                                <p>位於櫻之馬場城彩苑內，除了傳統口味，還有創新的<b>彩色糰子</b>，很受小朋友歡迎。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Hanamarudo+Kumamoto" target="_blank" class="btn-map">導航至華丸堂</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">3. 芋屋長兵衛</span>
+                            <div class="method-detail">
+                                <p>番薯專門店，除了糰子外，還有番薯片、番薯霜淇淋等各種番薯製品，是番薯控的天堂。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Imoya+Chobei" target="_blank" class="btn-map">搜尋芋屋長兵衛</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">4. 村上 KARASHI RENKON</span>
+                            <div class="method-detail">
+                                <p>除了甜點，也推薦嘗試熊本另一名物<b>「辛子蓮藕」</b>。這家店現場現炸，熱熱吃比較不嗆辣，是很棒的大人點心。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Murakami+Karashi+Renkon" target="_blank" class="btn-map">導航至村上辛子蓮藕</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">5. KUMAMON Square 限定甜點</span>
+                            <div class="method-detail">
+                                <p>如果到了熊本部長辦公室，一定要試試那裡的限定聖代或拿鐵，雖然是觀光地，但造型可愛絕對能收服小孩的心。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Kumamon+Square" target="_blank" class="btn-map">導航至 Kumamon Square</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="day-wrapper">
+                <div class="day-toggle" id="toggle-food-a" onclick="toggleTimeline('food-a', this)">
+                    <div class="day-info">
+                        <h3>阿蘇 & 黑川備案</h3>
+                        <span>赤牛丼、地雞、溫泉街甜點</span>
+                    </div>
+                    <div class="toggle-icon">▼</div>
+                </div>
+                <div id="food-a" class="timeline">
+                    <div class="info-section" style="border-color: #34D399; background-color: #ECFDF5; margin-bottom: 15px;">
+                        <h3 style="color: #059669; border-bottom-color: #34D399;">☀️ 午餐口袋名單 (赤牛丼/田樂/蕎麥麵)</h3>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🥩 Imakin 食堂 (いまきん食堂)</span>
+                            <div class="method-detail">
+                                <p>阿蘇<b>赤牛丼的傳說級名店</b>。百年老店，半熟的赤牛鋪滿碗面。需排隊很久，建議一早去登記或有心理準備。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Imakin+Shokudo" target="_blank" class="btn-map">導航至 Imakin</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">⛰️ 倍喰丼 (Bakuro)</span>
+                            <div class="method-detail">
+                                <p>如果 Imakin 太多人，這家是絕佳替代方案。位於半山腰，視野極佳可眺望阿蘇五岳，赤牛漢堡排和牛排丼都非常美味。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Restaurant+Bakuro+Aso" target="_blank" class="btn-map">導航至倍喰丼</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🍢 高森田樂保存會 (高森田楽保存会)</span>
+                            <div class="method-detail">
+                                <p>體驗在圍爐裏旁吃<b>「田樂燒」</b>。將芋頭、蒟蒻、山女魚塗上味噌炭烤，非常具有日本傳統風情，小朋友會覺得很有趣。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Takamori+Dengaku+Hozonkai" target="_blank" class="btn-map">導航至高森田樂</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🥢 阿蘇路 蕎麥麵 (そば処 阿蘇路)</span>
+                            <div class="method-detail">
+                                <p>位於阿蘇站附近的老字號蕎麥麵店。麵條手工製作，推薦搭配炸蝦天婦羅。上菜速度快，適合趕行程的午餐。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Sobadokoro+Asoji" target="_blank" class="btn-map">導航至阿蘇路</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🌾 農家餐廳 山之里 (農家れすとらん 山の里)</span>
+                            <div class="method-detail">
+                                <p>提供自家農場種植的食材與赤牛燒肉。環境溫馨，有種到鄉下親戚家作客的感覺，非常適合家庭用餐。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Nouka+Restaurant+Yamanosato" target="_blank" class="btn-map">導航至山之里</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" style="border-color: #FBBF24; background-color: #FFFBEB; margin-bottom: 15px;">
+                        <h3 style="color: #B45309; border-bottom-color: #FBBF24;">🌙 晚餐口袋名單 (黑川溫泉/阿蘇)</h3>
+                        <p style="font-size:0.8rem; color:#B45309; margin-bottom:5px;">*注意：山區店家大多很早打烊，晚餐建議預約或在旅館用餐。</p>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🏮 味處 Naka (味処なか)</span>
+                            <div class="method-detail">
+                                <p>黑川溫泉街上的人氣定食店。提供地雞料理、關東煮與丼飯。是黑川少數晚上有營業且價格平實的選擇。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Ajidokoro+Naka+Kurokawa" target="_blank" class="btn-map">導航至味處 Naka</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🥩 燒肉 UFUFU (焼肉 　うふふ)</span>
+                            <div class="method-detail">
+                                <p>黑川溫泉區內的燒肉店。如果旅館懷石料理吃膩了，來這裡大口吃阿蘇牛燒肉是絕佳轉換。店內乾淨舒適。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Yakiniku+Ufufu+Kurokawa" target="_blank" class="btn-map">導航至燒肉 UFUFU</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🍺 Waroku 屋 (わろく屋)</span>
+                            <div class="method-detail">
+                                <p>黑川著名的百年建築餐廳，主打<b>「黑咖哩」</b>與赤牛牛排。午晚餐都有供應，氛圍復古迷人。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Warokuya+Kurokawa" target="_blank" class="btn-map">導航至 Waroku 屋</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🍜 小國蕎麥街道 (午餐延伸/晚餐早去)</span>
+                            <div class="method-detail">
+                                <p>阿蘇小國町有一條「蕎麥街道」，如<b>「吾亦紅」</b>等名店。若晚餐時間較早(17:00前)，可以在回黑川前先用餐。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Sobadokoro+Waremoko" target="_blank" class="btn-map">導航至吾亦紅</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🍱 道之驛 阿蘇 (外帶備案)</span>
+                            <div class="method-detail">
+                                <p>最強備案！如果餐廳都關了，阿蘇站旁的道之驛販賣許多高品質的<b>赤牛便當</b>和在地熟食，買回飯店吃也很享受。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Michinoeki+Aso" target="_blank" class="btn-map">導航至道之驛阿蘇</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" style="border-color: #F472B6; background-color: #FFF1F2; margin-bottom: 15px;">
+                        <h3 style="color: #DB2777; border-bottom-color: #F472B6;">☕ 山林午茶 & 甜點</h3>
+                        
+                        <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
+                            <span class="method-title" style="color: #BE185D;">Patisserie Roku (麓)</span>
+                            <div class="method-detail">
+                                <p>黑川溫泉必訪甜點店。<b>「鹽麴泡芙」</b>是招牌，外皮酥脆內餡濃郁。也有好吃的蒙布朗。適合泡完湯後享用。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Patisserie+Roku+Kurokawa" target="_blank" class="btn-map">導航至 Patisserie Roku</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" style="border-color: #F87171; background-color: #FEF2F2; margin-bottom: 15px;">
+                        <h3 style="color: #DC2626; border-bottom-color: #F87171;">🥛 必吃！阿蘇牧場鮮乳 & 霜淇淋</h3>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">1. ABE 牧場 (ASO MILK FACTORY)</span>
+                            <div class="method-detail">
+                                <p>榮獲國際味覺賞三星的頂級牛奶。這裡的年輪蛋糕和義式冰淇淋 (Gelato) 超級濃郁，設有玫瑰園，環境優美。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Aso+Milk+Factory" target="_blank" class="btn-map">導航至 Aso Milk Factory</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">2. 大觀峰 茶店</span>
+                            <div class="method-detail">
+                                <p>在絕景展望台吃霜淇淋是阿蘇自駕的儀式感！這裡販售的是阿蘇小國澤西牛乳製作的霜淇淋，奶香特濃。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Daikanbo+Tea+House" target="_blank" class="btn-map">導航至大觀峰茶店</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">3. 草千里 珈琲焙煎所</span>
+                            <div class="method-detail">
+                                <p>位於草千里展望台，文青風格的咖啡店。手沖咖啡搭配獨特的竹炭拿鐵，拍照打卡必備。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Kusasenri+Coffee+Roastery" target="_blank" class="btn-map">導航至草千里咖啡</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">4. 山吹水源 烤香魚</span>
+                            <div class="method-detail">
+                                <p>如果不想吃甜的，產山村水源頭旁的現烤香魚也是一絕。肉質細緻，連骨頭都能吃，孩子也能輕鬆嘗試。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Yamabuki+Suigen" target="_blank" class="btn-map">導航至山吹水源</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">5. 白川水源 物產館</span>
+                            <div class="method-detail">
+                                <p>取用名水製作的<b>「水饅頭」</b>和豆腐，口感滑嫩清爽。在清澈的水源旁享用，格外消暑。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Shirakawa+Suigen" target="_blank" class="btn-map">導航至白川水源</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="day-wrapper">
+                <div class="day-toggle" id="toggle-food-y" onclick="toggleTimeline('food-y', this)">
+                    <div class="day-info">
+                        <h3>別府 & 由布院備案</h3>
+                        <span>地獄蒸、豐後牛釜飯</span>
+                    </div>
+                    <div class="toggle-icon">▼</div>
+                </div>
+                <div id="food-y" class="timeline">
+                    <div class="info-section" style="border-color: #34D399; background-color: #ECFDF5; margin-bottom: 15px;">
+                        <h3 style="color: #059669; border-bottom-color: #34D399;">☀️ 午餐口袋名單 (釜飯/天婦羅/地獄蒸)</h3>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🍚 由布Mabushi 心 (由布まぶし 心)</span>
+                            <div class="method-detail">
+                                <p>由布院排隊名店。必點<b>「豐後牛釜飯」</b>，一鍋三吃（原味、加佐料、茶泡飯）。金鱗湖店與站前店皆可，建議開店前去排。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Yufu+Mabushi+Shin+Kinrinko" target="_blank" class="btn-map">導航至金鱗湖店</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🍤 東洋軒 (Toyoken) - 別府</span>
+                            <div class="method-detail">
+                                <p>大分名物<b>「雞肉天婦羅 (Toriten)」</b>的發源地。外酥內嫩的炸雞肉，蘸上酸橘醋醬油，清爽好吃，是孩子們的最愛。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Toyoken+Beppu" target="_blank" class="btn-map">導航至東洋軒</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">♨️ 地獄蒸工房 鐵輪 (地獄蒸し工房)</span>
+                            <div class="method-detail">
+                                <p>DIY體驗型餐廳。租用蒸窯，將購買的蔬菜、海鮮、雞肉放入溫泉蒸氣中蒸熟。完全保留食材原味，健康又好玩。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Jigokumushi+Kobo+Kannawa" target="_blank" class="btn-map">導航至地獄蒸工房</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🍜 六盛 (Rokusei) 冷麵 - 別府</span>
+                            <div class="method-detail">
+                                <p>別府除了溫泉，<b>「別府冷麵」</b>也超有名。麵條Q彈有勁，牛肉湯頭醇厚，搭配泡菜，是一年四季都能吃的美味。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Rokusei+Reimen+Beppu" target="_blank" class="btn-map">導航至六盛冷麵</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🐶 Snoopy Tea House 由布院</span>
+                            <div class="method-detail">
+                                <p>全球第一間史努比茶屋。提供可愛造型的蛋包飯、漢堡排。雖然是主題餐廳，但口味意外地好，環境非常療癒。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Snoopy+Tea+House+Yufuin" target="_blank" class="btn-map">導航至史努比茶屋</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" style="border-color: #FBBF24; background-color: #FFFBEB; margin-bottom: 15px;">
+                        <h3 style="color: #B45309; border-bottom-color: #FBBF24;">🌙 晚餐口袋名單 (燒肉/居酒屋/洋食)</h3>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🥩 燒肉元相 (Gensou) - 別府</span>
+                            <div class="method-detail">
+                                <p>別府當地人氣燒肉店，提供高品質的豐後牛與黑毛和牛。座位寬敞，適合家庭聚餐。建議提前預約。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Yakiniku+Gensou+Beppu" target="_blank" class="btn-map">導航至燒肉元相</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🐟 海鮮居酒屋 爐端仁 (Robata Jin)</span>
+                            <div class="method-detail">
+                                <p>位於別府站前，CP值很高的居酒屋。可以吃到大分名物「關鯖魚、關竹莢魚」的生魚片。氣氛熱鬧。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Robata+Jin+Beppu" target="_blank" class="btn-map">導航至爐端仁</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🍽️ Somuri (そむり) 牛排館 - 別府</span>
+                            <div class="method-detail">
+                                <p>想吃正宗豐後牛牛排就來這。老派西餐廳的風格，服務周到，牛排鮮嫩多汁。午餐時段也有較平價的漢堡排。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Steak+House+Somuri+Beppu" target="_blank" class="btn-map">導航至 Somuri</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🍣 龜正迴轉壽司 (Kamesho) - 別府</span>
+                            <div class="method-detail">
+                                <p>別府傳奇排隊壽司。食材新鮮、份量大(生魚片厚切)，CP值極高。不能預約，只能現場排隊，建議晚餐前提早去。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Kamesho+Kurukuru+Sushi" target="_blank" class="btn-map">導航至龜正壽司</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🥘 龜之井別莊 湯之岳庵 - 由布院</span>
+                            <div class="method-detail">
+                                <p>如果不夜宿御三家旅館，也可以來這裡的餐廳享用晚餐。環境極為清幽雅致，提供精緻的山里料理。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Yunotakean+Yufuin" target="_blank" class="btn-map">導航至湯之岳庵</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" style="border-color: #F472B6; background-color: #FFF1F2; margin-bottom: 15px;">
+                        <h3 style="color: #DB2777; border-bottom-color: #F472B6;">☕ 由布院童話午茶</h3>
+                        
+                        <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
+                            <span class="method-title" style="color: #BE185D;">Miffy Kitchen (米飛兔麵包)</span>
+                            <div class="method-detail">
+                                <p>外觀是可愛的童話小屋，販售米飛兔造型的紅豆麵包和伴手禮。二樓有內用區，非常適合親子休息。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Miffy+Kitchen+Yufuin" target="_blank" class="btn-map">導航至米飛兔廚房</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" style="border-color: #F87171; background-color: #FEF2F2; margin-bottom: 15px;">
+                        <h3 style="color: #DC2626; border-bottom-color: #F87171;">🍰 必吃！由布院散步甜點</h3>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">1. B-Speak 蛋糕捲</span>
+                            <div class="method-detail">
+                                <p>由布院甜點的王者。P Roll 蛋糕捲蓬鬆濕潤，蛋香濃郁。通常中午前會賣完小條裝，建議一抵達就先買。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=B-Speak+Yufuin" target="_blank" class="btn-map">導航至 B-Speak</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">2. Milch (ミルヒ) 起司杯</span>
+                            <div class="method-detail">
+                                <p>半熟起司蛋糕杯 (Kase Kuchen)。熱熱吃中間會流心，冷吃像重乳酪蛋糕。推薦現場吃熱的！</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Milch+Yufuin" target="_blank" class="btn-map">導航至 Milch</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">3. 金賞可樂餅 (金賞コロッケ)</span>
+                            <div class="method-detail">
+                                <p>湯之坪街道上人手一個的散步美食。外皮酥脆，內餡是調味過的牛肉馬鈴薯泥，鹹香好吃。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Gold+Prize+Croquette+Yufuin" target="_blank" class="btn-map">導航至金賞可樂餅</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">4. 鞠智 (Cucuchi) 銅鑼燒</span>
+                            <div class="method-detail">
+                                <p>現做的銅鑼燒，餅皮鬆軟，內餡除了紅豆還有栗子、抹茶等多種口味。店面設計很美，適合拍照。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Cucuchi+Yufuin" target="_blank" class="btn-map">導航至鞠智</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">5. 岡本屋 地獄蒸布丁 (別府)</span>
+                            <div class="method-detail">
+                                <p>位於別府明礬溫泉區。利用溫泉蒸氣製作的布丁，口感稍微扎實，帶有淡淡的焦糖苦甜味，是別府必吃甜點。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Okamotoya+Shop" target="_blank" class="btn-map">導航至岡本屋</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="day-wrapper">
+                <div class="day-toggle" id="toggle-food-f" onclick="toggleTimeline('food-f', this)">
+                    <div class="day-info">
+                        <h3>福岡區備案</h3>
+                        <span>牛腸鍋、屋台、博多拉麵</span>
+                    </div>
+                    <div class="toggle-icon">▼</div>
+                </div>
+                <div id="food-f" class="timeline">
+                    
+                    <div class="info-section" style="border-color: #34D399; background-color: #ECFDF5; margin-bottom: 15px;">
+                        <h3 style="color: #059669; border-bottom-color: #34D399;">☀️ 午餐口袋名單 (壽司/定食/烏龍麵)</h3>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🍣 瓢簞壽司 (ひょうたん寿司)</span>
+                            <div class="method-detail">
+                                <p>天神地區排隊名店。食材新鮮、價格合理，是福岡人心中CP值最高的壽司店。推薦午間套餐。</p>
+                                <p style="margin-top:5px; font-size:0.85rem; color:#666;">*地點：天神站步行 2 分鐘 (Solaria Stage 旁)。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Hyotan+Sushi+Tenjin" target="_blank" class="btn-map">導航至瓢簞壽司</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🍤 天麩羅處 Hirao (天麩羅処ひらお)</span>
+                            <div class="method-detail">
+                                <p>福岡靈魂美食！現炸天婦羅一道道上桌，最大特色是桌上的<b>「柚子花枝 (いかの塩辛)」</b>免費吃到飽，非常下飯。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Tempura+Hirao+Daimyo" target="_blank" class="btn-map">導航至大名店</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🍜 大地之烏龍麵 (大地のうどん)</span>
+                            <div class="method-detail">
+                                <p>博多烏龍麵代表。推薦<b>「牛蒡天烏龍麵」</b>，炸牛蒡大到蓋住整個碗，視覺效果驚人，麵條半透明Q彈。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Daichi+no+Udon+Hakata" target="_blank" class="btn-map">導航至博多站地下店</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🍱 吉塚鰻魚屋 (吉塚うなぎ屋)</span>
+                            <div class="method-detail">
+                                <p>位於中洲河畔，創業超過百年的名店。烤工絕佳，外酥內嫩，醬汁濃郁。建議開店前就去抽號碼牌。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Yoshizuka+Unagiya" target="_blank" class="btn-map">導航至吉塚鰻魚屋</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #34D399; margin-top: 10px;">
+                            <span class="method-title" style="color: #059669;">🦀 稚加榮 (Chikae) - 假日午間御膳</span>
+                            <div class="method-detail">
+                                <p>福岡高級料亭，午餐時段提供限量御膳 (通常需排隊)。可以在巨大的魚池吧台旁用餐，體驗極佳。</p>
+                                <p style="margin-top:5px; font-size:0.85rem; color:#DC2626;">*注意：午間套餐數量有限，售完為止。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Chikae+Fukuoka" target="_blank" class="btn-map">導航至稚加榮</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" style="border-color: #FBBF24; background-color: #FFFBEB; margin-bottom: 15px;">
+                        <h3 style="color: #B45309; border-bottom-color: #FBBF24;">🌙 晚餐口袋名單 (鍋物/拉麵/燒肉)</h3>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🍲 博多華味鳥 (水炊雞肉鍋)</span>
+                            <div class="method-detail">
+                                <p><b>親子首選</b>。雞湯濃郁充滿膠原蛋白，雞肉軟嫩，口味清爽健康。博多站與天神都有多家分店，建議預約。</p>
+                                <a href="https://www.google.com/maps/search/博多華味鳥+博多駅前" target="_blank" class="btn-map">搜尋附近分店</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🍜 Shin-Shin 拉麵</span>
+                            <div class="method-detail">
+                                <p>在地人氣超高。麵條極細，豚骨湯頭濃郁但無腥味且帶甜味，小朋友接受度高。天神本店常大排長龍。</p>
+                                <a href="https://www.google.com/maps/search/博多らーめん+Shin-Shin" target="_blank" class="btn-map">搜尋 Shin-Shin</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🥩 極味屋 (KIWAMIYA) 漢堡排</span>
+                            <div class="method-detail">
+                                <p>特色是<b>「DIY 鐵板漢堡排」</b>，自己用筷子切下放在小鐵石上煎熟，好吃又好玩。排隊隊伍通常很長。</p>
+                                <a href="https://www.google.com/maps/search/極味屋+博多" target="_blank" class="btn-map">導航至極味屋</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🥘 博多摩滋鍋 大山 (もつ鍋 おおやま)</span>
+                            <div class="method-detail">
+                                <p>福岡代表性美食牛腸鍋。推薦<b>「味噌口味」</b>，濃郁香醇。店內裝潢通常較華麗，博多站內有分店，交通方便。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Hakata+Motsunabe+Ooyama" target="_blank" class="btn-map">搜尋大山牛腸鍋</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
+                            <span class="method-title" style="color: #B45309;">🍣 博多魚嘉 (博多魚がし)</span>
+                            <div class="method-detail">
+                                <p>位於博多站一番街的迴轉壽司(或點餐式)。由魚市場直營，食材新鮮度沒話說，適合晚餐想吃壽司但不想跑太遠的選擇。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Hakata+Uogashi+Hakata+Station" target="_blank" class="btn-map">導航至博多魚嘉</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" style="border-color: #F472B6; background-color: #FFF1F2; margin-bottom: 15px;">
+                        <h3 style="color: #DB2777; border-bottom-color: #F472B6;">🍰 下午茶 & 療癒甜點 (逛累專用)</h3>
+                        
+                        <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
+                            <span class="method-title" style="color: #BE185D;">Cafe del SOL (天神/西通)</span>
+                            <div class="method-detail">
+                                <p>福岡知名的<b>「蓬鬆系鬆餅」</b>，口感像雲朵一樣軟綿，搭配新鮮水果。店內氛圍溫馨，受女性與小孩歡迎。</p>
+                                <a href="https://www.google.com/maps/search/Cafe+del+SOL+福岡" target="_blank" class="btn-map">導航至 Cafe del SOL</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
+                            <span class="method-title" style="color: #BE185D;">Mutsukado むつか堂 (博多站)</span>
+                            <div class="method-detail">
+                                <p>知名吐司專賣店咖啡廳，必吃<b>「水果鮮奶油三明治」</b>。位於 AMU PLAZA 5樓 (大鐘旁)。</p>
+                                <a href="https://www.google.com/maps/search/むつか堂+アミュプラザ博多店" target="_blank" class="btn-map">導航至 AMU PLAZA 店</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
+                            <span class="method-title" style="color: #BE185D;">il FORNO del Mignon (博多站)</span>
+                            <div class="method-detail">
+                                <p>博多站中央改札口旁的<b>「迷你可頌」</b>排隊名店。按重量計價，適合買回飯店當宵夜。</p>
+                                <a href="https://www.google.com/maps/search/il+FORNO+del+Mignon+博多" target="_blank" class="btn-map">導航至博多站可頌</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" style="border-color: #F87171; background-color: #FEF2F2; margin-bottom: 15px;">
+                        <h3 style="color: #DC2626; border-bottom-color: #F87171;">🥖 必吃！明太子法國麵包 (5大名店)</h3>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">1. Full Full (フルフル)</span>
+                            <div class="method-detail">
+                                <p>福岡明太子法國麵包的代名詞！外皮酥脆，內餡充滿濃郁的明太子奶油。雖然本店較遠，但值得一試。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Full+Full+Bakery+Fukuoka" target="_blank" class="btn-map">搜尋 Full Full</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">2. Pain Stock (パンストック)</span>
+                            <div class="method-detail">
+                                <p>福岡超人氣排隊麵包店，以長時間發酵聞名。招牌明太子法國麵包口感極佳，常一出爐就秒殺。</p>
+                                <p style="margin-top:5px; font-size:0.85rem; color:#666;">*地點：箱崎本店 / 天神也有分店 (Stock)。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Pain+Stock+Tenjin" target="_blank" class="btn-map">導航至天神店 (Stock)</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">3. DACOMECCA (ダコメッカ)</span>
+                            <div class="method-detail">
+                                <p>位於博多站旁，是東京超紅 Amam Dacotan 的姊妹店。裝潢如童話般夢幻，炭烤漢堡排與明太子麵包都是必買。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Dacomecca+Hakata" target="_blank" class="btn-map">導航至 Dacomecca</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">4. TRANDOR (トランドール)</span>
+                            <div class="method-detail">
+                                <p>位於博多站內的麵包店，交通最方便。由 JR 九州經營，半熟蛋咖哩麵包和明太子麵包是旅客補給首選。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=Trandor+Hakata" target="_blank" class="btn-map">導航至博多站店</a>
+                            </div>
+                        </div>
+
+                        <div class="safari-method" style="border-color: #F87171; margin-top: 10px;">
+                            <span class="method-title" style="color: #DC2626;">5. THE CITY BAKERY</span>
+                            <div class="method-detail">
+                                <p>位於天神 Solaria Plaza B2。推薦<b>「明太子椒鹽可頌 (Pretzel Croissant)」</b>，鹹香酥脆，口感獨特。</p>
+                                <a href="http://googleusercontent.com/maps.google.com/search?q=The+City+Bakery+Tenjin" target="_blank" class="btn-map">導航至天神店</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
         <!-- 熊本 上/下通 攻略 -->
         <div class="card">
             <div class="card-header">
@@ -3901,75 +4593,7 @@ header.is-night {
                 </p>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Day 4-6: 福岡美食 & 下午茶口袋名單</div>
-                <div class="tag tag-food">彈性推薦</div>
-            </div>
-
-            <div class="info-section" style="border-color: #F472B6; background-color: #FFF1F2;">
-                <h3 style="color: #DB2777; border-bottom-color: #F472B6;">🍰 下午茶 & 療癒甜點 (逛累專用)</h3>
-                
-                <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
-                    <span class="method-title" style="color: #BE185D;">Cafe del SOL (天神/西通)</span>
-                    <div class="method-detail">
-                        <p>福岡知名的<b>「蓬鬆系鬆餅 (Pancake)」</b>，口感像雲朵一樣軟綿，搭配新鮮水果與冰淇淋。店內氛圍溫馨，非常受女性與小孩歡迎。</p>
-                        <ul style="margin-top:5px; font-size:0.85rem; color:#666; padding-left:20px;">
-                            <li><b>推薦：</b>季節限定水果鬆餅、拿鐵拉花。</li>
-                        </ul>
-                        <a href="https://www.google.com/maps/search/Cafe+del+SOL+福岡" target="_blank" class="btn-map">導航至 Cafe del SOL</a>
-                    </div>
-                </div>
-
-                <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
-                    <span class="method-title" style="color: #BE185D;">Mutsukado むつか堂 (博多站)</span>
-                    <div class="method-detail">
-                        <p>知名吐司專賣店的咖啡廳，位於博多站 AMU PLAZA 5樓 (大鐘旁手扶梯上去)。必吃<b>「水果鮮奶油三明治」</b>，吐司極度柔軟，鮮奶油清爽不膩。</p>
-                        <p style="margin-top:5px; font-size:0.85rem; color:#666;">*位置極佳，適合等待回程列車或剛抵達時享用。</p>
-                        <a href="https://www.google.com/maps/search/むつか堂+アミュプラザ博多店" target="_blank" class="btn-map">導航至 AMU PLAZA 店</a>
-                    </div>
-                </div>
-
-                <div class="safari-method" style="border-color: #F472B6; margin-top: 10px;">
-                    <span class="method-title" style="color: #BE185D;">il FORNO del Mignon (博多站)</span>
-                    <div class="method-detail">
-                        <p>位於博多站中央改札口旁的<b>「迷你可頌」</b>排隊名店。雖然不是內用店，但經過一定會聞到香味！</p>
-                        <p style="margin-top:5px; font-size:0.85rem; color:#666;">*按重量計價，有原味、巧克力、地瓜口味。非常適合買回飯店當宵夜或車上點心。</p>
-                        <a href="https://www.google.com/maps/search/il+FORNO+del+Mignon+博多" target="_blank" class="btn-map">導航至博多站可頌</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-section" style="border-color: #FBBF24; background-color: #FFFBEB;">
-                <h3 style="color: #B45309; border-bottom-color: #FBBF24;">🍜 晚餐與在地名物 (親子友善)</h3>
-
-                <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
-                    <span class="method-title" style="color: #B45309;">博多華味鳥 (水炊雞肉鍋)</span>
-                    <div class="method-detail">
-                        <p>如果不習慣重口味的拉麵或內臟鍋，<b>「博多水炊鍋 (Mizutaki)」</b>是親子首選。雞湯濃郁充滿膠原蛋白，雞肉軟嫩，口味清爽健康，最後的雜炊粥更是精華。</p>
-                        <p style="margin-top:5px; font-size:0.85rem; color:#666;">*博多站與天神都有多家分店，晚餐建議預約。</p>
-                        <a href="https://www.google.com/maps/search/博多華味鳥+博多駅前" target="_blank" class="btn-map">搜尋附近分店</a>
-                    </div>
-                </div>
-
-                <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
-                    <span class="method-title" style="color: #B45309;">Shin-Shin 拉麵 (博多/天神)</span>
-                    <div class="method-detail">
-                        <p>福岡在地人氣超高的拉麵店。相比一蘭，它的麵條極細，豚骨湯頭雖濃郁但較無腥味，且帶有甜味，<b>小朋友通常接受度很高</b>。</p>
-                        <a href="https://www.google.com/maps/search/博多らーめん+Shin-Shin" target="_blank" class="btn-map">搜尋 Shin-Shin 拉麵</a>
-                    </div>
-                </div>
-
-                <div class="safari-method" style="border-color: #FBBF24; margin-top: 10px;">
-                    <span class="method-title" style="color: #B45309;">極味屋 (KIWAMIYA) 漢堡排</span>
-                    <div class="method-detail">
-                        <p>超人氣排隊店！特色是<b>「DIY 鐵板漢堡排」</b>，店員會送上表面微熟的漢堡排，自己用筷子切下放在小鐵石上煎熟。雖然排隊隊伍通常很長，但用餐體驗非常有趣。</p>
-                        <p style="margin-top:5px; font-size:0.85rem; color:#DC2626;">*注意：鐵板極燙且有油煙，若孩子太小需注意安全。</p>
-                        <a href="https://www.google.com/maps/search/極味屋+博多" target="_blank" class="btn-map">導航至極味屋</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
         <!-- 伴手禮攻略 -->
         <div class="card">
             <div class="card-header">
@@ -4218,8 +4842,27 @@ header.is-night {
         </div>
     </div>
 <div id="note-modal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 350px; text-align: left;">
-            <div class="modal-title" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px;">
+        <div class="modal-box" style="max-width: 350px; text-align: left; position: relative;">
+            
+            <div style="position: absolute; top: 5px; right: 5px; display: flex; align-items: center; gap: 4px; z-index: 20;">
+                
+                <button class="btn-modal-close-x" style="position: static;" onclick="document.getElementById('note-img-input').click()" title="插入照片">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </button>
+
+                <button class="btn-modal-close-x" style="position: static;" onclick="closeNoteModal()" title="關閉">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-title" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:10px; padding-right: 80px;">
                 <span style="display:flex; align-items:center; gap:6px;">
                     <svg class="icon-mini" style="color:#2563EB;" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                     隨身圖文筆記
@@ -4227,20 +4870,11 @@ header.is-night {
                 <span id="note-status" style="font-size:0.75rem; color:#10B981; font-weight:normal;"></span>
             </div>
             
-            <div class="note-toolbar">
-                <button class="btn-note-tool" onclick="document.getElementById('note-img-input').click()">
-                    <svg class="icon-mini" style="width:16px;height:16px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                    插入照片
-                </button>
-                <input type="file" id="note-img-input" accept="image/*" style="display:none;" onchange="insertNoteImage(event)">
-            </div>
+            <input type="file" id="note-img-input" accept="image/*" style="display:none;" onchange="insertNoteImage(event)">
 
             <div id="note-area" class="note-editable-box" contenteditable="true" placeholder="在這裡記下停車位號碼、照片..."></div>
             
-            <div class="modal-btns" style="margin-top:15px;">
-                <button class="modal-btn btn-confirm" onclick="closeNoteModal()">關閉 (自動儲存)</button>
             </div>
-        </div>
     </div>
     <div id="calc-modal" class="modal-overlay">
         <div class="modal-box" style="max-width: 340px; padding: 25px 20px 20px 20px; position: relative;">
