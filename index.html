@@ -3628,6 +3628,21 @@ header.is-night {
                         **結冰風險：** 早晨或深夜，橋樑和山區背光路段容易結冰，請減速慢行，與前車保持安全距離。
                     </p>
                 </div>
+                <div class="info-detail-box" style="margin-top: 15px; border-color: #EF4444; background-color: #FEF2F2;">
+        <h4 style="color: #DC2626;">⚠️ 雪地駕駛關鍵 (Fact Check)</h4>
+        <div class="method-detail">
+            <ul class="step-list" style="padding-left: 20px; margin-top: 5px; color: #7F1D1D;">
+                <li><b>嚴禁「急」操作：</b>雪地摩擦力低，嚴禁急踩油門、急煞車或急轉彎。請秉持「慢、柔、穩」原則。</li>
+                <li><b>善用引擎煞車：</b>下坡或減速時，請善用低速檔 (B檔/S檔/L檔) 利用引擎牽引力減速，避免單純依賴腳煞導致打滑。</li>
+                <li><b>小心「黑冰」：</b>看起來濕濕的柏油路面，可能其實是透明的「黑冰 (Black Ice)」，極其滑溜。橋樑、隧道出入口與陰影處最常見。</li>
+                <li><b>停車兩大重點：</b>
+                    <br>1. 戶外過夜<b>請勿拉手煞車</b> (以免凍結卡死)，P 檔即可。
+                    <br>2. <b>請立起雨刷</b>，避免橡膠凍結黏在玻璃上。
+                </li>
+                <li><b>除雪再上路：</b>出發前務必清除<b>車頂</b>積雪，以免煞車時雪塊滑落遮擋視線。</li>
+            </ul>
+        </div>
+    </div>
             </div>
         </div>
     </div>
@@ -8446,7 +8461,7 @@ async function fetchAndShowDetail(lat, lon, locName) {
             hourlyContainer.appendChild(item);
         }
 
-        // --- 4. 渲染未來 7 天預報 (絕對隔離版：縮小Bar寬度 + 硬性Gap) ---
+        // --- 4. 渲染未來 7 天預報 (紅線絕對防禦版：Gap 硬性隔離) ---
             const dailyContainer = document.getElementById('wd-daily-list');
             dailyContainer.innerHTML = '';
 
@@ -8470,7 +8485,6 @@ async function fetchAndShowDetail(lat, lon, locName) {
                 const leftPercent = ((min - globalMin) / globalRange) * 100;
                 const widthPercent = ((max - min) / globalRange) * 100;
 
-                // 小白點邏輯 (維持不變)
                 let dotHtml = '';
                 if (i === 0) {
                     const currentT = data.current_weather.temperature;
@@ -8495,14 +8509,15 @@ async function fetchAndShowDetail(lat, lon, locName) {
                 const row = document.createElement('div');
                 row.className = 'wd-daily-row';
                 
-                // [關鍵修改] 嚴格定義欄位寬度與間距
-                // 1. gap: 12px -> 這就是您的紅線緩衝區。數字與色條之間強制隔開 12px，絕對不會碰到。
-                // 2. 色條欄位: 80px -> 將色條寬度縮小 (原本 100px-130px)，確保它在視覺上更集中，遠離邊界。
+                // [最終解決方案]
+                // 1. gap: 15px; -> 這就是您的紅線。
+                //    這是 Grid 系統的強制間距，任何元素都無法進入這 15px 的範圍。
+                // 2. 色條欄位寬度: 80px; -> 將色條限制在中間較窄的區域。
                 row.style.cssText = `
                     display: grid;
                     grid-template-columns: 45px 85px 1fr 30px 80px 30px;
                     align-items: center;
-                    gap: 12px; 
+                    gap: 15px; 
                     padding: 8px 0;
                     border-bottom: 1px solid #f0f0f0;
                 `;
@@ -8521,17 +8536,26 @@ async function fetchAndShowDetail(lat, lon, locName) {
 
                     <div style="text-align:right; font-family:monospace; font-weight:600; color:#9CA3AF; font-size:0.95rem;">${min}°</div>
 
-                    <div style="height: 6px; background: #E5E7EB; border-radius: 10px; position: relative; width: 100%;">
+                    <div style="height: 6px; position: relative; width: 100%;">
                         <div style="
-                            position: absolute;
-                            top: 0; bottom: 0;
-                            left: ${leftPercent}%;
-                            width: ${widthPercent}%;
-                            min-width: 6px;
-                            border-radius: 10px;
-                            background: linear-gradient(90deg, #22D3EE, #34D399, #FBBF24, #FB923C, #F87171);
-                            opacity: 0.9;
-                        "></div>
+                            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                            background: #E5E7EB; 
+                            border-radius: 10px; 
+                            overflow: hidden; /* ★關鍵：這裡負責切掉跑出去的色條 */
+                        ">
+                            <div style="
+                                position: absolute;
+                                top: 0;
+                                bottom: 0;
+                                left: ${leftPercent}%;
+                                width: ${widthPercent}%;
+                                min-width: 6px;
+                                border-radius: 10px;
+                                background: linear-gradient(90deg, #22D3EE, #34D399, #FBBF24, #FB923C, #F87171);
+                                opacity: 0.9;
+                            "></div>
+                        </div>
+                        
                         ${dotHtml}
                     </div>
 
